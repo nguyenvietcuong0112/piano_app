@@ -1,0 +1,33 @@
+{
+  "urlRoot": "",
+  "data": [
+    {
+      "categoryID": 1,
+      "categoryName": "Popular Song",
+      "content": [
+        {
+          "id": 101,
+          "song": "Kiss the Rain",
+          "artist": "Yiruma",
+          "duration": "02:45",
+          "thumb": "https://img.youtube.com/vi/7maJOI3QMu0/0.jpg",
+          "lessonsData": "kiss_the_rain.json",
+          "level": 3,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 102,
+          "song": "Nếu Mai Sau Này Nhớ Đến Nhau",
+          "artist": "Vẫn Luôn Là Anh",
+          "duration": "04:43",
+          "thumb": "",
+          "lessonsData": "neu_mai_sau_nay.json",
+          "level": 2,
+          "score": 100,
+          "status": 1
+        }
+      ]
+    }
+  ]
+}

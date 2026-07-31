@@ -1,0 +1,51 @@
+{
+  "urlRoot": "",
+  "data": [
+    {
+      "categoryID": 1,
+      "categoryName": "Anime & Manga",
+      "content": [
+        {
+          "id": 1,
+          "name": "Jujutsu Kaisen",
+          "urlThumb": "theme_jujutsu_kaisen",
+          "urlTheme": "theme_jujutsu_kaisen",
+          "status": 1
+        },
+        {
+          "id": 2,
+          "name": "One Piece",
+          "urlThumb": "theme_one_piece",
+          "urlTheme": "theme_one_piece",
+          "status": 1
+        }
+      ]
+    },
+    {
+      "categoryID": 2,
+      "categoryName": "Nature",
+      "content": [
+        {
+          "id": 3,
+          "name": "Cloud & Sky",
+          "urlThumb": "theme_cloud_sky",
+          "urlTheme": "theme_cloud_sky",
+          "status": 1
+        }
+      ]
+    },
+    {
+      "categoryID": 3,
+      "categoryName": "Universe",
+      "content": [
+        {
+          "id": 4,
+          "name": "Star",
+          "urlThumb": "theme_star",
+          "urlTheme": "theme_star",
+          "status": 1
+        }
+      ]
+    }
+  ]
+}
