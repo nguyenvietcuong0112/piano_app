@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
-import 'easy_loading_splash.dart';
 
 class EasyInterstitialAdSplashWith2Id extends StatefulWidget {
   final AdNetwork adNetwork;

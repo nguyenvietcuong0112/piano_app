@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:easy_ads_flutter/src/easy_admob/easy_admob_native_ad.dart';
 import 'services/easy_adjust_service.dart';
+import 'services/easy_gsm_service.dart';
 import 'utils/easy_app_open_ad.dart';
 import 'utils/easy_interstitial_ad_splash_with_3_id.dart';
 import 'utils/easy_splash_ad_with_interstitial_and_app_open.dart';
@@ -157,6 +158,20 @@ class EasyAds {
   Future<void> initFirebaseAnalytics(FirebaseAnalytics analytics) async {
     EasyFirebaseService().init(analytics);
   }
+
+  Future<String?> loginGSM({
+    required String gsmAppId,
+    required bool isProd,
+    String? deviceId,
+  }) async {
+    return await EasyGsmService().loginGSM(
+      gsmAppId: gsmAppId,
+      isProd: isProd,
+      deviceId: deviceId,
+    );
+  }
+
+  String? get gsmAccessToken => EasyGsmService().gsmAccessToken;
 
   String resolveAdUnitId(String adId) {
     if (adId.startsWith('ca-app-pub-')) return adId;
