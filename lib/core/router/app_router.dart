@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:project_flutter/features/home/ui/home_tab.dart';
-import 'package:project_flutter/features/lesson/domain/lesson_model.dart';
-import 'package:project_flutter/features/lesson/ui/all_lessons_screen.dart';
-import 'package:project_flutter/features/lesson/ui/lesson_play_screen.dart';
-import 'package:project_flutter/features/piano/ui/piano_tab.dart';
-import 'package:project_flutter/features/piano/ui/play_piano_screen.dart';
-import 'package:project_flutter/features/themes/ui/theme_tab.dart';
+import '../../features/home/ui/home_tab.dart';
+import '../../features/lesson/domain/lesson_model.dart';
+import '../../features/lesson/ui/all_lessons_screen.dart';
+import '../../features/lesson/ui/lesson_play_screen.dart';
+import '../../features/piano/ui/piano_tab.dart';
+import '../../features/piano/ui/play_piano_screen.dart';
+import '../../features/themes/ui/theme_tab.dart';
 
 import '../../features/main/main_screen.dart';
 

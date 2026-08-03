@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:injectable/injectable.dart';
 import '../domain/lesson_model.dart';
 
+@lazySingleton
 class LessonDataSource {
   Future<LessonsResponse?> getAllLessons() async {
     try {

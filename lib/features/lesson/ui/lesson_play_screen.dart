@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:project_flutter/core/services/audio_engine.dart';
-import 'package:project_flutter/core/theme/theme_service.dart';
-import 'package:project_flutter/core/widgets/record_button.dart';
-import 'package:project_flutter/features/piano/ui/piano_view.dart';
+import '../../../core/services/audio_engine.dart';
+import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/record_button.dart';
+import '../../piano/ui/piano_view.dart';
 import '../data/lesson_datasource.dart';
 import '../domain/lesson_model.dart';
 import '../controller/lesson_play_controller.dart';

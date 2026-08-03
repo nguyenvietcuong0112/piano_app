@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:injectable/injectable.dart';
 import '../domain/theme_model.dart';
 
+@lazySingleton
 class ThemeDataSource {
   Future<ThemeResponse?> getThemes() async {
     try {

@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:project_flutter/core/services/audio_engine.dart';
-import 'package:project_flutter/core/theme/theme_service.dart';
-import 'package:project_flutter/core/widgets/mini_piano_overview.dart';
-import 'package:project_flutter/core/widgets/record_button.dart';
-import 'package:project_flutter/features/lesson/domain/lesson_model.dart';
+import '../../../core/services/audio_engine.dart';
+import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/mini_piano_overview.dart';
+import '../../../core/widgets/record_button.dart';
+import '../../lesson/domain/lesson_model.dart';
 import '../state/piano_provider.dart';
 import '../controller/piano_play_controller.dart';
 import 'piano_view.dart';

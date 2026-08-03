@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:project_flutter/core/services/audio_engine.dart';
+import '../../../core/services/audio_engine.dart';
 
 class PianoPlayState {
   final int currentOctave;
