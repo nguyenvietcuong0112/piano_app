@@ -3,27 +3,71 @@
   "data": [
     {
       "categoryID": 1,
-      "categoryName": "Popular Song",
+      "categoryName": "Popular Piano Songs",
       "content": [
         {
           "id": 101,
           "song": "Kiss the Rain",
           "artist": "Yiruma",
           "duration": "02:45",
-          "thumb": "https://img.youtube.com/vi/7maJOI3QMu0/0.jpg",
+          "thumb": "",
           "lessonsData": "kiss_the_rain.json",
           "level": 3,
           "score": 100,
           "status": 1
         },
         {
-          "id": 102,
-          "song": "Nếu Mai Sau Này Nhớ Đến Nhau",
-          "artist": "Vẫn Luôn Là Anh",
-          "duration": "04:43",
+          "id": 103,
+          "song": "Für Elise",
+          "artist": "Ludwig van Beethoven",
+          "duration": "02:50",
           "thumb": "",
-          "lessonsData": "neu_mai_sau_nay.json",
+          "lessonsData": "fur_elise.json",
           "level": 2,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 104,
+          "song": "River Flows in You",
+          "artist": "Yiruma",
+          "duration": "03:08",
+          "thumb": "",
+          "lessonsData": "river_flows_in_you.json",
+          "level": 3,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 105,
+          "song": "Canon in D",
+          "artist": "Johann Pachelbel",
+          "duration": "04:15",
+          "thumb": "",
+          "lessonsData": "canon_in_d.json",
+          "level": 2,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 106,
+          "song": "Moonlight Sonata",
+          "artist": "Ludwig van Beethoven",
+          "duration": "05:15",
+          "thumb": "",
+          "lessonsData": "moonlight_sonata.json",
+          "level": 4,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 107,
+          "song": "Happy Birthday",
+          "artist": "Traditional",
+          "duration": "01:00",
+          "thumb": "",
+          "lessonsData": "happy_birthday.json",
+          "level": 1,
           "score": 100,
           "status": 1
         }

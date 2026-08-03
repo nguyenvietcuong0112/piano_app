@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
-import '../models/lesson.dart';
-import 'lesson_play_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'lesson_model.dart';
+import 'lesson_provider.dart';
 
-class AllLessonsScreen extends StatelessWidget {
+class AllLessonsScreen extends ConsumerWidget {
   final List<LessonsCategory> categories;
 
-  const AllLessonsScreen({super.key, required this.categories});
+  const AllLessonsScreen({super.key, this.categories = const []});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lessonsAsync = ref.watch(lessonsProvider);
+    final displayCategories = categories.isNotEmpty
+        ? categories
+        : (lessonsAsync.asData?.value?.categories ?? []);
+
     return Scaffold(
       backgroundColor: const Color(0xFF121218),
       appBar: AppBar(
@@ -24,59 +31,41 @@ class AllLessonsScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
       ),
-      body: categories.isEmpty
+      body: displayCategories.isEmpty
           ? const Center(
               child: Text(
-                "No lessons available",
-                style: TextStyle(color: Colors.white70),
+                "No lessons found",
+                style: TextStyle(color: Colors.white54),
               ),
             )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: categories.length,
+              itemCount: displayCategories.length,
               itemBuilder: (context, catIndex) {
-                final category = categories[catIndex];
-                final songs = category.items;
-
+                final category = displayCategories[catIndex];
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Category Header
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 4,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            category.categoryName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        category.categoryName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-
-                    // Song Tiles for this Category
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: songs.length,
-                      itemBuilder: (context, songIndex) {
-                        final song = songs[songIndex];
+                      itemCount: category.items.length,
+                      itemBuilder: (context, itemIndex) {
+                        final song = category.items[itemIndex];
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           decoration: BoxDecoration(
@@ -88,7 +77,8 @@ class AllLessonsScreen extends StatelessWidget {
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 4),
                             leading: CircleAvatar(
-                              backgroundColor: Colors.amber.withOpacity(0.15),
+                              backgroundColor:
+                                  Colors.amber.withValues(alpha: 0.15),
                               child: Image.asset(
                                 'assets/icons/ic_note.png',
                                 width: 24,
@@ -128,20 +118,11 @@ class AllLessonsScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LessonPlayScreen(lesson: song),
-                                ),
-                              );
-                            },
+                            onTap: () => context.push('/lesson-play', extra: song),
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 16),
                   ],
                 );
               },

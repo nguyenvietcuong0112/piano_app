@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import '../models/lesson.dart';
-import '../models/theme.dart';
+import 'lesson_model.dart';
 
-class LocalDataProvider {
-  static Future<LessonsResponse?> getAllLessons() async {
+class LessonDataSource {
+  Future<LessonsResponse?> getAllLessons() async {
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/lessons.json');
@@ -17,19 +16,7 @@ class LocalDataProvider {
     }
   }
 
-  static Future<ThemeResponse?> getThemes() async {
-    try {
-      final jsonString = await rootBundle.loadString('assets/json/themes.json');
-      final Map<String, dynamic> jsonMap = json.decode(jsonString);
-      return ThemeResponse.fromJson(jsonMap);
-    } catch (e) {
-      debugPrint("Error loading themes.json: $e");
-      return null;
-    }
-  }
-
-  static Future<List<LessonNote>> getLessonNotes(String fileName) async {
-    // 1. Try assets/json/lesson/
+  Future<List<LessonNote>> getLessonNotes(String fileName) async {
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/lesson/$fileName');
@@ -42,7 +29,6 @@ class LocalDataProvider {
       debugPrint("Error loading lesson assets/json/lesson/$fileName: $e");
     }
 
-    // 2. Try root assets/json/
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/$fileName');
@@ -53,7 +39,6 @@ class LocalDataProvider {
       }
     } catch (_) {}
 
-    // 3. Fallback kiss_the_rain.json
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/lesson/kiss_the_rain.json');

@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'tabs/home_tab.dart';
-import 'tabs/theme_tab.dart';
-import 'tabs/piano_tab.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainScreen extends ConsumerWidget {
+  final StatefulNavigationShell navigationShell;
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
+  const MainScreen({
+    super.key,
+    required this.navigationShell,
+  });
 
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-
-  final List<Widget> _tabs = const [
-    HomeTab(),
-    ThemeTab(),
-    PianoTab(),
-  ];
-
-  final List<String> _titles = const [
+  static const List<String> _titles = [
     "The Piano",
     "Themes",
     "Piano",
   ];
 
+  void _onTap(int index) {
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = navigationShell.currentIndex;
+
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         title: Text(
-          _titles[_currentIndex],
+          _titles[currentIndex],
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -41,17 +41,10 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: const Color(0xFF1E0248),
         elevation: 0,
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _tabs,
-      ),
+      body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        currentIndex: currentIndex,
+        onTap: _onTap,
         backgroundColor: const Color(0xFF1F0248),
         selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.white60,

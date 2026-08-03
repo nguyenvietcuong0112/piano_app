@@ -1,31 +1,39 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/lesson.dart';
-import '../services/local_data_provider.dart';
-import '../services/theme_service.dart';
-import '../widgets/piano_view.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class LessonPlayScreen extends StatefulWidget {
+import 'package:project_flutter/core/audio_engine.dart';
+import 'package:project_flutter/core/theme_service.dart';
+import 'package:project_flutter/features/piano/piano_view.dart';
+import 'package:project_flutter/features/piano/record_button.dart';
+import 'lesson_datasource.dart';
+import 'lesson_model.dart';
+
+class LessonPlayScreen extends ConsumerStatefulWidget {
   final LessonsItem lesson;
 
   const LessonPlayScreen({super.key, required this.lesson});
 
   @override
-  State<LessonPlayScreen> createState() => _LessonPlayScreenState();
+  ConsumerState<LessonPlayScreen> createState() => _LessonPlayScreenState();
 }
 
-class _LessonPlayScreenState extends State<LessonPlayScreen> {
+class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   final GlobalKey<PianoViewState> _pianoKey = GlobalKey<PianoViewState>();
   List<LessonNote> _noteList = [];
   int _currentNoteIndex = 0;
   int _score = 0;
   bool _isPlaying = false;
+  bool _isRecording = false;
+  double _noteSpeedMultiplier = 1.0;
   Timer? _noteTimer;
 
   @override
   void initState() {
     super.initState();
+    AudioEngine().loadInstrument("bright");
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -34,8 +42,8 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
   }
 
   Future<void> _loadLessonNotes() async {
-    final notes =
-        await LocalDataProvider.getLessonNotes(widget.lesson.lessonsData);
+    final ds = LessonDataSource();
+    final notes = await ds.getLessonNotes(widget.lesson.lessonsData);
     setState(() {
       _noteList = notes;
     });
@@ -66,7 +74,8 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
     });
 
     if (_currentNoteIndex < _noteList.length) {
-      int delayMs = (targetNote.breakTime * 1.35).round().clamp(350, 2500);
+      int delayMs =
+          (targetNote.breakTime * 1.35 / _noteSpeedMultiplier).round().clamp(180, 3000);
       _noteTimer = Timer(Duration(milliseconds: delayMs), _scheduleNextNote);
     } else {
       _finishLesson();
@@ -175,6 +184,7 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
 
   @override
   void dispose() {
+    AudioEngine().stopAllNotes();
     _noteTimer?.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -197,13 +207,12 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Reactive Selected Theme Background Wallpaper
             ValueListenableBuilder<String>(
               valueListenable: ThemeService.currentThemeRes,
               builder: (context, themeRes, child) {
                 return Positioned.fill(
                   child: Opacity(
-                    opacity: 0.35,
+                    opacity: 0.95,
                     child: Image.asset(
                       'assets/images/$themeRes.jpg',
                       fit: BoxFit.cover,
@@ -221,16 +230,14 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
 
             Column(
               children: [
-                // Single Merged Sleek Top Header Bar
                 Container(
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   color: Colors.black87,
                   child: Row(
                     children: [
-                      // Back Icon
                       GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => context.pop(),
                         child: Image.asset(
                           'assets/icons/ic_back.png',
                           width: 36,
@@ -240,7 +247,6 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                       ),
                       const SizedBox(width: 8),
 
-                      // Song Title Badge
                       Container(
                         width: 140,
                         height: 32,
@@ -278,14 +284,12 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                       ),
                       const SizedBox(width: 10),
 
-                      // Elapsed Time
                       Text(
                         elapsedStr,
                         style: const TextStyle(
                             color: Colors.white70, fontSize: 11),
                       ),
 
-                      // Integrated Progress Slider
                       Expanded(
                         child: SliderTheme(
                           data: SliderTheme.of(context).copyWith(
@@ -302,7 +306,6 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                         ),
                       ),
 
-                      // Total Song Duration
                       Text(
                         widget.lesson.duration,
                         style: const TextStyle(
@@ -310,40 +313,66 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                       ),
                       const SizedBox(width: 8),
 
-                      // Record Button
-                      GestureDetector(
+                      RecordButton(
+                        isRecording: _isRecording,
                         onTap: () {
+                          setState(() {
+                            _isRecording = !_isRecording;
+                          });
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Audio Recording Started")),
+                            SnackBar(
+                              content: Text(_isRecording
+                                  ? "🔴 Recording Started"
+                                  : "Saved Recording"),
+                            ),
                           );
                         },
-                        child: Image.asset(
-                          'assets/icons/ic_bg_record.png',
-                          width: 70,
-                          height: 32,
-                          fit: BoxFit.fill,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            width: 70,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(16),
+                      ),
+                      const SizedBox(width: 6),
+
+                      Container(
+                        height: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF252533),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<double>(
+                            value: _noteSpeedMultiplier,
+                            dropdownColor: const Color(0xFF1E1E2C),
+                            icon: const Icon(Icons.speed,
+                                color: Colors.amber, size: 16),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
                             ),
-                            child: const Center(
-                              child: Text("REC",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11)),
-                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 0.5, child: Text("0.5x Slow")),
+                              DropdownMenuItem(
+                                  value: 0.75, child: Text("0.75x Practice")),
+                              DropdownMenuItem(
+                                  value: 1.0, child: Text("1.0x Normal")),
+                              DropdownMenuItem(
+                                  value: 1.5, child: Text("1.5x Fast")),
+                              DropdownMenuItem(
+                                  value: 2.0, child: Text("2.0x Turbo")),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() {
+                                  _noteSpeedMultiplier = val;
+                                });
+                              }
+                            },
                           ),
                         ),
                       ),
                       const SizedBox(width: 6),
 
-                      // Play/Pause Icon Button
                       IconButton(
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -360,7 +389,6 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                   ),
                 ),
 
-                // Main Piano Canvas Area
                 Expanded(
                   child: PianoView(
                     key: _pianoKey,
@@ -368,6 +396,7 @@ class _LessonPlayScreenState extends State<LessonPlayScreen> {
                     visibleWhiteKeysCount: 14,
                     showNoteNames: true,
                     isLessonMode: true,
+                    noteSpeed: 7.5 * _noteSpeedMultiplier,
                     onNotePressed: (keyName, label) {
                       setState(() {
                         _score += 10;

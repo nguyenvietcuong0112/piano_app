@@ -1,8 +1,8 @@
 class LessonNote {
-  final int type; // 0: white, 1: black
-  final int group; // octave (e.g. 4)
-  final int position; // position within octave (0..6)
-  final int breakTime; // delay ms before next note
+  final int type;
+  final int group;
+  final int position;
+  final int breakTime;
 
   LessonNote({
     this.type = 0,
@@ -49,8 +49,6 @@ class LessonsItem {
   final String duration;
   final String lessonsData;
   final String thumbnail;
-  final int level;
-  final int score;
 
   LessonsItem({
     required this.id,
@@ -59,20 +57,16 @@ class LessonsItem {
     required this.duration,
     required this.lessonsData,
     required this.thumbnail,
-    this.level = 1,
-    this.score = 100,
   });
 
   factory LessonsItem.fromJson(Map<String, dynamic> json) {
     return LessonsItem(
       id: json['id'] ?? 0,
-      titleName: json['song'] ?? json['titleName'] ?? '',
-      authorName: json['artist'] ?? json['authorName'] ?? '',
-      duration: json['duration'] ?? '02:30',
-      lessonsData: json['lessonsData'] ?? '',
-      thumbnail: json['thumb'] ?? json['thumbnail'] ?? '',
-      level: json['level'] ?? 1,
-      score: json['score'] ?? 100,
+      titleName: json['song'] ?? json['name'] ?? json['titleName'] ?? json['title'] ?? '',
+      authorName: json['artist'] ?? json['author'] ?? json['authorName'] ?? 'Unknown',
+      duration: json['duration'] ?? json['time'] ?? '03:00',
+      lessonsData: json['lessonsData'] ?? json['urlData'] ?? '',
+      thumbnail: json['thumb'] ?? json['urlThumb'] ?? json['thumbnail'] ?? '',
     );
   }
 }
@@ -114,21 +108,6 @@ class LessonsResponse {
               ?.map((e) => LessonsCategory.fromJson(e as Map<String, dynamic>))
               .toList() ??
           (json['categories'] as List<dynamic>?)
-              ?.map((e) => LessonsCategory.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-    );
-  }
-}
-
-class PopularResponse {
-  final List<LessonsCategory> categories;
-
-  PopularResponse({required this.categories});
-
-  factory PopularResponse.fromJson(Map<String, dynamic> json) {
-    return PopularResponse(
-      categories: (json['data'] as List<dynamic>?)
               ?.map((e) => LessonsCategory.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

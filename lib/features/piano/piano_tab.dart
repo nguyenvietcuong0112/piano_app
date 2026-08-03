@@ -1,31 +1,22 @@
 import 'package:flutter/material.dart';
-import '../../audio/audio_engine.dart';
-import '../play_piano_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:project_flutter/core/audio_engine.dart';
 
-class PianoTab extends StatefulWidget {
+import 'piano_provider.dart';
+
+class PianoTab extends ConsumerWidget {
   const PianoTab({super.key});
 
-  @override
-  State<PianoTab> createState() => _PianoTabState();
-}
-
-class _PianoTabState extends State<PianoTab> {
   void _openPianoWithInstrument(
-      BuildContext context, String instrumentFolder) async {
-    await AudioEngine().loadInstrument(instrumentFolder);
-    setState(() {});
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PlayPianoScreen()),
-      );
-    }
+      BuildContext context, WidgetRef ref, String instrumentFolder) {
+    ref.read(pianoSettingsProvider.notifier).setSoundPreset(instrumentFolder);
+    AudioEngine().loadInstrument(instrumentFolder);
+    context.push('/play');
   }
 
   @override
-  Widget build(BuildContext context) {
-    final String currentFolder = AudioEngine().currentInstrument;
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final List<Map<String, String>> instruments = [
       {
         "name": "Acoustic Piano",
@@ -66,20 +57,17 @@ class _PianoTabState extends State<PianoTab> {
         itemCount: instruments.length,
         itemBuilder: (context, index) {
           final inst = instruments[index];
-          final isSelected = inst["folder"] == currentFolder;
 
           return GestureDetector(
-            onTap: () => _openPianoWithInstrument(context, inst["folder"]!),
+            onTap: () =>
+                _openPianoWithInstrument(context, ref, inst["folder"]!),
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E2C),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isSelected ? Colors.greenAccent : Colors.white10,
-                  width: isSelected ? 2 : 1,
-                ),
+                border: Border.all(color: Colors.white10),
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.black38,
@@ -94,7 +82,7 @@ class _PianoTabState extends State<PianoTab> {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.2),
+                      color: Colors.amber.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -130,20 +118,26 @@ class _PianoTabState extends State<PianoTab> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                        horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.greenAccent
-                          : const Color(0xFF6B21A8),
+                      color: const Color(0xFF6B21A8),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      isSelected ? "SELECTED" : "SELECT",
-                      style: TextStyle(
-                        color: isSelected ? Colors.black : Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.play_arrow_rounded,
+                            color: Colors.white, size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          "PLAY",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

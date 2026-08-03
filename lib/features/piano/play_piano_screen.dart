@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
-import '../audio/audio_engine.dart';
-import '../widgets/piano_view.dart';
-import '../widgets/mini_piano_overview.dart';
-import '../services/theme_service.dart';
-import 'lesson_play_screen.dart';
-import '../models/lesson.dart';
 
-class PlayPianoScreen extends StatefulWidget {
+import 'package:go_router/go_router.dart';
+
+import 'package:project_flutter/core/audio_engine.dart';
+import 'package:project_flutter/core/theme_service.dart';
+import 'package:project_flutter/features/lessons/lesson_model.dart';
+import 'piano_provider.dart';
+import 'piano_view.dart';
+import 'mini_piano_overview.dart';
+import 'record_button.dart';
+
+class PlayPianoScreen extends ConsumerStatefulWidget {
   const PlayPianoScreen({super.key});
 
   @override
-  State<PlayPianoScreen> createState() => _PlayPianoScreenState();
+  ConsumerState<PlayPianoScreen> createState() => _PlayPianoScreenState();
 }
 
-class _PlayPianoScreenState extends State<PlayPianoScreen> {
+class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
   int currentOctave = 3;
   int visibleWhiteKeysCount = 14;
   bool showNoteNames = true;
@@ -28,6 +33,8 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
   @override
   void initState() {
     super.initState();
+    final preset = ref.read(pianoSettingsProvider).soundPreset;
+    AudioEngine().loadInstrument(preset);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -36,6 +43,7 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
 
   @override
   void dispose() {
+    AudioEngine().stopAllNotes();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -94,6 +102,7 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
 
   void _volumeUp() async {
     await AudioEngine().volumeUp();
+    ref.read(pianoSettingsProvider.notifier).setVolume(AudioEngine().volume);
     int percent = (AudioEngine().volume * 100).round();
     setState(() {
       statusMessage = "🔊 Volume: $percent%";
@@ -102,6 +111,7 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
 
   void _volumeDown() async {
     await AudioEngine().volumeDown();
+    ref.read(pianoSettingsProvider.notifier).setVolume(AudioEngine().volume);
     int percent = (AudioEngine().volume * 100).round();
     setState(() {
       statusMessage = "🔉 Volume: $percent%";
@@ -115,13 +125,12 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Dynamic Reactive Theme Background Wallpaper
             ValueListenableBuilder<String>(
               valueListenable: ThemeService.currentThemeRes,
               builder: (context, themeRes, child) {
                 return Positioned.fill(
                   child: Opacity(
-                    opacity: 0.35,
+                    opacity: 0.95,
                     child: Image.asset(
                       'assets/images/$themeRes.jpg',
                       fit: BoxFit.cover,
@@ -139,16 +148,16 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
 
             Column(
               children: [
-                // Sleek Top Bar
                 Container(
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   color: const Color(0xFF14141A),
-                  child: Row(
-                    children: [
-                      // Home Button
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
                       GestureDetector(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => context.pop(),
                         child: Image.asset(
                           'assets/icons/ic_home.png',
                           width: 34,
@@ -160,7 +169,6 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Settings Button
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -181,7 +189,6 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Volume Decrease Button
                       GestureDetector(
                         onTap: _volumeDown,
                         child: Image.asset(
@@ -196,7 +203,6 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Volume Increase Button
                       GestureDetector(
                         onTap: _volumeUp,
                         child: Image.asset(
@@ -211,22 +217,17 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Game Pill Button
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LessonPlayScreen(
-                                lesson: LessonsItem(
-                                  id: 101,
-                                  titleName: "Kiss the Rain",
-                                  authorName: "Yiruma",
-                                  duration: "02:45",
-                                  lessonsData: "kiss_the_rain.json",
-                                  thumbnail: "",
-                                ),
-                              ),
+                          context.push(
+                            '/lesson-play',
+                            extra: LessonsItem(
+                              id: 101,
+                              titleName: "Kiss the Rain",
+                              authorName: "Yiruma",
+                              duration: "02:45",
+                              lessonsData: "kiss_the_rain.json",
+                              thumbnail: "",
                             ),
                           );
                         },
@@ -257,7 +258,6 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Key Minus Zoom Button
                       GestureDetector(
                         onTap: _zoomOut,
                         child: Image.asset(
@@ -284,20 +284,22 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                         ),
                       ),
 
-                      // Mini Piano Overview Bar in Middle
-                      Expanded(
-                        child: MiniPianoOverview(
-                          currentStartOctave: currentOctave,
-                          visibleWhiteKeysCount: visibleWhiteKeysCount,
-                          onScrollOctave: (octave) {
-                            setState(() {
-                              currentOctave = octave;
-                            });
-                          },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: SizedBox(
+                          width: 140,
+                          child: MiniPianoOverview(
+                            currentStartOctave: currentOctave,
+                            visibleWhiteKeysCount: visibleWhiteKeysCount,
+                            onScrollOctave: (octave) {
+                              setState(() {
+                                currentOctave = octave;
+                              });
+                            },
+                          ),
                         ),
                       ),
 
-                      // Key Plus Zoom Button
                       GestureDetector(
                         onTap: _zoomIn,
                         child: Image.asset(
@@ -325,7 +327,6 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Record List Button
                       GestureDetector(
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -344,62 +345,15 @@ class _PlayPianoScreenState extends State<PlayPianoScreen> {
                       ),
                       const SizedBox(width: 4),
 
-                      // Record Mic Button
-                      GestureDetector(
+                      RecordButton(
+                        isRecording: isRecording,
                         onTap: _toggleRecording,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/ic_bg_record.png',
-                              width: 76,
-                              height: 30,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Container(
-                                width: 76,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/ic_record.png',
-                                  width: 14,
-                                  height: 14,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (context, err, stack) => Icon(
-                                    isRecording
-                                        ? Icons.stop
-                                        : Icons.fiber_manual_record,
-                                    color: Colors.red,
-                                    size: 14,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  isRecording ? "Stop" : "REC",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
                 ),
+              ),
 
-                // Piano Keyboard View
                 Expanded(
                   child: PianoView(
                     startOctave: currentOctave,
