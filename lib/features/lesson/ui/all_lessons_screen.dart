@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'lesson_model.dart';
-import 'lesson_provider.dart';
+import '../domain/lesson_model.dart';
+import '../state/lesson_provider.dart';
 
 class AllLessonsScreen extends ConsumerWidget {
   final List<LessonsCategory> categories;

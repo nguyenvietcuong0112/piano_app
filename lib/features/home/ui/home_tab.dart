@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'lesson_model.dart';
-import 'lesson_provider.dart';
+import 'package:project_flutter/features/lesson/domain/lesson_model.dart';
+import 'package:project_flutter/features/lesson/state/lesson_provider.dart';
 
 class HomeTab extends ConsumerWidget {
   const HomeTab({super.key});

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'lesson_model.dart';
+import '../domain/lesson_model.dart';
 
 class LessonDataSource {
   Future<LessonsResponse?> getAllLessons() async {

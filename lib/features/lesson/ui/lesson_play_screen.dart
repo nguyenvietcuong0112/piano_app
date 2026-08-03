@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:project_flutter/core/audio_engine.dart';
-import 'package:project_flutter/core/theme_service.dart';
-import 'package:project_flutter/features/piano/piano_view.dart';
-import 'package:project_flutter/features/piano/record_button.dart';
-import 'lesson_datasource.dart';
-import 'lesson_model.dart';
+import 'package:project_flutter/core/services/audio_engine.dart';
+import 'package:project_flutter/core/theme/theme_service.dart';
+import 'package:project_flutter/core/widgets/record_button.dart';
+import 'package:project_flutter/features/piano/ui/piano_view.dart';
+import '../data/lesson_datasource.dart';
+import '../domain/lesson_model.dart';
+import '../controller/lesson_play_controller.dart';
 
 class LessonPlayScreen extends ConsumerStatefulWidget {
   final LessonsItem lesson;
@@ -23,11 +24,6 @@ class LessonPlayScreen extends ConsumerStatefulWidget {
 class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   final GlobalKey<PianoViewState> _pianoKey = GlobalKey<PianoViewState>();
   List<LessonNote> _noteList = [];
-  int _currentNoteIndex = 0;
-  int _score = 0;
-  bool _isPlaying = false;
-  bool _isRecording = false;
-  double _noteSpeedMultiplier = 1.0;
   Timer? _noteTimer;
 
   @override
@@ -51,16 +47,22 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   void _startFallingNotesSequence() {
     _noteTimer?.cancel();
-    if (_currentNoteIndex >= _noteList.length) {
-      _currentNoteIndex = 0;
+    final controller = ref.read(lessonPlayControllerProvider.notifier);
+    final state = ref.read(lessonPlayControllerProvider);
+
+    if (state.currentNoteIndex >= _noteList.length) {
+      controller.resetNoteIndex();
     }
     _scheduleNextNote();
   }
 
   void _scheduleNextNote() {
-    if (!_isPlaying || _currentNoteIndex >= _noteList.length) return;
+    final controller = ref.read(lessonPlayControllerProvider.notifier);
+    final state = ref.read(lessonPlayControllerProvider);
 
-    final targetNote = _noteList[_currentNoteIndex];
+    if (!state.isPlaying || state.currentNoteIndex >= _noteList.length) return;
+
+    final targetNote = _noteList[state.currentNoteIndex];
     final keyPrefix = targetNote.type == 0 ? "w" : "b";
     final targetKeyName =
         "$keyPrefix${targetNote.group}${targetNote.position}";
@@ -69,13 +71,12 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     _pianoKey.currentState
         ?.addFallingNote(targetKeyName, label, targetNote.type == 1);
 
-    setState(() {
-      _currentNoteIndex++;
-    });
+    controller.incrementNoteIndex();
+    final updatedIndex = ref.read(lessonPlayControllerProvider).currentNoteIndex;
 
-    if (_currentNoteIndex < _noteList.length) {
+    if (updatedIndex < _noteList.length) {
       int delayMs =
-          (targetNote.breakTime * 1.35 / _noteSpeedMultiplier).round().clamp(180, 3000);
+          (targetNote.breakTime * 1.35 / state.noteSpeedMultiplier).round().clamp(180, 3000);
       _noteTimer = Timer(Duration(milliseconds: delayMs), _scheduleNextNote);
     } else {
       _finishLesson();
@@ -83,10 +84,11 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   }
 
   void _togglePlayback() {
-    setState(() {
-      _isPlaying = !_isPlaying;
-    });
-    if (_isPlaying) {
+    final controller = ref.read(lessonPlayControllerProvider.notifier);
+    controller.togglePlayback();
+    final isPlaying = ref.read(lessonPlayControllerProvider).isPlaying;
+
+    if (isPlaying) {
       _startFallingNotesSequence();
     } else {
       _noteTimer?.cancel();
@@ -95,6 +97,8 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   void _finishLesson() {
     _noteTimer?.cancel();
+    final score = ref.read(lessonPlayControllerProvider).score;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -145,7 +149,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              "$_score Pts",
+              "$score Pts",
               style: const TextStyle(
                 color: Colors.greenAccent,
                 fontSize: 32,
@@ -166,7 +170,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
               ),
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
@@ -196,9 +200,12 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lessonState = ref.watch(lessonPlayControllerProvider);
+    final controller = ref.read(lessonPlayControllerProvider.notifier);
+
     int totalNotes = _noteList.length;
-    double progress = totalNotes > 0 ? (_currentNoteIndex / totalNotes) : 0.0;
-    int elapsedSec = (_currentNoteIndex * 0.5).toInt();
+    double progress = totalNotes > 0 ? (lessonState.currentNoteIndex / totalNotes) : 0.0;
+    int elapsedSec = (lessonState.currentNoteIndex * 0.5).toInt();
     String elapsedStr =
         "${(elapsedSec ~/ 60).toString().padLeft(2, '0')}:${(elapsedSec % 60).toString().padLeft(2, '0')}";
 
@@ -234,8 +241,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   color: Colors.black87,
-                  child: Row(
-                    children: [
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
                       GestureDetector(
                         onTap: () => context.pop(),
                         child: Image.asset(
@@ -290,7 +299,8 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                             color: Colors.white70, fontSize: 11),
                       ),
 
-                      Expanded(
+                      SizedBox(
+                        width: 120,
                         child: SliderTheme(
                           data: SliderTheme.of(context).copyWith(
                             trackHeight: 3,
@@ -314,14 +324,13 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       const SizedBox(width: 8),
 
                       RecordButton(
-                        isRecording: _isRecording,
+                        isRecording: lessonState.isRecording,
                         onTap: () {
-                          setState(() {
-                            _isRecording = !_isRecording;
-                          });
+                          controller.toggleRecording();
+                          final recording = ref.read(lessonPlayControllerProvider).isRecording;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(_isRecording
+                              content: Text(recording
                                   ? "🔴 Recording Started"
                                   : "Saved Recording"),
                             ),
@@ -340,7 +349,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<double>(
-                            value: _noteSpeedMultiplier,
+                            value: lessonState.noteSpeedMultiplier,
                             dropdownColor: const Color(0xFF1E1E2C),
                             icon: const Icon(Icons.speed,
                                 color: Colors.amber, size: 16),
@@ -363,9 +372,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                             ],
                             onChanged: (val) {
                               if (val != null) {
-                                setState(() {
-                                  _noteSpeedMultiplier = val;
-                                });
+                                controller.setSpeedMultiplier(val);
                               }
                             },
                           ),
@@ -377,7 +384,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         icon: Icon(
-                          _isPlaying
+                          lessonState.isPlaying
                               ? Icons.pause_circle_filled
                               : Icons.play_circle_filled,
                           color: Colors.amber,
@@ -388,6 +395,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                     ],
                   ),
                 ),
+              ),
 
                 Expanded(
                   child: PianoView(
@@ -396,11 +404,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                     visibleWhiteKeysCount: 14,
                     showNoteNames: true,
                     isLessonMode: true,
-                    noteSpeed: 7.5 * _noteSpeedMultiplier,
+                    noteSpeed: 7.5 * lessonState.noteSpeedMultiplier,
                     onNotePressed: (keyName, label) {
-                      setState(() {
-                        _score += 10;
-                      });
+                      controller.addScore(10);
                     },
                   ),
                 ),

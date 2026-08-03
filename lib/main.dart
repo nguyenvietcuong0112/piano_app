@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:project_flutter/core/app_router.dart';
-import 'package:project_flutter/core/app_theme.dart';
-import 'package:project_flutter/core/audio_engine.dart';
-import 'package:project_flutter/core/theme_service.dart';
+import 'package:project_flutter/core/router/app_router.dart';
+import 'package:project_flutter/core/services/audio_engine.dart';
+import 'package:project_flutter/core/theme/app_theme.dart';
+import 'package:project_flutter/core/theme/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

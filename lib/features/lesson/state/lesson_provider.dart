@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'lesson_datasource.dart';
-import 'lesson_model.dart';
+import '../data/lesson_datasource.dart';
+import '../domain/lesson_model.dart';
 
 final lessonDataSourceProvider = Provider<LessonDataSource>((ref) {
   return LessonDataSource();

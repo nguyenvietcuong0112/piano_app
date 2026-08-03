@@ -1,27 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:project_flutter/features/lessons/all_lessons_screen.dart';
-import 'package:project_flutter/features/lessons/home_tab.dart';
-import 'package:project_flutter/features/lessons/lesson_model.dart';
-import 'package:project_flutter/features/lessons/lesson_play_screen.dart';
-import 'package:project_flutter/features/piano/piano_tab.dart';
-import 'package:project_flutter/features/piano/play_piano_screen.dart';
-import 'package:project_flutter/features/themes/theme_tab.dart';
-import 'package:project_flutter/features/main/main_screen.dart';
+import 'package:project_flutter/features/home/ui/home_tab.dart';
+import 'package:project_flutter/features/lesson/domain/lesson_model.dart';
+import 'package:project_flutter/features/lesson/ui/all_lessons_screen.dart';
+import 'package:project_flutter/features/lesson/ui/lesson_play_screen.dart';
+import 'package:project_flutter/features/piano/ui/piano_tab.dart';
+import 'package:project_flutter/features/piano/ui/play_piano_screen.dart';
+import 'package:project_flutter/features/themes/ui/theme_tab.dart';
+
+import '../../features/main/main_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/home',
     debugLogDiagnostics: false,
     routes: [
-      // StatefulShellRoute for Bottom Navigation Bar tabs with state preservation
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScreen(navigationShell: navigationShell);
         },
         branches: [
-          // Branch 0: Home Tab
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -31,7 +30,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Branch 1: Themes Tab
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -41,7 +39,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Branch 2: Piano Tab
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -54,21 +51,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // Free Play Landscape Piano Screen
       GoRoute(
         path: '/play',
         name: 'play',
         builder: (context, state) => const PlayPianoScreen(),
       ),
 
-      // All Lessons Category List Screen
       GoRoute(
         path: '/all-lessons',
         name: 'all-lessons',
         builder: (context, state) => const AllLessonsScreen(),
       ),
 
-      // Waterfall Piano Lesson Play Practice Screen
       GoRoute(
         path: '/lesson-play',
         name: 'lesson-play',

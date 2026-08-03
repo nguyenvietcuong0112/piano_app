@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:project_flutter/core/audio_engine.dart';
+import 'package:project_flutter/core/services/audio_engine.dart';
 
 class PianoKey {
   final String keyName;

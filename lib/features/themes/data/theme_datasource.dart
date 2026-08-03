@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'theme_model.dart';
+import '../domain/theme_model.dart';
 
 class ThemeDataSource {
   Future<ThemeResponse?> getThemes() async {

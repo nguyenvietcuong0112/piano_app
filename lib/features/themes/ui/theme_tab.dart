@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:project_flutter/core/theme_service.dart';
-import 'theme_model.dart';
-import 'theme_provider.dart';
+import 'package:project_flutter/core/theme/theme_service.dart';
+import '../domain/theme_model.dart';
+import '../state/theme_provider.dart';
 
 class ThemeTab extends ConsumerWidget {
   const ThemeTab({super.key});
