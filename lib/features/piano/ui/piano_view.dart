@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class FallingNote {
   final double targetX;
   final double keyTopY;
   final double keyWidth;
+  final int durationMs;
   double currentY;
   double speed;
   bool isHit;
@@ -34,6 +36,7 @@ class FallingNote {
     required this.targetX,
     required this.keyTopY,
     required this.keyWidth,
+    this.durationMs = 300,
     this.currentY = 0.0,
     this.speed = 0.5,
     this.isHit = false,
@@ -71,18 +74,22 @@ class HitParticle {
 
 class PianoView extends ConsumerStatefulWidget {
   final int startOctave;
+  final int startKeyPosition;
   final int visibleWhiteKeysCount;
   final bool showNoteNames;
   final bool isLessonMode;
+  final bool isAutoGuideMode;
   final double noteSpeed;
   final Function(String keyName, String label)? onNotePressed;
 
   const PianoView({
     super.key,
     this.startOctave = 4,
+    this.startKeyPosition = 0,
     this.visibleWhiteKeysCount = 14,
     this.showNoteNames = true,
     this.isLessonMode = false,
+    this.isAutoGuideMode = false,
     this.noteSpeed = 7.5,
     this.onNotePressed,
   });
@@ -131,7 +138,7 @@ class PianoViewState extends ConsumerState<PianoView>
     super.dispose();
   }
 
-  void addFallingNote(String keyName, String label, bool isBlack) {
+  void addFallingNote(String keyName, String label, bool isBlack, {int durationMs = 300}) {
     if (_keys.isEmpty) return;
 
     PianoKey? matchingKey = _keys
@@ -141,15 +148,20 @@ class PianoViewState extends ConsumerState<PianoView>
     if (matchingKey == null) {
       String keyType = keyName.startsWith("w") ? "w" : "b";
       int posDigit = int.tryParse(keyName.substring(keyName.length - 1)) ?? 0;
-      String mappedKeyName = "$keyType${widget.startOctave}$posDigit";
-      matchingKey = _keys
-          .cast<PianoKey?>()
-          .firstWhere((k) => k?.keyName == mappedKeyName, orElse: () => null);
+      matchingKey = _keys.cast<PianoKey?>().firstWhere(
+            (k) => k?.keyName == "$keyType${widget.startOctave}$posDigit",
+            orElse: () => null,
+          );
+      matchingKey ??= _keys.cast<PianoKey?>().firstWhere(
+            (k) => k?.keyName == "$keyType${widget.startOctave + 1}$posDigit",
+            orElse: () => null,
+          );
     }
 
-    matchingKey ??= _keys
-        .cast<PianoKey?>()
-        .firstWhere((k) => k?.isBlack == isBlack, orElse: () => null);
+    matchingKey ??= _keys.cast<PianoKey?>().firstWhere(
+          (k) => k?.isBlack == isBlack,
+          orElse: () => null,
+        );
     matchingKey ??= _keys.isNotEmpty ? _keys.first : null;
 
     if (matchingKey == null) return;
@@ -161,6 +173,7 @@ class PianoViewState extends ConsumerState<PianoView>
         targetX: matchingKey.rect.center.dx,
         keyTopY: matchingKey.rect.top,
         keyWidth: matchingKey.rect.width,
+        durationMs: durationMs,
         currentY: 0.0,
         speed: widget.noteSpeed,
       ));
@@ -211,6 +224,24 @@ class PianoViewState extends ConsumerState<PianoView>
         if (note.currentY >= note.keyTopY && !note.hasTriggeredParticles) {
           note.hasTriggeredParticles = true;
           _spawnHitParticles(note.targetX, note.keyTopY);
+
+          // Auto-Play Guide Mode: Automatically trigger audio, key light & score!
+          if (widget.isAutoGuideMode) {
+            AudioEngine().playNote(note.keyName);
+            _activeKeyNames.add(note.keyName);
+            int sustainMs = (note.durationMs > 0) ? note.durationMs : 250;
+            Future.delayed(Duration(milliseconds: sustainMs), () {
+              if (mounted) {
+                _activeKeyNames.remove(note.keyName);
+                AudioEngine().stopNote(note.keyName);
+                setState(() {});
+              }
+            });
+
+            if (widget.onNotePressed != null) {
+              widget.onNotePressed!(note.keyName, note.label);
+            }
+          }
         }
 
         if (note.currentY > note.keyTopY + 60) {
@@ -259,37 +290,34 @@ class PianoViewState extends ConsumerState<PianoView>
     final double keyboardHeight = height - keyboardTop;
     final double blackKeyHeight = keyboardHeight * 0.62;
 
-    final int octaves = (widget.visibleWhiteKeysCount / 7).ceil() + 1;
-
     final List<PianoKey> whiteKeysList = [];
     final List<PianoKey> blackKeysList = [];
 
     int whiteIndex = 0;
-    for (int oct = widget.startOctave;
-        oct < (widget.startOctave + octaves);
-        oct++) {
-      for (int i = 0; i < 7; i++) {
-        if (whiteIndex >= widget.visibleWhiteKeysCount) break;
+    int currentOctave = widget.startOctave;
+    int currentPos = widget.startKeyPosition;
 
-        double left = whiteIndex * whiteKeyWidth;
-        double right = left + whiteKeyWidth;
-        String keyName = "w$oct$i";
-        String label = "${_noteNamesWhite[i]}$oct";
+    while (whiteIndex < widget.visibleWhiteKeysCount) {
+      double left = whiteIndex * whiteKeyWidth;
+      double right = left + whiteKeyWidth;
+      String keyName = "w$currentOctave$currentPos";
+      String label = "${_noteNamesWhite[currentPos]}$currentOctave";
 
-        var key = PianoKey(
-          keyName: keyName,
-          label: label,
-          isBlack: false,
-          rect: Rect.fromLTRB(left, keyboardTop, right, height),
-        );
-        whiteKeysList.add(key);
+      var key = PianoKey(
+        keyName: keyName,
+        label: label,
+        isBlack: false,
+        rect: Rect.fromLTRB(left, keyboardTop, right, height),
+      );
+      whiteKeysList.add(key);
 
-        int? bIndex = _getBlackKeyAudioIndex(i);
-        if (bIndex != null) {
-          double bLeft = right - (blackKeyWidth / 2.0);
-          double bRight = bLeft + blackKeyWidth;
-          String bKeyName = "b$oct$bIndex";
-          String bLabel = "${_noteNamesBlack[i]}$oct";
+      int? bIndex = _getBlackKeyAudioIndex(currentPos);
+      if (bIndex != null) {
+        double bLeft = right - (blackKeyWidth / 2.0);
+        double bRight = bLeft + blackKeyWidth;
+        if (bLeft >= 0 && bRight <= width) {
+          String bKeyName = "b$currentOctave$bIndex";
+          String bLabel = "${_noteNamesBlack[currentPos]}$currentOctave";
 
           var bKey = PianoKey(
             keyName: bKeyName,
@@ -300,8 +328,13 @@ class PianoViewState extends ConsumerState<PianoView>
           );
           blackKeysList.add(bKey);
         }
+      }
 
-        whiteIndex++;
+      whiteIndex++;
+      currentPos++;
+      if (currentPos >= 7) {
+        currentPos = 0;
+        currentOctave++;
       }
     }
 
@@ -323,70 +356,40 @@ class PianoViewState extends ConsumerState<PianoView>
     return null;
   }
 
-  void _onPointerDown(PointerDownEvent event) {
-    PianoKey? touchedKey = _getKeyAt(event.localPosition);
-    if (touchedKey != null) {
-      _pointerToKeyMap[event.pointer] = touchedKey.keyName;
-      if (_activeKeyNames.add(touchedKey.keyName)) {
-        AudioEngine().playNote(touchedKey.keyName);
-        widget.onNotePressed?.call(touchedKey.keyName, touchedKey.label);
-        _checkNoteHit(touchedKey.keyName);
-        _spawnHitParticles(
-            touchedKey.rect.center.dx, touchedKey.rect.top);
-        setState(() {});
-      }
-    }
-  }
+  void _handleTouch(int pointerId, Offset position) {
+    PianoKey? key = _getKeyAt(position);
+    String? currentActiveKey = _pointerToKeyMap[pointerId];
 
-  void _onPointerMove(PointerMoveEvent event) {
-    PianoKey? currentKey = _getKeyAt(event.localPosition);
-    String? prevKeyName = _pointerToKeyMap[event.pointer];
-
-    if (currentKey?.keyName != prevKeyName) {
-      if (prevKeyName != null) {
-        _activeKeyNames.remove(prevKeyName);
-        AudioEngine().stopNote(prevKeyName);
-      }
-      if (currentKey != null) {
-        _pointerToKeyMap[event.pointer] = currentKey.keyName;
-        if (_activeKeyNames.add(currentKey.keyName)) {
-          AudioEngine().playNote(currentKey.keyName);
-          widget.onNotePressed?.call(currentKey.keyName, currentKey.label);
-          _checkNoteHit(currentKey.keyName);
-          _spawnHitParticles(
-              currentKey.rect.center.dx, currentKey.rect.top);
+    if (key != null) {
+      if (currentActiveKey != key.keyName) {
+        if (currentActiveKey != null) {
+          _activeKeyNames.remove(currentActiveKey);
+          AudioEngine().stopNote(currentActiveKey);
         }
-      } else {
-        _pointerToKeyMap.remove(event.pointer);
+        _pointerToKeyMap[pointerId] = key.keyName;
+        _activeKeyNames.add(key.keyName);
+        AudioEngine().playNote(key.keyName);
+
+        if (widget.onNotePressed != null) {
+          widget.onNotePressed!(key.keyName, key.label);
+        }
       }
-      setState(() {});
-    }
-  }
-
-  void _onPointerUp(PointerUpEvent event) {
-    String? releasedKey = _pointerToKeyMap.remove(event.pointer);
-    if (releasedKey != null) {
-      _activeKeyNames.remove(releasedKey);
-      AudioEngine().stopNote(releasedKey);
-      setState(() {});
-    }
-  }
-
-  void _onPointerCancel(PointerCancelEvent event) {
-    String? releasedKey = _pointerToKeyMap.remove(event.pointer);
-    if (releasedKey != null) {
-      _activeKeyNames.remove(releasedKey);
-      AudioEngine().stopNote(releasedKey);
-      setState(() {});
-    }
-  }
-
-  void _checkNoteHit(String keyName) {
-    for (var note in _fallingNotes) {
-      if (note.keyName == keyName && !note.isHit) {
-        note.isHit = true;
-        break;
+    } else {
+      if (currentActiveKey != null) {
+        _pointerToKeyMap.remove(pointerId);
+        _activeKeyNames.remove(currentActiveKey);
+        AudioEngine().stopNote(currentActiveKey);
       }
+    }
+    setState(() {});
+  }
+
+  void _handleTouchUp(int pointerId) {
+    String? activeKey = _pointerToKeyMap.remove(pointerId);
+    if (activeKey != null) {
+      _activeKeyNames.remove(activeKey);
+      AudioEngine().stopNote(activeKey);
+      setState(() {});
     }
   }
 
@@ -394,14 +397,16 @@ class PianoViewState extends ConsumerState<PianoView>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final Size size = Size(constraints.maxWidth, constraints.maxHeight);
+        Size size = Size(constraints.maxWidth, constraints.maxHeight);
         _calculateLayout(size);
 
         return Listener(
-          onPointerDown: _onPointerDown,
-          onPointerMove: _onPointerMove,
-          onPointerUp: _onPointerUp,
-          onPointerCancel: _onPointerCancel,
+          onPointerDown: (event) =>
+              _handleTouch(event.pointer, event.localPosition),
+          onPointerMove: (event) =>
+              _handleTouch(event.pointer, event.localPosition),
+          onPointerUp: (event) => _handleTouchUp(event.pointer),
+          onPointerCancel: (event) => _handleTouchUp(event.pointer),
           child: CustomPaint(
             size: size,
             painter: PianoPainter(
@@ -595,39 +600,36 @@ class PianoPainter extends CustomPainter {
         ..strokeWidth = 1.2;
       canvas.drawRRect(roundedBar, borderPaint);
 
-      // Light Beam Effect at Key Contact Line
-      if (note.currentY >= note.keyTopY - 10) {
-        Paint beamPaint = Paint()
-          ..shader = RadialGradient(
-            colors: [
-              Colors.white,
-              const Color(0xFFFFD54F).withValues(alpha: 0.8),
-              Colors.transparent,
-            ],
-          ).createShader(
-            Rect.fromCircle(
-                center: Offset(note.targetX, note.keyTopY), radius: 30),
-          );
-        canvas.drawCircle(Offset(note.targetX, note.keyTopY), 24, beamPaint);
+      // Note Name Label
+      if (showNoteNames && note.label.isNotEmpty) {
+        TextPainter tp = TextPainter(
+          text: TextSpan(
+            text: note.label,
+            style: const TextStyle(
+              color: Color(0xFF3E2723),
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        );
+        tp.layout();
+        tp.paint(
+          canvas,
+          Offset(barRect.center.dx - tp.width / 2,
+              barRect.center.dy - tp.height / 2),
+        );
       }
     }
 
-    // Draw Hit Sparkles / Particle Fireworks Effect
+    // Draw Fireworks Particle Sparks
     for (var particle in particles) {
-      Paint pPaint = Paint()
-        ..color = particle.color.withValues(alpha: particle.opacity.clamp(0.0, 1.0))
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
-
-      canvas.drawCircle(
-        Offset(particle.x, particle.y),
-        particle.radius,
-        pPaint,
-      );
+      final Paint pPaint = Paint()
+        ..color = particle.color.withValues(alpha: particle.opacity);
+      canvas.drawCircle(Offset(particle.x, particle.y), particle.radius, pPaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant PianoPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant PianoPainter oldDelegate) => true;
 }

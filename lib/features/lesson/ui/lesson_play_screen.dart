@@ -26,6 +26,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   final GlobalKey<PianoViewState> _pianoKey = GlobalKey<PianoViewState>();
   List<LessonNote> _noteList = [];
   Timer? _noteTimer;
+  bool _isAutoGuideMode = false;
 
   @override
   void initState() {
@@ -63,21 +64,35 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
     if (!state.isPlaying || state.currentNoteIndex >= _noteList.length) return;
 
-    final targetNote = _noteList[state.currentNoteIndex];
-    final keyPrefix = targetNote.type == 0 ? "w" : "b";
-    final targetKeyName =
-        "$keyPrefix${targetNote.group}${targetNote.position}";
-    final label = "${targetNote.group}${targetNote.position}";
+    int currentIndex = state.currentNoteIndex;
+    int nextDelayMs = 0;
 
-    _pianoKey.currentState
-        ?.addFallingNote(targetKeyName, label, targetNote.type == 1);
+    while (currentIndex < _noteList.length) {
+      final targetNote = _noteList[currentIndex];
+      final keyPrefix = targetNote.type == 0 ? "w" : "b";
+      final targetKeyName =
+          "$keyPrefix${targetNote.group}${targetNote.position}";
+      final label = "${targetNote.group}${targetNote.position}";
 
-    controller.incrementNoteIndex();
-    final updatedIndex = ref.read(lessonPlayControllerProvider).currentNoteIndex;
+      _pianoKey.currentState?.addFallingNote(
+        targetKeyName,
+        label,
+        targetNote.type == 1,
+        durationMs: targetNote.duration,
+      );
 
-    if (updatedIndex < _noteList.length) {
+      currentIndex++;
+      controller.incrementNoteIndex();
+      nextDelayMs = targetNote.breakTime;
+
+      if (nextDelayMs > 0) {
+        break; // Stop spawning simultaneous notes and wait for delay!
+      }
+    }
+
+    if (currentIndex < _noteList.length) {
       int delayMs =
-          (targetNote.breakTime * 1.35 / state.noteSpeedMultiplier).round().clamp(180, 3000);
+          (nextDelayMs / state.noteSpeedMultiplier).round().clamp(20, 5000);
       _noteTimer = Timer(Duration(milliseconds: delayMs), _scheduleNextNote);
     } else {
       _finishLesson();
@@ -331,6 +346,58 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       ),
                       const SizedBox(width: 6),
 
+                      // Auto-Play Guide Mode Toggle Button
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _isAutoGuideMode = !_isAutoGuideMode;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(seconds: 2),
+                              backgroundColor: _isAutoGuideMode ? Colors.green : Colors.blueGrey,
+                              content: Text(
+                                _isAutoGuideMode
+                                    ? "🎓 Hướng dẫn Tự động (Auto Guide): Đang bật"
+                                    : "✋ Chế độ Tự đánh (Manual Play): Đang bật",
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _isAutoGuideMode
+                                ? const Color(0xFF2E7D32)
+                                : const Color(0xFF252533),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: _isAutoGuideMode ? Colors.greenAccent : Colors.white24,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _isAutoGuideMode ? Icons.school : Icons.touch_app,
+                                color: _isAutoGuideMode ? Colors.greenAccent : Colors.white70,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _isAutoGuideMode ? "Auto Guide" : "Manual",
+                                style: TextStyle(
+                                  color: _isAutoGuideMode ? Colors.greenAccent : Colors.white70,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+
                       Container(
                         height: 32,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -351,6 +418,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                             items: const [
+                              DropdownMenuItem(
+                                  value: 0.25, child: Text("0.25x Super Slow")),
+                              DropdownMenuItem(
+                                  value: 0.35, child: Text("0.35x Slowest")),
                               DropdownMenuItem(
                                   value: 0.5, child: Text("0.5x Slow")),
                               DropdownMenuItem(
@@ -392,11 +463,13 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                 Expanded(
                   child: PianoView(
                     key: _pianoKey,
-                    startOctave: 4,
-                    visibleWhiteKeysCount: 14,
+                    startOctave: widget.lesson.startOctave,
+                    startKeyPosition: widget.lesson.startKeyPosition,
+                    visibleWhiteKeysCount: widget.lesson.visibleWhiteKeysCount,
                     showNoteNames: true,
                     isLessonMode: true,
-                    noteSpeed: 7.5 * lessonState.noteSpeedMultiplier,
+                    isAutoGuideMode: _isAutoGuideMode,
+                    noteSpeed: 3.2 * lessonState.noteSpeedMultiplier,
                     onNotePressed: (keyName, label) {
                       controller.addScore(10);
                     },

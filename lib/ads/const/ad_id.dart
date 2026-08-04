@@ -8,8 +8,8 @@ Map<String, Map<String, String>> myAdsId = {
       ? {}
       : {
           MyAdIdName.appOpenResume: 'ca-app-pub-3940256099942544/9257395921',
-          MyAdIdName.interSplash: 'ca-app-pub-3940256099942544/1033173712',
-          MyAdIdName.interSplashHigh: 'ca-app-pub-3940256099942544/1033173712',
+          MyAdIdName.interSplash: '',
+          MyAdIdName.interSplashHigh: '',
           MyAdIdName.nativeLanguage: 'ca-app-pub-3940256099942544/1044960115',
           MyAdIdName.nativeLanguageHigh: 'ca-app-pub-3940256099942544/1044960115',
           MyAdIdName.nativeLanguageClick: 'ca-app-pub-3940256099942544/1044960115',

@@ -89,13 +89,43 @@ class AllLessonsScreen extends ConsumerWidget {
                                         color: Colors.amber),
                               ),
                             ),
-                            title: Text(
-                              song.titleName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    song.titleName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: song.level == 1
+                                        ? const Color(0xFF1B5E20)
+                                        : (song.level == 2
+                                            ? const Color(0xFFE65100)
+                                            : const Color(0xFFB71C1C)),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    song.level == 1
+                                        ? "⭐ Dễ"
+                                        : (song.level == 2
+                                            ? "⭐⭐ Vừa"
+                                            : "⭐⭐⭐ Khó"),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             subtitle: Text(
                               "${song.authorName} • ${song.duration}",

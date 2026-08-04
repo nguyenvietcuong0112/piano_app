@@ -1,39 +1,83 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
+
+import '../../../core/constants/app_constants.dart';
 import '../domain/lesson_model.dart';
 
 @lazySingleton
 class LessonDataSource {
   Future<LessonsResponse?> getAllLessons() async {
+    // 1. Attempt API fetch from Server
+    try {
+      final apiUrl = Uri.parse('${AppConstants.baseApiUrl}/lessons');
+      final response =
+          await http.get(apiUrl).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonMap = json.decode(response.body);
+        final lessonsResponse = LessonsResponse.fromJson(jsonMap);
+        if (lessonsResponse.categories.isNotEmpty) {
+          debugPrint("Successfully loaded lessons from API: $apiUrl");
+          return lessonsResponse;
+        }
+      }
+    } catch (e) {
+      debugPrint("API fetch failed, falling back to local asset: $e");
+    }
+
+    // 2. Fallback to local lessons.json asset
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/lessons.json');
       final Map<String, dynamic> jsonMap = json.decode(jsonString);
       return LessonsResponse.fromJson(jsonMap);
     } catch (e) {
-      debugPrint("Error loading lessons.json: $e");
+      debugPrint("Error loading local lessons.json: $e");
       return null;
     }
   }
 
-  Future<List<LessonNote>> getLessonNotes(String fileName) async {
+  Future<List<LessonNote>> getLessonNotes(String fileNameOrUrl) async {
+    // 1. Attempt API fetch if filename or URL provided
+    try {
+      final String targetUrl = fileNameOrUrl.startsWith('http://') ||
+              fileNameOrUrl.startsWith('https://')
+          ? fileNameOrUrl
+          : '${AppConstants.baseApiUrl}/lessons/$fileNameOrUrl';
+
+      final response = await http
+          .get(Uri.parse(targetUrl))
+          .timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonMap = json.decode(response.body);
+        final container = LessonNoteContainer.fromJson(jsonMap);
+        if (container.data != null && container.data!.isNotEmpty) {
+          debugPrint("Successfully loaded lesson notes from API: $targetUrl");
+          return container.data!;
+        }
+      }
+    } catch (e) {
+      debugPrint("API lesson notes fetch failed, falling back to asset: $e");
+    }
+
+    // 2. Fallback to local asset files
     try {
       final jsonString =
-          await rootBundle.loadString('assets/json/lesson/$fileName');
+          await rootBundle.loadString('assets/json/lesson/$fileNameOrUrl');
       final Map<String, dynamic> jsonMap = json.decode(jsonString);
       final container = LessonNoteContainer.fromJson(jsonMap);
       if (container.data != null && container.data!.isNotEmpty) {
         return container.data!;
       }
-    } catch (e) {
-      debugPrint("Error loading lesson assets/json/lesson/$fileName: $e");
-    }
+    } catch (_) {}
 
     try {
       final jsonString =
-          await rootBundle.loadString('assets/json/$fileName');
+          await rootBundle.loadString('assets/json/$fileNameOrUrl');
       final Map<String, dynamic> jsonMap = json.decode(jsonString);
       final container = LessonNoteContainer.fromJson(jsonMap);
       if (container.data != null && container.data!.isNotEmpty) {

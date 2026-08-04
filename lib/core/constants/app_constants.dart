@@ -1,7 +1,19 @@
+import 'dart:io' show Platform;
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class AppConstants {
+  static String get baseApiUrl {
+    if (kIsWeb) {
+      return 'http://192.168.1.47:3000/api/v1';
+    } else if (!kIsWeb && Platform.isAndroid) {
+      return 'http://192.168.1.47:3000/api/v1';
+    } else {
+      // Windows Desktop, macOS, iOS Simulator
+      return 'http://192.168.1.47:3000/api/v1';
+    }
+  }
+
   static const String appIdIOS = '';
 
   // GSM & Adjust Constants
