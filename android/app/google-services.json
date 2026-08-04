@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "494519174127",
+    "project_id": "d73---learn-piano",
+    "storage_bucket": "d73---learn-piano.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494519174127:android:4d5584d25fdc30891dec1a",
+        "android_client_info": {
+          "package_name": "com.pianokeyboard.virtualpiano.learnpiano"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqQl3kj-jqV6we_DU5T5o2HpBqPB48u8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

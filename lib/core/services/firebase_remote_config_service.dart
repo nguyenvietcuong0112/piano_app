@@ -1,7 +1,7 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 class FirebaseRemoteConfigService {
-  static FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
+  static FirebaseRemoteConfig get remoteConfig => FirebaseRemoteConfig.instance;
 
   static const String android_app_version = "android_app_version";
 

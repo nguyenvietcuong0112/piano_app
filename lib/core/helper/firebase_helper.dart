@@ -12,7 +12,7 @@ import '../../ads/const/ad_id.dart';
 import '../../ads/const/ad_id_name.dart';
 
 class FirebaseHelper {
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalytics get analytics => FirebaseAnalytics.instance;
 
   static Locale? get userLocale => PlatformDispatcher.instance.locale;
 

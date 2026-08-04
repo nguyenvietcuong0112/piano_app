@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:adjust_sdk/adjust_config.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
@@ -159,6 +160,87 @@ class EasyAds {
       _defaultLoadingMessage = loadingMessage;
     }
     _initialized = true;
+  }
+
+  /// Initializes App Tracking Transparency (iOS ATT) and Google UMP GDPR Consent Form.
+  Future<void> initConsent({bool isDebugGeographyEEA = true}) async {
+    // 1. App Tracking Transparency for iOS
+    try {
+      final TrackingStatus status =
+          await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    } catch (e) {
+      _logger.logInfo('Tracking transparency status error: $e');
+    }
+
+    // 2. Google UMP GDPR Consent Form
+    try {
+      final params = ConsentRequestParameters(
+        consentDebugSettings: isDebugGeographyEEA
+            ? ConsentDebugSettings(
+                debugGeography: DebugGeography.debugGeographyEea,
+              )
+            : null,
+      );
+
+      final consentCompleter = Completer<void>();
+
+      ConsentInformation.instance.requestConsentInfoUpdate(
+        params,
+        () async {
+          try {
+            if (await ConsentInformation.instance.isConsentFormAvailable()) {
+              await _loadConsentForm();
+            }
+            _logger.logInfo('Consent completed');
+          } catch (e) {
+            _logger.logInfo('Consent form error: $e');
+          }
+          consentCompleter.complete();
+        },
+        (error) {
+          _logger.logInfo('Consent error: ${error.message}');
+          consentCompleter.complete();
+        },
+      );
+
+      await consentCompleter.future;
+    } catch (e) {
+      _logger.logInfo('Consent request error: $e');
+    }
+  }
+
+  Future<void> _loadConsentForm() async {
+    final completer = Completer<void>();
+
+    ConsentForm.loadConsentForm(
+      (consentForm) async {
+        final status = await ConsentInformation.instance.getConsentStatus();
+
+        if (status == ConsentStatus.required) {
+          consentForm.show((formError) async {
+            if (formError != null) {
+              _logger.logInfo('Consent form show error: ${formError.message}');
+              completer.complete();
+              return;
+            }
+            await _loadConsentForm();
+            completer.complete();
+          });
+        } else {
+          completer.complete();
+        }
+      },
+      (formError) {
+        _logger.logInfo('Consent form load error: ${formError.message}');
+        completer.complete();
+      },
+    );
+
+    await completer.future;
   }
 
   Future<void> initAdjust(

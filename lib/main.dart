@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'ads/const/ad_id_extension.dart';
 import 'ads/const/ad_id_name.dart';
 import 'ads/loading/ad_loading_page.dart';
@@ -36,11 +36,14 @@ void main() async {
     SystemUiMode.immersiveSticky,
   );
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await configureDependencies();
   await ThemeService.init();
   await AudioEngine().ensureInitialized();
 
-  await initPlugin();
   await _initializeAds();
 
   runApp(
@@ -56,34 +59,8 @@ Future<void> _initializeAds() async {
 
     await EasyAds.instance.initFirebaseAnalytics(FirebaseHelper.analytics);
 
-    final params = ConsentRequestParameters(
-      consentDebugSettings: ConsentDebugSettings(
-        debugGeography: DebugGeography.debugGeographyEea,
-      ),
-    );
-
-    final consentCompleter = Completer<void>();
-
-    ConsentInformation.instance.requestConsentInfoUpdate(
-      params,
-      () async {
-        try {
-          if (await ConsentInformation.instance.isConsentFormAvailable()) {
-            await _loadConsentForm();
-          }
-          debugPrint('✅ Consent completed');
-        } catch (e) {
-          debugPrint('⚠️ Consent form error: $e');
-        }
-        consentCompleter.complete();
-      },
-      (error) {
-        debugPrint('⚠️ Consent error: ${error.message}');
-        consentCompleter.complete();
-      },
-    );
-
-    await consentCompleter.future;
+    // Encapsulated Consent Flow (ATT & UMP GDPR)
+    await EasyAds.instance.initConsent();
 
     final IAdIdManager adIdManager = MyAdIdManager();
 
@@ -106,48 +83,5 @@ Future<void> _initializeAds() async {
 
   } catch (e) {
     debugPrint('❌ Ads initialization error: $e');
-  }
-}
-
-Future<void> _loadConsentForm() async {
-  final completer = Completer<void>();
-
-  ConsentForm.loadConsentForm(
-    (consentForm) async {
-      final status = await ConsentInformation.instance.getConsentStatus();
-
-      if (status == ConsentStatus.required) {
-        consentForm.show((formError) async {
-          if (formError != null) {
-            debugPrint('⚠️ Consent form show error: ${formError.message}');
-            completer.complete();
-            return;
-          }
-          await _loadConsentForm();
-          completer.complete();
-        });
-      } else {
-        completer.complete();
-      }
-    },
-    (formError) {
-      debugPrint('⚠️ Consent form load error: ${formError.message}');
-      completer.complete();
-    },
-  );
-
-  await completer.future;
-}
-
-Future<void> initPlugin() async {
-  try {
-    final TrackingStatus status =
-        await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await Future.delayed(const Duration(milliseconds: 200));
-      await AppTrackingTransparency.requestTrackingAuthorization();
-    }
-  } catch (e) {
-    debugPrint('Tracking transparency status error: $e');
   }
 }

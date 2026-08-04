@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_mobile_ads: ^9.0.0
+  app_tracking_transparency: ^2.0.4
   gma_mediation_applovin: ^2.6.2
   gma_mediation_ironsource: ^2.4.3
   gma_mediation_meta: ^1.5.3
