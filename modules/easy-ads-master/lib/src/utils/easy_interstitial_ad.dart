@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class EasyInterstitialAd extends StatefulWidget {
   final AdNetwork adNetwork;
@@ -160,13 +161,21 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: const Scaffold(
-        backgroundColor: Colors.transparent,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF131722).withValues(alpha: 0.8),
         body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: Lottie.asset(
+            'assets/json/loading_ads.json',
+            width: 150,
+            height: 150,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              );
+            },
           ),
         ),
       ),

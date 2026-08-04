@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/theme_image.dart';
 import '../domain/theme_model.dart';
 import '../state/theme_provider.dart';
 
-class ThemeTab extends ConsumerWidget {
+class ThemeTab extends ConsumerStatefulWidget {
   const ThemeTab({super.key});
+
+  @override
+  ConsumerState<ThemeTab> createState() => _ThemeTabState();
+}
+
+class _ThemeTabState extends ConsumerState<ThemeTab> {
+  int _selectedCategoryId = 0; // 0 = All categories
 
   Future<void> _applyTheme(BuildContext context, ThemeItem theme) async {
     await ThemeService.setTheme(theme.resName, theme.id);
@@ -15,13 +24,14 @@ class ThemeTab extends ConsumerWidget {
         SnackBar(
           content: Text("Applied Theme: ${theme.titleName}"),
           duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final themesAsync = ref.watch(themesProvider);
 
     return Scaffold(
@@ -36,134 +46,242 @@ class ThemeTab extends ConsumerWidget {
           ),
         ),
         data: (themeResponse) {
-          List<ThemeItem> allThemes = [];
-          if (themeResponse != null) {
-            for (var cat in themeResponse.themeCategories) {
-              allThemes.addAll(cat.items);
-            }
-          }
+          final List<ThemeCategory> rawCategories =
+              themeResponse?.themeCategories ?? [];
 
-          if (allThemes.isEmpty) {
-            allThemes = [
-              ThemeItem(
-                  id: 1,
-                  titleName: "Jujutsu Kaisen",
-                  imageName: "theme_jujutsu_kaisen",
-                  resName: "theme_jujutsu_kaisen"),
-              ThemeItem(
-                  id: 2,
-                  titleName: "One Piece",
-                  imageName: "theme_one_piece",
-                  resName: "theme_one_piece"),
-              ThemeItem(
-                  id: 3,
-                  titleName: "Cloud & Sky",
-                  imageName: "theme_cloud_sky",
-                  resName: "theme_cloud_sky"),
-              ThemeItem(
-                  id: 4,
-                  titleName: "Star Universe",
-                  imageName: "theme_star",
-                  resName: "theme_star"),
-            ];
-          }
+          // Fallback if JSON fails or empty
+          final List<ThemeCategory> categories = rawCategories.isNotEmpty
+              ? rawCategories
+              : [
+                  ThemeCategory(
+                    categoryID: 1,
+                    categoryName: "Anime & Manga",
+                    items: [
+                      ThemeItem(
+                          id: 1,
+                          titleName: "Jujutsu Kaisen",
+                          imageName: "theme_jujutsu_kaisen",
+                          resName: "theme_jujutsu_kaisen"),
+                      ThemeItem(
+                          id: 2,
+                          titleName: "One Piece",
+                          imageName: "theme_one_piece",
+                          resName: "theme_one_piece"),
+                    ],
+                  ),
+                  ThemeCategory(
+                    categoryID: 2,
+                    categoryName: "Nature",
+                    items: [
+                      ThemeItem(
+                          id: 3,
+                          titleName: "Cloud & Sky",
+                          imageName: "theme_cloud_sky",
+                          resName: "theme_cloud_sky"),
+                    ],
+                  ),
+                  ThemeCategory(
+                    categoryID: 3,
+                    categoryName: "Universe",
+                    items: [
+                      ThemeItem(
+                          id: 4,
+                          titleName: "Star",
+                          imageName: "theme_star",
+                          resName: "theme_star"),
+                    ],
+                  ),
+                ];
 
-          return ValueListenableBuilder<String>(
-            valueListenable: ThemeService.currentThemeRes,
-            builder: (context, currentThemeRes, child) {
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.3,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+          // Filter categories based on selected chip
+          final filteredCategories = _selectedCategoryId == 0
+              ? categories
+              : categories
+                  .where((c) => c.categoryID == _selectedCategoryId)
+                  .toList();
+
+          return Column(
+            children: [
+              // Top Category Chips Bar
+              _buildCategoryChips(categories),
+
+              // Categorized Theme List
+              Expanded(
+                child: ValueListenableBuilder<String>(
+                  valueListenable: ThemeService.currentThemeRes,
+                  builder: (context, currentThemeRes, child) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      itemCount: filteredCategories.length,
+                      itemBuilder: (context, catIndex) {
+                        final category = filteredCategories[catIndex];
+                        return _buildCategorySection(
+                            context, category, currentThemeRes);
+                      },
+                    );
+                  },
                 ),
-                itemCount: allThemes.length,
-                itemBuilder: (context, index) {
-                  final theme = allThemes[index];
-                  final isSelected = theme.resName == currentThemeRes;
-
-                  return GestureDetector(
-                    onTap: () => _applyTheme(context, theme),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.greenAccent
-                              : Colors.white24,
-                          width: isSelected ? 3 : 1,
-                        ),
-                        boxShadow: [
-                          if (isSelected)
-                            BoxShadow(
-                              color: Colors.greenAccent.withValues(alpha: 0.4),
-                              blurRadius: 10,
-                            ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Stack(
-                          children: [
-                            Positioned.fill(
-                              child: Image.asset(
-                                'assets/images/${theme.resName}.jpg',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Image.asset(
-                                  'assets/images/${theme.resName}.png',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, err, stack) =>
-                                      Container(color: const Color(0xFF2A2A3D)),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 6, horizontal: 8),
-                                color: Colors.black.withValues(alpha: 0.75),
-                                child: Text(
-                                  theme.titleName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            if (isSelected)
-                              const Positioned(
-                                top: 8,
-                                right: 8,
-                                child: CircleAvatar(
-                                  radius: 14,
-                                  backgroundColor: Colors.greenAccent,
-                                  child: Icon(
-                                    Icons.check,
-                                    color: Colors.black,
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+              ),
+            ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildCategoryChips(List<ThemeCategory> categories) {
+    return Container(
+      height: 48,
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          // "All" chip
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: const Text("All"),
+              selected: _selectedCategoryId == 0,
+              selectedColor: Colors.amber,
+              backgroundColor: const Color(0xFF2A2A3D),
+              labelStyle: TextStyle(
+                color: _selectedCategoryId == 0 ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() => _selectedCategoryId = 0);
+                }
+              },
+            ),
+          ),
+          ...categories.map((cat) {
+            final isSelected = _selectedCategoryId == cat.categoryID;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                label: Text(cat.categoryName),
+                selected: isSelected,
+                selectedColor: Colors.amber,
+                backgroundColor: const Color(0xFF2A2A3D),
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                onSelected: (selected) {
+                  setState(() {
+                    _selectedCategoryId = selected ? cat.categoryID : 0;
+                  });
+                },
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategorySection(
+      BuildContext context, ThemeCategory category, String currentThemeRes) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Category Title Header
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Text(
+            category.categoryName,
+            style: const TextStyle(
+              color: Colors.amber,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+
+        // Grid of Theme Cards in this category
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.3,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemCount: category.items.length,
+          itemBuilder: (context, index) {
+            final theme = category.items[index];
+            final isSelected = theme.resName == currentThemeRes;
+
+            return GestureDetector(
+              onTap: () => _applyTheme(context, theme),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isSelected ? Colors.greenAccent : Colors.white24,
+                    width: isSelected ? 3 : 1,
+                  ),
+                  boxShadow: [
+                    if (isSelected)
+                      BoxShadow(
+                        color: Colors.greenAccent.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                      ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: ThemeImage(resName: theme.resName),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 6, horizontal: 8),
+                          color: Colors.black.withValues(alpha: 0.75),
+                          child: Text(
+                            theme.titleName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        const Positioned(
+                          top: 8,
+                          right: 8,
+                          child: CircleAvatar(
+                            radius: 14,
+                            backgroundColor: Colors.greenAccent,
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+      ],
     );
   }
 }

@@ -14,7 +14,7 @@ class FirebaseRemoteConfigService {
   static const String native_onboarding_1 = "native_onboarding_1";
   static const String native_onboarding_full_2 = "native_onboarding_full_2";
   static const String native_onboarding_full_1 = "native_onboarding_full_1";
-  static const String native_onboarding_3 = "native_onboarding_3";
+  static const String native_onboarding_4 = "native_onboarding_4";
   static const String native_permission = "native_permission";
   static const String native_banner = "native_banner";
   static const String inter_all = "inter_all";
@@ -44,7 +44,7 @@ class FirebaseRemoteConfigService {
         "native_onboarding_1": true,
         "native_onboarding_full_1": true,
         "native_onboarding_full_2": true,
-        "native_onboarding_3": true,
+        "native_onboarding_4": true,
         "native_permission": true,
         "native_banner": true,
         "inter_all": true,

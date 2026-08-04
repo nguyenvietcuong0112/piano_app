@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ads/const/ad_id_extension.dart';
+import '../../ads/const/ad_id_factory.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_colors.dart';
 import 'language_controller.dart';
 
 class LanguagePage extends ConsumerStatefulWidget {
@@ -43,11 +44,12 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
           children: [
             Positioned.fill(
               child: SafeArea(
+                bottom: false,
                 child: Column(
                   children: [
-                    buildNavigation(controller),
-                    Expanded(child: buildContent(controller)),
-                    buildNativeAd(controller),
+                    _buildNavigation(controller),
+                    Expanded(child: _buildContent(controller)),
+                    _buildNativeAd(controller),
                   ],
                 ),
               ),
@@ -55,7 +57,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             if (controller.isLoading)
               Positioned.fill(
                 child: Container(
-                  color: const Color(0xFF131722).withOpacity(0.8),
+                  color: const Color(0xFF131722).withValues(alpha: 0.8),
                   child: const Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
@@ -67,42 +69,45 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
     );
   }
 
-  Widget buildNativeAd(LanguageController controller) {
-    if (AppConstants.isPremiumUser.value) return const SizedBox.shrink();
+  Widget _buildNativeAd(LanguageController controller) {
+    if (AppConstants.isPremiumUser.value ||
+        !controller.isFirstLaunch ||
+        !controller.isShouldShowAds) {
+      return const SizedBox.shrink();
+    }
 
-    final isClick = controller.isShowAltAds;
-    return Container(
-      height: 150,
-      width: double.infinity,
-      alignment: Alignment.center,
-      margin: const EdgeInsets.only(bottom: 10),
-      child: isClick
-          ? EasyNativeAdHigh(
-              factoryId: MyAdIdName.nativeLanguageClick,
-              adId: MyAdIdName.nativeLanguageClick.getId,
-              adIdHigh: MyAdIdName.nativeLanguageClickHigh.getId,
-              height: AdDimen.largeNativeAdHeight,
-            )
-          : EasyNativeAdHigh(
-              factoryId: MyAdIdName.nativeLanguage,
-              adId: MyAdIdName.nativeLanguage.getId,
-              adIdHigh: MyAdIdName.nativeLanguageHigh.getId,
-              height: AdDimen.largeNativeAdHeight,
-            ),
-    );
+    final isClick = controller.isShowClickAds;
+    return isClick
+        ? EasyNativeAdHigh(
+            key: const ValueKey('nativeLanguageClick'),
+            factoryId: NativeFactoryId.nativeMedia2,
+            adId: MyAdIdName.nativeLanguageClick.getId,
+            adIdHigh: MyAdIdName.nativeLanguageClickHigh.getId,
+            height: AdDimen.mediumNativeHeight,
+          )
+        : EasyNativeAdHigh(
+            key: const ValueKey('nativeLanguage'),
+            factoryId: NativeFactoryId.nativeMedia,
+            adId: MyAdIdName.nativeLanguage.getId,
+            adIdHigh: MyAdIdName.nativeLanguageHigh.getId,
+            height: AdDimen.mediumNativeHeight,
+          );
   }
 
-  Widget buildContent(LanguageController controller) {
+  Widget _buildContent(LanguageController controller) {
     return ListView.builder(
       itemCount: controller.itemsList.length,
       scrollDirection: Axis.vertical,
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 10),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 10,
+        bottom: AppConstants.isPremiumUser.value ? 20 : AdDimen.mediumNativeHeight + 10,
+      ),
       itemBuilder: (context, index) {
         final isSelected = controller.selectedIndex == index;
         return GestureDetector(
-          onTap: () {
-            controller.onSelectItem(index);
-          },
+          onTap: () => controller.onSelectItem(index),
           child: Container(
             height: 44,
             width: double.infinity,
@@ -171,7 +176,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
     );
   }
 
-  Widget buildNavigation(LanguageController controller) {
+  Widget _buildNavigation(LanguageController controller) {
     return SizedBox(
       height: 64,
       width: double.infinity,
@@ -195,9 +200,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               bottom: 0,
               top: 0,
               child: GestureDetector(
-                onTap: () {
-                  controller.onSelectBack(context);
-                },
+                onTap: () => controller.onSelectBack(context),
                 child: const AspectRatio(
                   aspectRatio: 1,
                   child: Center(
@@ -223,9 +226,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                 onTap: () {
                   controller.onClickNext(
                     context,
-                    onNavigateNext: () {
-                      context.go('/onboard');
-                    },
+                    onNavigateNext: () => context.go('/onboard'),
                   );
                 },
                 child: const Row(

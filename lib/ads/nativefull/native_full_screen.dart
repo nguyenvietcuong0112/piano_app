@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../const/ad_id_factory.dart';
 import '../const/ad_id_name.dart';
 
 class NativeFullScreen extends StatefulWidget {
@@ -166,7 +167,7 @@ class _NativeFullScreenState extends State<NativeFullScreen>
                     },
                   )
                 : EasyNativeAd(
-                    factoryId: MyAdIdName.nativeFull,
+                    factoryId: NativeFactoryId.nativeFull,
                     adId: widget.nativeFullId,
                     height: screenHeight,
                     onImpression: () {

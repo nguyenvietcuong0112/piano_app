@@ -23,26 +23,110 @@
     },
     {
       "categoryID": 2,
-      "categoryName": "Nature",
+      "categoryName": "Classic & Acoustic",
       "content": [
         {
           "id": 3,
-          "name": "Cloud & Sky",
-          "urlThumb": "theme_cloud_sky",
-          "urlTheme": "theme_cloud_sky",
+          "name": "Traditional Wood",
+          "urlThumb": "bg_piano_traditional",
+          "urlTheme": "bg_piano_traditional",
+          "status": 1
+        },
+        {
+          "id": 4,
+          "name": "Acoustic Blue",
+          "urlThumb": "bg_piano_11",
+          "urlTheme": "bg_piano_11",
+          "status": 1
+        },
+        {
+          "id": 5,
+          "name": "Golden Grand",
+          "urlThumb": "bg_piano_12",
+          "urlTheme": "bg_piano_12",
+          "status": 1
+        },
+        {
+          "id": 6,
+          "name": "Royal Purple",
+          "urlThumb": "bg_piano_13",
+          "urlTheme": "bg_piano_13",
+          "status": 1
+        },
+        {
+          "id": 7,
+          "name": "Emerald Studio",
+          "urlThumb": "bg_piano_14",
+          "urlTheme": "bg_piano_14",
+          "status": 1
+        },
+        {
+          "id": 8,
+          "name": "Piano Stage 1",
+          "urlThumb": "bg_piano_4",
+          "urlTheme": "bg_piano_4",
+          "status": 1
+        },
+        {
+          "id": 9,
+          "name": "Piano Stage 2",
+          "urlThumb": "bg_piano_5",
+          "urlTheme": "bg_piano_5",
+          "status": 1
+        },
+        {
+          "id": 10,
+          "name": "Piano Stage 3",
+          "urlThumb": "bg_piano_8",
+          "urlTheme": "bg_piano_8",
+          "status": 1
+        },
+        {
+          "id": 11,
+          "name": "Piano Stage 4",
+          "urlThumb": "bg_piano_9",
+          "urlTheme": "bg_piano_9",
           "status": 1
         }
       ]
     },
     {
       "categoryID": 3,
-      "categoryName": "Universe",
+      "categoryName": "Universe & Events",
       "content": [
         {
-          "id": 4,
-          "name": "Star",
+          "id": 12,
+          "name": "Cloud & Sky",
+          "urlThumb": "theme_cloud_sky",
+          "urlTheme": "theme_cloud_sky",
+          "status": 1
+        },
+        {
+          "id": 13,
+          "name": "Star Universe",
           "urlThumb": "theme_star",
           "urlTheme": "theme_star",
+          "status": 1
+        },
+        {
+          "id": 14,
+          "name": "New Year Fireworks",
+          "urlThumb": "bg_piano_fireworks",
+          "urlTheme": "bg_piano_fireworks",
+          "status": 1
+        },
+        {
+          "id": 15,
+          "name": "Year of Snake 2025",
+          "urlThumb": "bg_piano_snake",
+          "urlTheme": "bg_piano_snake",
+          "status": 1
+        },
+        {
+          "id": 16,
+          "name": "New Year 2025",
+          "urlThumb": "bg_piano_2025",
+          "urlTheme": "bg_piano_2025",
           "status": 1
         }
       ]

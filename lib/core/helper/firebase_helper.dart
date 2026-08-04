@@ -100,12 +100,14 @@ class FirebaseHelper {
         case MyAdIdName.interSplashHigh:
         case MyAdIdName.interSplash:
           return "inter_splash_view";
-        case MyAdIdName.interAllAd:
+        case MyAdIdName.interClick:
           return "inters_ad_view";
         case MyAdIdName.nativeLanguage:
+          return "native_language_view";
         case MyAdIdName.nativeLanguageHigh:
           return "native_language_view";
         case MyAdIdName.nativeLanguageClick:
+          return "native_language_click_view";
         case MyAdIdName.nativeLanguageClickHigh:
           return "native_language_click_view";
         case MyAdIdName.nativeOnboard1Ad:
@@ -115,7 +117,7 @@ class FirebaseHelper {
         case MyAdIdName.nativeOnboardFull2Ad:
           return "native_onboarding_full_2_view";
         case MyAdIdName.nativeOnboard3Ad:
-          return "native_onboarding_3_view";
+          return "native_onboarding_4_view";
       }
     }
 

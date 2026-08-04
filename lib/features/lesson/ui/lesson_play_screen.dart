@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/audio_engine.dart';
 import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/record_button.dart';
 import '../../piano/ui/piano_view.dart';
 import '../data/lesson_datasource.dart';
@@ -220,16 +221,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                 return Positioned.fill(
                   child: Opacity(
                     opacity: 0.95,
-                    child: Image.asset(
-                      'assets/images/$themeRes.jpg',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/images/$themeRes.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, err, stack) =>
-                            Container(color: const Color(0xFF121212)),
-                      ),
-                    ),
+                    child: ThemeImage(resName: themeRes),
                   ),
                 );
               },

@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/app_constants.dart';
+
 class LanguageModel {
   final String pngAsset;
   final String title;
   final String languageCode;
 
-  LanguageModel({
+  const LanguageModel({
     required this.pngAsset,
     required this.title,
     required this.languageCode,
@@ -20,15 +22,19 @@ class LanguageController extends ChangeNotifier {
 
   bool isFirstLaunch = false;
   int selectedIndex = 100;
-  bool isShowAltAds = false;
+  bool isShowClickAds = false;
   bool isShouldShowNext = false;
   bool isShouldShowAds = true;
   bool isLoading = false;
+  bool _isDisposed = false;
+
+  Timer? _nextDelayTimer;
+  Timer? _loadingTimer;
 
   void init({bool firstLaunch = false}) {
     isFirstLaunch = firstLaunch;
     itemsList.clear();
-    itemsList.addAll([
+    itemsList.addAll(const [
       LanguageModel(pngAsset: 'assets/flag/flag_hindi.png', title: 'Hindi', languageCode: 'hi'),
       LanguageModel(pngAsset: 'assets/flag/flag_bengali.png', title: 'Bengali', languageCode: 'bn'),
       LanguageModel(pngAsset: 'assets/flag/flag_indonesia.png', title: 'Indonesian', languageCode: 'id'),
@@ -43,20 +49,61 @@ class LanguageController extends ChangeNotifier {
       LanguageModel(pngAsset: 'assets/flag/flag_vietnam.png', title: 'Vietnamese', languageCode: 'vi'),
     ]);
 
-    isLoading = true;
-    notifyListeners();
+    if (!isFirstLaunch) {
+      getPreviousSelectedLanguage();
+    }
 
-    Future.delayed(const Duration(seconds: 1), () {
+    isLoading = true;
+    _notify();
+
+    _loadingTimer?.cancel();
+    _loadingTimer = Timer(const Duration(seconds: 3), () {
       isLoading = false;
-      notifyListeners();
+      _notify();
     });
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _nextDelayTimer?.cancel();
+    _loadingTimer?.cancel();
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_isDisposed) notifyListeners();
+  }
+
+  void getPreviousSelectedLanguage() {
+    final selected = AppConstants.selectedLanguageCode;
+    var index = -1;
+    for (var i = 0; i < itemsList.length; i++) {
+      if (itemsList[i].languageCode == selected) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index >= 0) {
+      selectedIndex = index;
+    } else {
+      selectedIndex = 0;
+    }
+    isShouldShowNext = true;
   }
 
   void onSelectItem(int index) {
     selectedIndex = index;
-    isShowAltAds = true;
-    isShouldShowNext = true;
-    notifyListeners();
+    isShowClickAds = true;
+    isShouldShowNext = false;
+    _notify();
+
+    _nextDelayTimer?.cancel();
+    _nextDelayTimer = Timer(const Duration(milliseconds: 3500), () {
+      isShouldShowNext = true;
+      _notify();
+    });
   }
 
   void onSelectBack(BuildContext context) {
@@ -64,6 +111,10 @@ class LanguageController extends ChangeNotifier {
   }
 
   void onClickNext(BuildContext context, {required VoidCallback onNavigateNext}) {
+    if (selectedIndex >= 0 && selectedIndex < itemsList.length) {
+      AppConstants.selectedLanguageCode = itemsList[selectedIndex].languageCode;
+    }
+
     if (!isFirstLaunch) {
       Navigator.pop(context);
     } else {

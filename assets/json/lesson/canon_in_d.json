@@ -7,7 +7,6 @@
   {"type":0,"group":4,"position":5,"breakTime":400},
   {"type":0,"group":4,"position":6,"breakTime":400},
   {"type":1,"group":5,"position":0,"breakTime":400},
-
   {"type":0,"group":5,"position":0,"breakTime":400},
   {"type":1,"group":5,"position":3,"breakTime":400},
   {"type":0,"group":5,"position":5,"breakTime":400},
@@ -16,7 +15,6 @@
   {"type":0,"group":5,"position":0,"breakTime":400},
   {"type":1,"group":5,"position":3,"breakTime":400},
   {"type":0,"group":5,"position":2,"breakTime":400},
-
   {"type":0,"group":5,"position":0,"breakTime":400},
   {"type":1,"group":5,"position":0,"breakTime":400},
   {"type":0,"group":4,"position":6,"breakTime":400},
@@ -25,7 +23,6 @@
   {"type":0,"group":4,"position":3,"breakTime":400},
   {"type":0,"group":4,"position":4,"breakTime":400},
   {"type":0,"group":4,"position":5,"breakTime":400},
-
   {"type":1,"group":5,"position":3,"breakTime":300},
   {"type":1,"group":5,"position":3,"breakTime":300},
   {"type":0,"group":5,"position":4,"breakTime":300},
@@ -34,7 +31,6 @@
   {"type":0,"group":5,"position":4,"breakTime":300},
   {"type":1,"group":5,"position":3,"breakTime":300},
   {"type":0,"group":5,"position":2,"breakTime":300},
-
   {"type":0,"group":5,"position":0,"breakTime":300},
   {"type":0,"group":5,"position":0,"breakTime":300},
   {"type":0,"group":5,"position":2,"breakTime":300},
@@ -43,7 +39,6 @@
   {"type":0,"group":5,"position":2,"breakTime":300},
   {"type":0,"group":5,"position":0,"breakTime":300},
   {"type":1,"group":5,"position":0,"breakTime":300},
-
   {"type":0,"group":4,"position":6,"breakTime":300},
   {"type":0,"group":4,"position":6,"breakTime":300},
   {"type":1,"group":5,"position":0,"breakTime":300},
@@ -52,7 +47,6 @@
   {"type":1,"group":5,"position":0,"breakTime":300},
   {"type":0,"group":4,"position":6,"breakTime":300},
   {"type":0,"group":4,"position":5,"breakTime":300},
-
   {"type":0,"group":4,"position":4,"breakTime":300},
   {"type":0,"group":4,"position":4,"breakTime":300},
   {"type":0,"group":4,"position":5,"breakTime":300},

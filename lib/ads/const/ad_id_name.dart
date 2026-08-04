@@ -16,7 +16,7 @@ class MyAdIdName {
   static const nativeOnboardFull1Ad = "nativeOnboardFull1Ad";
   static const nativeOnboardFull2Ad = "nativeOnboardFull2Ad";
   static const nativeOnboard3Ad = "nativeOnboard3Ad";
-  static const interAllAd = "interAllAd";
+  static const interClick = "interClick";
   static const nativeFull = "nativeFull";
   static const rewardedAd = "rewardedAd";
   static const bannerAll = "bannerAll";
