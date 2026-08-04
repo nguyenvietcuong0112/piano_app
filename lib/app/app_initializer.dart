@@ -8,8 +8,9 @@ import 'package:injectable/injectable.dart';
 
 import '../core/helper/iap_helper.dart';
 import '../core/helper/notification_helper.dart';
+import '../core/services/ads_service.dart';
 import '../core/theme/app_colors.dart';
-import '../core/utils/app_setting.dart';
+import '../core/constants/app_constants.dart';
 import '../main.dart' as app_main;
 
 class AppInitializer {
@@ -17,6 +18,7 @@ class AppInitializer {
 
   static void init() {
     configLoading();
+    AdsService.initOrganic();
     _initCommonSDK();
 
     Future.delayed(const Duration(seconds: 5), () {
@@ -34,9 +36,9 @@ class AppInitializer {
     _fgbgSubscription = FGBGEvents.instance.stream.listen((event) {
       debugPrint('MyApp FGBGEvents: $event');
       if (event == FGBGType.foreground) {
-        AppSetting.appInBackground = false;
+        AppConstants.appInBackground = false;
       } else if (event == FGBGType.background) {
-        AppSetting.appInBackground = true;
+        AppConstants.appInBackground = true;
       }
     });
 
@@ -48,19 +50,19 @@ class AppInitializer {
   static Future<void> loginGSM() async {
     final isProd = app_main.env == Environment.prod;
     final token = await EasyAds.instance.loginGSM(
-      gsmAppId: '69d63797e75be4583154138a',
+      gsmAppId: AppConstants.gsmAppId,
       isProd: isProd,
     );
     if (token != null) {
-      AppSetting.GSMAccessToken = token;
+      AppConstants.GSMAccessToken = token;
     }
   }
 
   static Future<void> _initPlatformState() async {
     final isProd = app_main.env == Environment.prod;
     AdjustHelper.init(
-      token: "",
-      iapToken: "",
+      token: AppConstants.adjustToken,
+      iapToken: AppConstants.adjustIapToken,
       isProd: isProd,
     );
 
@@ -69,7 +71,10 @@ class AppInitializer {
       !isProd ? AdjustEnvironment.sandbox : AdjustEnvironment.production,
     );
 
-    await EasyAds.instance.initAdjust(config);
+    await EasyAds.instance.initAdjust(
+      config,
+      onOrganicChanged: (isOrganic) => AdsService.setIsOrganic(isOrganic),
+    );
   }
 
   static void handleStateApp(FGBGType event) {

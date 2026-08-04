@@ -7,13 +7,13 @@ import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/utils/app_setting.dart';
+import '../../core/constants/app_constants.dart';
 import 'onboard_controller.dart';
 
 class OnboardPage extends ConsumerStatefulWidget {
   const OnboardPage({super.key});
 
-  @override
+  @override 
   ConsumerState<OnboardPage> createState() => _OnboardPageState();
 }
 
@@ -146,7 +146,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
   }
 
   Widget _buildNativeAdForStep(int index) {
-    if (AppSetting.isPremiumUser.value) return const SizedBox.shrink();
+    if (AppConstants.isPremiumUser.value) return const SizedBox.shrink();
 
     if (index == 0) {
       return Container(

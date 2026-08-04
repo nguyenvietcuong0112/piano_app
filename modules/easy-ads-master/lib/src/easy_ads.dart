@@ -59,6 +59,16 @@ class EasyAds {
   /// Flag to disable app open ad from lifecycle when showing manually
   bool _isManualAppOpenAdShowing = false;
 
+  /// True value when user has purchased Premium / No Ads
+  bool _isPremiumUser = false;
+
+  bool get isPremiumUser => _isPremiumUser;
+
+  void setPremiumUser(bool value) {
+    _isPremiumUser = value;
+    _logger.logInfo('EasyAds: setPremiumUser = $value');
+  }
+
   void setManualAppOpenAdShowing(bool value) =>
       _isManualAppOpenAdShowing = value;
 
@@ -151,8 +161,14 @@ class EasyAds {
     _initialized = true;
   }
 
-  Future<void> initAdjust(AdjustConfig config) async {
-    await EasyAdjustService().initAdjust(config);
+  Future<void> initAdjust(
+    AdjustConfig config, {
+    Function(bool isOrganic)? onOrganicChanged,
+  }) async {
+    await EasyAdjustService().initAdjust(
+      config,
+      onOrganicChanged: onOrganicChanged,
+    );
   }
 
   Future<void> initFirebaseAnalytics(FirebaseAnalytics analytics) async {
@@ -348,6 +364,7 @@ class EasyAds {
   ///
   /// [adUnitType] should be mentioned here, only interstitial or rewarded should be mentioned here
   bool showRandomAd(AdUnitType adUnitType) {
+    if (_isPremiumUser) return false;
     assert(
         adUnitType == AdUnitType.interstitial ||
             adUnitType == AdUnitType.rewarded,
@@ -384,6 +401,11 @@ class EasyAds {
     Function()? onFailed,
     Function()? callback,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      callback?.call();
+      return;
+    }
     if (_isFullscreenAdShowing || _isManualAppOpenAdShowing) {
       return;
     }
@@ -431,6 +453,11 @@ class EasyAds {
     Function()? onFailed,
     Function()? callback,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      callback?.call();
+      return;
+    }
     if (_isFullscreenAdShowing || _isManualAppOpenAdShowing) {
       return;
     }
@@ -479,6 +506,7 @@ class EasyAds {
   /// if [random] is true, any random loaded ad would be displayed
   Future<bool> showAd(AdUnitType adUnitType,
       {AdNetwork adNetwork = AdNetwork.any}) async {
+    if (_isPremiumUser) return false;
     List<EasyAdBase> ads = [];
     if (adUnitType == AdUnitType.rewarded) {
       ads = _rewardedAds;
@@ -525,6 +553,7 @@ class EasyAds {
   ///
   /// if [adNetwork] is provided, only that network's ad would be loaded
   void loadAd({AdNetwork adNetwork = AdNetwork.any}) {
+    if (_isPremiumUser) return;
     for (final e in _rewardedAds) {
       if (adNetwork == AdNetwork.any || adNetwork == e.adNetwork) {
         e.load();
@@ -542,6 +571,7 @@ class EasyAds {
   ///
   /// if [adNetwork] is provided, only that network's ad would be checked
   bool isRewardedAdLoaded({AdNetwork adNetwork = AdNetwork.any}) {
+    if (_isPremiumUser) return false;
     final ad = _rewardedAds.firstWhereOrNull((e) =>
         (adNetwork == AdNetwork.any || adNetwork == e.adNetwork) &&
         e.isAdLoaded);
@@ -552,6 +582,7 @@ class EasyAds {
   ///
   /// if [adNetwork] is provided, only that network's ad would be checked
   bool isInterstitialAdLoaded({AdNetwork adNetwork = AdNetwork.any}) {
+    if (_isPremiumUser) return false;
     final ad = _interstitialAds.firstWhereOrNull((e) =>
         (adNetwork == AdNetwork.any || adNetwork == e.adNetwork) &&
         e.isAdLoaded);
@@ -562,6 +593,7 @@ class EasyAds {
   ///
   /// if [adNetwork] is provided, only that network's ad would be checked
   bool isAppOpenAdLoaded({AdNetwork adNetwork = AdNetwork.any}) {
+    if (_isPremiumUser) return false;
     final ad = _appOpenAds.firstWhereOrNull((e) =>
         (adNetwork == AdNetwork.any || adNetwork == e.adNetwork) &&
         e.isAdLoaded);
@@ -575,6 +607,7 @@ class EasyAds {
   ///
   /// if [adNetwork] is provided, only that network's ad would be loaded
   void loadAppOpenAd({AdNetwork adNetwork = AdNetwork.any}) {
+    if (_isPremiumUser) return;
     for (final e in _appOpenAds) {
       if (adNetwork == AdNetwork.any || adNetwork == e.adNetwork) {
         e.load();
@@ -607,6 +640,10 @@ class EasyAds {
     Function()? adDissmissed,
     Function()? onFailed,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -640,6 +677,10 @@ class EasyAds {
     Function()? adDissmissed,
     Function()? onFailed,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -668,6 +709,10 @@ class EasyAds {
     Function()? adDissmissed,
     Function()? onFailed,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -697,6 +742,10 @@ class EasyAds {
     Function()? adDissmissed,
     Function()? onFailed,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -724,6 +773,10 @@ class EasyAds {
     Function()? adDissmissed,
     Function()? onFailed,
   }) {
+    if (_isPremiumUser) {
+      adDissmissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -751,6 +804,10 @@ class EasyAds {
     Function()? onDismissed,
     Function()? onFailedToLoad,
   }) {
+    if (_isPremiumUser) {
+      onDismissed?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }
@@ -774,6 +831,10 @@ class EasyAds {
     AdNetwork adNetwork = AdNetwork.admob,
     Function()? callback,
   }) {
+    if (_isPremiumUser) {
+      callback?.call();
+      return;
+    }
     if (_isFullscreenAdShowing) {
       return;
     }

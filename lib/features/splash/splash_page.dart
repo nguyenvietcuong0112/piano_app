@@ -5,7 +5,7 @@ import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/const/ad_id_extension.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/utils/app_setting.dart';
+import '../../core/constants/app_constants.dart';
 import 'splash_controller.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -107,7 +107,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                             backgroundColor: const Color(0xFFEAEAEA),
                           ),
                         ),
-                        if (!AppSetting.isPremiumUser.value) ...[
+                        if (!AppConstants.isPremiumUser.value) ...[
                           const SizedBox(height: 10),
                           EasyBannerAd(
                             adId: MyAdIdName.bannerAll.getId,

@@ -7,7 +7,7 @@ import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/nativefull/native_full_screen.dart';
 import '../../core/services/firebase_remote_config_service.dart';
-import '../../core/utils/app_setting.dart';
+import '../../core/constants/app_constants.dart';
 
 import '../../core/services/shared_preference_service.dart';
 
@@ -84,7 +84,7 @@ class OnboardController extends ChangeNotifier {
     if (currentIndex == 0) {
       bool showNativeFull1 = FirebaseRemoteConfigService.getBoolConfigByKey(
               FirebaseRemoteConfigService.native_onboarding_full_1) &&
-          !AppSetting.isPremiumUser.value;
+          !AppConstants.isPremiumUser.value; 
 
       if (showNativeFull1) {
         Navigator.push(
@@ -107,7 +107,7 @@ class OnboardController extends ChangeNotifier {
     } else if (currentIndex == 2) {
       bool showNativeFull2 = FirebaseRemoteConfigService.getBoolConfigByKey(
               FirebaseRemoteConfigService.native_onboarding_full_2) &&
-          !AppSetting.isPremiumUser.value;
+          !AppConstants.isPremiumUser.value;
 
       if (showNativeFull2) {
         Navigator.push(

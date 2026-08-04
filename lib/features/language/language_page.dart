@@ -7,7 +7,7 @@ import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/utils/app_setting.dart';
+import '../../core/constants/app_constants.dart';
 import 'language_controller.dart';
 
 class LanguagePage extends ConsumerStatefulWidget {
@@ -68,7 +68,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
   }
 
   Widget buildNativeAd(LanguageController controller) {
-    if (AppSetting.isPremiumUser.value) return const SizedBox.shrink();
+    if (AppConstants.isPremiumUser.value) return const SizedBox.shrink();
 
     final isClick = controller.isShowAltAds;
     return Container(

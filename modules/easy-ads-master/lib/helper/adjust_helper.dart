@@ -23,6 +23,21 @@ class AdjustHelper {
     isProduction = isProd;
   }
 
+  static Future<void> saveAttributionNetwork(String? network) async {
+    print('====================================================');
+    print('[ADJUST ATTRIBUTION LOG]');
+    print('👉 User Network Source: ${network ?? "Unknown/Null"}');
+
+    if (network == null || network.isEmpty) {
+      print('====================================================');
+      return;
+    }
+
+    bool isOrganicUser = network.toLowerCase().contains('organic');
+    print('👉 Is Organic User: $isOrganicUser');
+    print('====================================================');
+  }
+
   static String adjustEventTokenBuyWeeklySuccess = '';
   static String adjustEventTokenBuyMonthlySuccess = '';
   static String adjustEventTokenBuyYearlySuccess = '';

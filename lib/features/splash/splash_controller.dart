@@ -6,9 +6,10 @@ import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/const/ad_id_extension.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/helper/firebase_helper.dart';
+import '../../core/services/ads_service.dart';
 import '../../core/services/firebase_remote_config_service.dart';
-import '../../core/utils/app_setting.dart';
 import '../language/language_page.dart';
 
 import '../../core/services/shared_preference_service.dart';
@@ -60,22 +61,27 @@ class SplashController extends ChangeNotifier {
             FirebaseRemoteConfigService.inter_splash) ||
         FirebaseRemoteConfigService.getBoolConfigByKey(
             FirebaseRemoteConfigService.inter_splash_high))
-        && !AppSetting.isPremiumUser.value;
+        && !AppConstants.isPremiumUser.value;
 
     if (showInterSplash) {
-      EasyAds.instance.showInterstitialAdSplashWith2Id(
-        context,
-        interSplashHigh: MyAdIdName.interSplashHigh.getId,
-        interSplashAll: MyAdIdName.interSplash.getId,
-        onShowed: () {
-        },
-        adDissmissed: () {
-          goNextScreen(context, onFinished: onFinished);
-        },
-        onFailed: () {
-          goNextScreen(context, onFinished: onFinished);
-        },
-      );
+      if(AdsService.isOrganic.value){
+        EasyAds.instance.showInterstitialAdSplashWith2Id(
+          context,
+          interSplashHigh: MyAdIdName.interSplashHigh.getId,
+          interSplashAll: MyAdIdName.interSplash.getId,
+          onShowed: () {
+          },
+          adDissmissed: () {
+            goNextScreen(context, onFinished: onFinished);
+          },
+          onFailed: () {
+            goNextScreen(context, onFinished: onFinished);
+          },
+        );
+      } else {
+        goNextScreen(context, onFinished: onFinished);
+      }
+
     } else {
       goNextScreen(context, onFinished: onFinished);
     }
