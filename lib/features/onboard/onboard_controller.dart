@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/nativefull/native_full_screen.dart';
-import '../../core/helper/firebase_remote_config_service.dart';
+import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/utils/app_setting.dart';
+
+import '../../core/services/shared_preference_service.dart';
 
 class OnboardStep {
   final String title;
@@ -124,8 +126,13 @@ class OnboardController extends ChangeNotifier {
         _goToNextPage(steps);
       }
     } else {
+      _markAppOpened();
       context.go('/home');
     }
+  }
+
+  Future<void> _markAppOpened() async {
+    await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
   }
 
   void _goToNextPage(List<OnboardStep> steps) {

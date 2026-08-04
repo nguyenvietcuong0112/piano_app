@@ -3,28 +3,28 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 class FirebaseRemoteConfigService {
   static FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
-  static final String android_app_version = "android_app_version";
-  static final String banner_splash = "banner_splash";
-  static final String inter_splash_high = "inter_splash_high";
-  static final String inter_splash = "inter_splash";
-  static final String native_language = "native_language";
-  static final String native_language_alt = "native_language_alt";
-  static final String native_onboarding_1 = "native_onboarding_1";
-  static final String native_onboarding_full_2 = "native_onboarding_full_2";
-  static final String native_onboarding_full_1 = "native_onboarding_full_1";
-  static final String native_onboarding_3 = "native_onboarding_3";
-  static final String native_permission = "native_permission";
-  static final String native_banner = "native_banner";
-  static final String inter_all = "inter_all";
-  static final String interval_inter_ad = "interval_inter_ad";
-  static final String native_all = "native_all";
-  static final String time_delay_close_premium = "time_delay_close_premium";
-  static final String show_activity_iap = "show_activity_iap";
+  static const String android_app_version = "android_app_version";
 
-  static final String limit_free_enhance = "limit_free_enhance";
-  static final String limit_free_restore = "limit_free_restore";
-  static final String limit_free_ai_photo = "limit_free_ai_photo";
-  static final String limit_free_ai_filter = "limit_free_ai_filter";
+  //ads
+  static const String banner_splash = "banner_splash";
+  static const String inter_splash_high = "inter_splash_high";
+  static const String inter_splash = "inter_splash";
+  static const String native_language = "native_language";
+  static const String native_language_alt = "native_language_alt";
+  static const String native_onboarding_1 = "native_onboarding_1";
+  static const String native_onboarding_full_2 = "native_onboarding_full_2";
+  static const String native_onboarding_full_1 = "native_onboarding_full_1";
+  static const String native_onboarding_3 = "native_onboarding_3";
+  static const String native_permission = "native_permission";
+  static const String native_banner = "native_banner";
+  static const String inter_all = "inter_all";
+  static const String interval_inter_ad = "interval_inter_ad";
+  static const String native_all = "native_all";
+
+  static const String time_delay_close_premium = "time_delay_close_premium";
+  static const String show_activity_iap = "show_activity_iap";
+
+
 
   static Future<void> initFirebaseRemoteConfig() async {
     try {
@@ -84,3 +84,5 @@ class FirebaseRemoteConfigService {
     }
   }
 }
+
+typedef FirebaseService = FirebaseRemoteConfigService;

@@ -2,14 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/shared_preference_service.dart';
+
 import '../../lesson/domain/lesson_model.dart';
 import '../../lesson/state/lesson_provider.dart';
 
-class HomeTab extends ConsumerWidget {
+class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends ConsumerState<HomeTab> {
+  @override
+  void initState() {
+    super.initState();
+    _markAppOpened();
+  }
+
+  Future<void> _markAppOpened() async {
+    await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsProvider);
 
     return Scaffold(

@@ -1,14 +1,31 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/services/ads_service.dart';
+import '../core/services/firebase_remote_config_service.dart';
+import '../core/services/shared_preference_service.dart';
+import '../main.dart';
 import 'dependency_injection.config.dart';
 
 final GetIt getIt = GetIt.instance;
 
-@InjectableInit(
-  initializerName: 'init',
-  preferRelativeImports: true,
-  asExtension: true,
-)
-Future<void> configureDependencies({String env = Environment.prod}) async =>
-    getIt.init(environment: env);
+@injectableInit
+Future<void> configure(String environment) async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  await FirebaseRemoteConfigService.initFirebaseRemoteConfig();
+
+  getIt.registerSingleton<SharedPreferences>(sharedPreferences);
+  getIt.registerSingleton<FirebaseAnalytics>(FirebaseAnalytics.instance);
+  getIt.registerSingleton<FirebaseRemoteConfigService>(
+    FirebaseRemoteConfigService(),
+  );
+  getIt.registerSingleton<AdsService>(AdsService());
+  getIt.registerSingleton<SharedPreferenceService>(SharedPreferenceService());
+}
+
+Future<void> configureDependencies() async {
+  getIt.init(environment: env);
+  await configure(env);
+}

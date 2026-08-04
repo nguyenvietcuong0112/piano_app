@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:adjust_sdk/adjust.dart';
 import 'package:adjust_sdk/adjust_config.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
-import 'package:easy_ads_flutter/helper/adjust_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
@@ -19,7 +17,6 @@ class AppInitializer {
 
   static void init() {
     configLoading();
-    AppSetting.initAppSetting();
     _initCommonSDK();
 
     Future.delayed(const Duration(seconds: 5), () {

@@ -7,9 +7,11 @@ import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/const/ad_id_extension.dart';
 import '../../core/helper/firebase_helper.dart';
-import '../../core/helper/firebase_remote_config_service.dart';
+import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/utils/app_setting.dart';
 import '../language/language_page.dart';
+
+import '../../core/services/shared_preference_service.dart';
 
 class SplashController extends ChangeNotifier {
   double percentLoading = 0.0;
@@ -34,6 +36,8 @@ class SplashController extends ChangeNotifier {
   }
 
   Future<void> _checkInternetAndStart(BuildContext context, {required VoidCallback onFinished}) async {
+    isNoFirstOpenApp = await SharedPreferenceUtils.getIsNoFirstOpenApp();
+    if (!context.mounted) return;
     startFakeDuration(context, onFinished: onFinished);
   }
 

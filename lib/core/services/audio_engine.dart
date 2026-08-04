@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart' as ap;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'shared_preference_service.dart';
 
 class AudioEngine {
   static final AudioEngine _instance = AudioEngine._internal();
@@ -32,10 +32,8 @@ class AudioEngine {
     _isLoading = true;
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      currentInstrument =
-          prefs.getString("SELECTED_INSTRUMENT") ?? "bright";
-      volume = prefs.getDouble("AUDIO_VOLUME") ?? 0.8;
+      currentInstrument = await SharedPreferenceUtils.getSelectedInstrument();
+      volume = await SharedPreferenceUtils.getAudioVolume();
 
       if (!SoLoud.instance.isInitialized) {
         await SoLoud.instance.init();
@@ -108,8 +106,7 @@ class AudioEngine {
 
   Future<void> setVolume(double newVolume) async {
     volume = newVolume.clamp(0.0, 1.0);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble("AUDIO_VOLUME", volume);
+    await SharedPreferenceUtils.setAudioVolume(volume);
   }
 
   Future<void> volumeUp() async {
@@ -124,8 +121,7 @@ class AudioEngine {
 
   Future<void> loadInstrument(String instrumentFolder) async {
     currentInstrument = instrumentFolder;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("SELECTED_INSTRUMENT", instrumentFolder);
+    await SharedPreferenceUtils.setSelectedInstrument(instrumentFolder);
     await _preloadInstrument(instrumentFolder);
   }
 

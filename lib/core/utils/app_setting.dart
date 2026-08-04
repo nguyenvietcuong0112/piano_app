@@ -8,15 +8,4 @@ class AppSetting {
   static int adImpressionCount = 0;
   static String selectedLanguageCode = 'en';
   static String GSMAccessToken = '';
-
-  static void initAppSetting() {}
-
-  static void showInterstitialAd(
-    BuildContext context, {
-    required String adId,
-    required VoidCallback adDismissed,
-    required VoidCallback onFailed,
-  }) {
-    adDismissed();
-  }
 }
