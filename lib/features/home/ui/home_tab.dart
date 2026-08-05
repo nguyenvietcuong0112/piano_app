@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/shared_preference_service.dart';
-
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/gradient_border_card.dart';
+import '../../../core/widgets/song_thumbnail.dart';
 import '../../lesson/domain/lesson_model.dart';
 import '../../lesson/state/lesson_provider.dart';
 
@@ -15,26 +21,74 @@ class HomeTab extends ConsumerStatefulWidget {
 }
 
 class _HomeTabState extends ConsumerState<HomeTab> {
+  final Map<String, int> _songStarsMap = {};
+
   @override
   void initState() {
     super.initState();
     _markAppOpened();
+    _loadSongStars();
   }
 
   Future<void> _markAppOpened() async {
     await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
   }
 
+  Future<void> _loadSongStars() async {
+    final lessonsResponse = ref.read(lessonsProvider).valueOrNull;
+    List<int> idsToLoad = [1, 2, 3];
+    if (lessonsResponse != null) {
+      for (var c in lessonsResponse.categories) {
+        for (var item in c.items) {
+          idsToLoad.add(item.id);
+        }
+      }
+    }
+    for (var id in idsToLoad) {
+      final stars = await SharedPreferenceService.getLessonStars(id.toString());
+      if (mounted) {
+        setState(() {
+          _songStarsMap[id.toString()] = stars;
+        });
+      }
+    }
+  }
+
+  String _getDifficultyText(int level) {
+    switch (level) {
+      case 1:
+        return "Easy";
+      case 2:
+        return "Medium";
+      case 3:
+        return "Hard";
+      default:
+        return "Easy";
+    }
+  }
+
+  Color _getDifficultyColor(int level) {
+    switch (level) {
+      case 1:
+        return AppColors.levelEasy;
+      case 2:
+        return AppColors.levelMedium;
+      case 3:
+        return AppColors.levelHard;
+      default:
+        return AppColors.levelEasy;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF121218),
-      body: SafeArea(
-        child: lessonsAsync.when(
+    return AppScaffold(
+      horizontalPadding: 16.w,
+      body: lessonsAsync.when(
           loading: () => const Center(
-            child: CircularProgressIndicator(color: Colors.amber),
+            child: CircularProgressIndicator(color: Color(0xFFAD57E6)),
           ),
           error: (err, stack) => Center(
             child: Text(
@@ -48,201 +102,279 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             for (var c in categories) {
               popularSongs.addAll(c.items);
             }
-            popularSongs = popularSongs.take(3).toList();
-
+            if (popularSongs.isEmpty) {
+              popularSongs = [
+                LessonsItem(
+                  id: 1,
+                  titleName: "A Thousand Years",
+                  authorName: "Christina Perri",
+                  duration: "03:45",
+                  lessonsData: "a_thousand_years.json",
+                  thumbnail: "",
+                  level: 1, // 1 = Easy
+                  startOctave: 4,
+                  startKeyPosition: 0,
+                  visibleWhiteKeysCount: 14,
+                ),
+                LessonsItem(
+                  id: 2,
+                  titleName: "A Thousand Years",
+                  authorName: "Christina Perri",
+                  duration: "03:45",
+                  lessonsData: "a_thousand_years.json",
+                  thumbnail: "",
+                  level: 3, // 3 = Hard
+                  startOctave: 4,
+                  startKeyPosition: 0,
+                  visibleWhiteKeysCount: 14,
+                ),
+                LessonsItem(
+                  id: 3,
+                  titleName: "A Thousand Years",
+                  authorName: "Christina Perri",
+                  duration: "03:45",
+                  lessonsData: "a_thousand_years.json",
+                  thumbnail: "",
+                  level: 2, // 2 = Medium
+                  startOctave: 4,
+                  startKeyPosition: 0,
+                  visibleWhiteKeysCount: 14,
+                ),
+              ];
+            }
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.only(top: 12.h, bottom: 90.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Real Piano",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.settings, color: Colors.white70),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Settings")),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  GestureDetector(
+                  GradientBorderCard(
+                    height: 150.h,
+                    borderRadius: 20,
+                    bgImageAsset: 'assets/images/img_acoustic_piano.png',
+                    imageFit: BoxFit.fill,
                     onTap: () => context.push('/play'),
-                    child: Container(
-                      height: 140,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6B21A8), Color(0xFF3B0764)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF6B21A8).withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(12),
+                    padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 6,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(text: "ACOUSTIC ", style: AppTextStyles.textWhite20), 
+                                    TextSpan(text: "PIANO", style: AppTextStyles.textPurple20),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Text(
+                                "Learn Piano anywhere,\nanytime. Real keys, real feel.",
+                                style: AppTextStyles.textWhite12,
+                              ),
+                              SizedBox(height: 12.h),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFB158F0), Color(0xFF7E26D4)],
                                   ),
-                                  child: const Text(
-                                    "FREE PLAY",
-                                    style: TextStyle(
-                                      color: Colors.amber,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18.sp),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      "Play Now",
+                                      style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "Acoustic Piano",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  "Real feel, low latency sound",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: const BoxDecoration(
-                              color: Colors.amber,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow_rounded,
-                              color: Colors.black,
-                              size: 32,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
+                  SizedBox(height: 16.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Popular Lessons",
+                        "Popular Songs",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (categories.isNotEmpty)
-                        GestureDetector(
-                          onTap: () => context.push('/all-lessons'),
-                          child: const Text(
-                            "See All >",
-                            style: TextStyle(color: Colors.amber),
-                          ),
+                      GestureDetector(
+                        onTap: () => context.push('/all-lessons'),
+                        child:  Row(
+                          children: [
+                            Text(
+                              "See All",
+                              style: AppTextStyles.textPurple14,
+                            ),
+                            SizedBox(width: 2),
+                            Icon(Icons.chevron_right_rounded, color: AppColors.textPurple, size: 18),
+                          ],
                         ),
+                      ),
                     ],
                   ),
-
-                  const SizedBox(height: 8),
-
+                  SizedBox(height: 8.h),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: popularSongs.length,
                     itemBuilder: (context, index) {
                       final song = popularSongs[index];
+                      final songIdStr = song.id.toString();
+                      final starCount = _songStarsMap[songIdStr] ?? 0;
+                      final difficulty = _getDifficultyText(song.level);
+                      final diffColor = _getDifficultyColor(song.level);
+
                       return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E2C),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white10),
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.10),
+                            width: 1,
+                          ),
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 4),
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.amber.withValues(alpha: 0.15),
-                            child: Image.asset(
-                              'assets/icons/ic_note.png',
-                              width: 24,
-                              height: 24,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.music_note,
-                                      color: Colors.amber),
+                        child: Row(
+                          children: [
+                            // Song Thumbnail + VIP Crown Badge
+                            Stack(
+                              children: [
+                                SongThumbnail(
+                                  thumbnailUrl: song.thumbnail,
+                                  width: 100.sp,
+                                  height: 80.sp,
+                                  borderRadius: 12,
+                                ),
+                                Positioned(
+                                  top: 5.sp,
+                                  left: 5.sp,
+                                  child: SvgPicture.asset(
+                                    'assets/icons/ic_reward.svg',
+                                    width: 18.sp,
+                                    height: 18.sp,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          title: Text(
-                            song.titleName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                          subtitle: Text(
-                            "${song.authorName} • ${song.duration}",
-                            style: const TextStyle(
-                                color: Colors.white60, fontSize: 13),
-                          ),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Text(
-                              "PLAY",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                             SizedBox(width: 10.w),
+                            // Song Title, Author & 5-Star Rating
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    song.titleName,
+                                    style:  AppTextStyles.textWhite14,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                   SizedBox(height: 4.h),
+                                  Text(
+                                    song.authorName,
+                                    style: AppTextStyles.textGrey12,
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  // Star Rating Row
+                                  Row(
+                                    children: List.generate(5, (starIndex) {
+                                      bool isStarFilled = starIndex < starCount;
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 2),
+                                        child: Icon(
+                                          isStarFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+                                          size: 14.sp,
+                                          color: isStarFilled ? Colors.amber : Colors.white24,
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                          onTap: () => context.push('/lesson-play', extra: song),
+
+                            // Difficulty Tag & Play Button
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: diffColor.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
+                                  ),
+                                  child: Text(
+                                    difficulty,
+                                    style: TextStyle(
+                                      color: diffColor,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await context.push('/lesson-play', extra: song);
+                                    _loadSongStars();
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD065F2),
+                                      borderRadius: BorderRadius.circular(16.r),
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          const Color(0xFF7745D3).withValues(alpha: 0.25),
+                                          const Color(0xFFCC69EE).withValues(alpha: 0.25),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/icons/ic_play.svg',
+                                          width: 12.sp,
+                                          height: 12.sp,
+                                          color: AppColors.textPurple,
+                                        ),
+                                        SizedBox(width: 5.w),
+                                        Text(
+                                          "Play",
+                                          style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -252,7 +384,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             );
           },
         ),
-      ),
     );
   }
 }

@@ -69,7 +69,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textWhite,
                         ),
                       ),
                       const SizedBox(height: 200),
@@ -94,7 +94,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textSecondary),
+                              color: AppColors.textGrey),
                         ),
                         const SizedBox(height: 10),
                         Container(

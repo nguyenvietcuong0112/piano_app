@@ -135,7 +135,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                       controller.itemsList[index].title,
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppColors.textWhite,
                         fontSize: 14,
                       ),
                     ),
@@ -189,7 +189,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textWhite,
                 ),
               ),
             ),
@@ -209,7 +209,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                       height: 40,
                       child: Icon(
                         Icons.arrow_back,
-                        color: AppColors.textPrimary,
+                        color: AppColors.textWhite,
                         size: 25,
                       ),
                     ),
@@ -237,7 +237,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                       child: Center(
                         child: Icon(
                           Icons.done,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textWhite,
                           size: 25,
                         ),
                       ),

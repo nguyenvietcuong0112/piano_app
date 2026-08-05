@@ -229,8 +229,8 @@ class _NativeFullScreenState extends State<NativeFullScreen>
                             'assets/icons/ic_close.svg',
                             colorFilter: ColorFilter.mode(
                               _closeLocked
-                                  ? AppColors.textPrimary.withOpacity(0.5)
-                                  : AppColors.textPrimary,
+                                  ? AppColors.textWhite.withOpacity(0.5)
+                                  : AppColors.textWhite,
                               BlendMode.srcIn,
                             ),
                             width: 20,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -134,6 +135,93 @@ class SharedPreferenceService {
 
   static Future<double?> getDouble(String key) async {
     return (await getInstance()).getDouble(key);
+  }
+
+  // --- Lesson High Scores / Stars ---
+  static const String keyLessonStarsPrefix = 'LESSON_STARS_';
+  static const String keyCompletedSongsList = 'KEY_COMPLETED_SONGS_LIST';
+
+  static Future<int> getLessonStars(String lessonId) async {
+    try {
+      final prefs = await getInstance();
+      return prefs.getInt('$keyLessonStarsPrefix$lessonId') ?? 0;
+    } catch (e) {
+      debugPrint('SharedPreferenceService getLessonStars error: $e');
+      return 0;
+    }
+  }
+
+  static Future<bool> saveLessonStars(String lessonId, int stars) async {
+    try {
+      final prefs = await getInstance();
+      final currentMax = prefs.getInt('$keyLessonStarsPrefix$lessonId') ?? 0;
+      if (stars > currentMax) {
+        return await prefs.setInt('$keyLessonStarsPrefix$lessonId', stars);
+      }
+      return true;
+    } catch (e) {
+      debugPrint('SharedPreferenceService saveLessonStars error: $e');
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getCompletedSongsList() async {
+    try {
+      final prefs = await getInstance();
+      final String? jsonStr = prefs.getString(keyCompletedSongsList);
+      if (jsonStr != null && jsonStr.isNotEmpty) {
+        final List<dynamic> decoded = json.decode(jsonStr);
+        return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (e) {
+      debugPrint('SharedPreferenceService getCompletedSongsList error: $e');
+    }
+    return [];
+  }
+
+  static Future<bool> saveCompletedSongRecord({
+    required String songId,
+    required String titleName,
+    required String authorName,
+    required String duration,
+    required String lessonsData,
+    required int level,
+    required int stars,
+    required int score,
+    required double accuracy,
+  }) async {
+    try {
+      final prefs = await getInstance();
+      final currentList = await getCompletedSongsList();
+
+      final existingIndex = currentList.indexWhere((item) => item['songId'].toString() == songId);
+      final newRecord = {
+        'songId': songId,
+        'titleName': titleName,
+        'authorName': authorName,
+        'duration': duration,
+        'lessonsData': lessonsData,
+        'level': level,
+        'stars': stars,
+        'score': score,
+        'accuracy': accuracy.round(),
+        'completedAt': DateTime.now().toIso8601String(),
+      };
+
+      if (existingIndex >= 0) {
+        final oldStars = (currentList[existingIndex]['stars'] as num?)?.toInt() ?? 0;
+        if (stars >= oldStars) {
+          currentList[existingIndex] = newRecord;
+        }
+      } else {
+        currentList.insert(0, newRecord);
+      }
+
+      return await prefs.setString(keyCompletedSongsList, json.encode(currentList));
+    } catch (e) {
+      debugPrint('SharedPreferenceService saveCompletedSongRecord error: $e');
+      return false;
+    }
   }
 
   static Future<bool> remove(String key) async {

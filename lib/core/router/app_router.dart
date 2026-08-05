@@ -11,6 +11,8 @@ import '../../features/lesson/ui/lesson_play_screen.dart';
 import '../../features/piano/ui/piano_tab.dart';
 import '../../features/piano/ui/play_piano_screen.dart';
 import '../../features/themes/ui/theme_tab.dart';
+import '../../features/my_songs/ui/my_songs_tab.dart';
+import '../../features/premium/ui/premium_screen.dart';
 import '../../features/main/main_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -67,6 +69,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my-songs',
+                name: 'my-songs',
+                builder: (context, state) => const MySongsTab(),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -86,6 +97,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final lesson = state.extra as LessonsItem;
           return LessonPlayScreen(lesson: lesson);
         },
+      ),
+      GoRoute(
+        path: '/premium',
+        name: 'premium',
+        builder: (context, state) => const PremiumScreen(),
       ),
     ],
   );

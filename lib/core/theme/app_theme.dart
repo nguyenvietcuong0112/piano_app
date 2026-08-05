@@ -12,7 +12,7 @@ class AppTheme {
     return baseTheme.copyWith(
       scaffoldBackgroundColor: AppColors.scaffoldBackground,
       primaryColor: AppColors.primary,
-      textTheme: GoogleFonts.interTextTheme(baseTheme.textTheme),
+      textTheme: GoogleFonts.beVietnamProTextTheme(baseTheme.textTheme),
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         surface: AppColors.surface,
@@ -21,7 +21,7 @@ class AppTheme {
         backgroundColor: const Color(0xFF1E0248),
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTextStyles.h2,
+        titleTextStyle: AppTextStyles.textWhite22,
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,

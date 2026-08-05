@@ -30,6 +30,7 @@ class FallingNote {
   double speed;
   bool isHit;
   bool hasTriggeredParticles;
+  bool hasMissed;
 
   FallingNote({
     required this.keyName,
@@ -43,6 +44,7 @@ class FallingNote {
     this.speed = 0.5,
     this.isHit = false,
     this.hasTriggeredParticles = false,
+    this.hasMissed = false,
   });
 }
 
@@ -76,24 +78,32 @@ class HitParticle {
 
 class PianoView extends ConsumerStatefulWidget {
   final int startOctave;
+  final int octaveShift;
   final int startKeyPosition;
   final int visibleWhiteKeysCount;
   final bool showNoteNames;
+  final String noteLabelMode; // 'scientific', 'solfege', 'off'
   final bool isLessonMode;
   final bool isAutoGuideMode;
   final double noteSpeed;
   final Function(String keyName, String label)? onNotePressed;
+  final Function(String keyName, bool isPerfect)? onNoteHit;
+  final VoidCallback? onNoteMissed;
 
   const PianoView({
     super.key,
     this.startOctave = 4,
+    this.octaveShift = 0,
     this.startKeyPosition = 0,
     this.visibleWhiteKeysCount = 14,
     this.showNoteNames = true,
+    this.noteLabelMode = 'scientific',
     this.isLessonMode = false,
     this.isAutoGuideMode = false,
     this.noteSpeed = 7.5,
     this.onNotePressed,
+    this.onNoteHit,
+    this.onNoteMissed,
   });
 
   @override
@@ -247,6 +257,14 @@ class PianoViewState extends ConsumerState<PianoView>
           }
         }
 
+        // Check for missed notes
+        if (note.currentY > note.keyTopY + 30 && !note.isHit && !note.hasMissed) {
+          note.hasMissed = true;
+          if (!widget.isAutoGuideMode && widget.isLessonMode) {
+            widget.onNoteMissed?.call();
+          }
+        }
+
         if (note.currentY > note.keyTopY + 60) {
           _fallingNotes.removeAt(i);
         }
@@ -297,7 +315,7 @@ class PianoViewState extends ConsumerState<PianoView>
     final List<PianoKey> blackKeysList = [];
 
     int whiteIndex = 0;
-    int currentOctave = widget.startOctave;
+    int currentOctave = (widget.startOctave + widget.octaveShift).clamp(1, 7);
     int currentPos = widget.startKeyPosition;
 
     while (whiteIndex < widget.visibleWhiteKeysCount) {
@@ -376,6 +394,31 @@ class PianoViewState extends ConsumerState<PianoView>
         if (widget.onNotePressed != null) {
           widget.onNotePressed!(key.keyName, key.label);
         }
+
+        if (widget.isLessonMode && !widget.isAutoGuideMode) {
+          FallingNote? matchingNote;
+          for (var fn in _fallingNotes) {
+            if ((fn.keyName == key.keyName || fn.originalKeyName == key.keyName) && !fn.isHit && !fn.hasMissed) {
+              double diff = (fn.currentY - fn.keyTopY).abs();
+              if (diff <= 65) {
+                matchingNote = fn;
+                break;
+              }
+            }
+          }
+
+          if (matchingNote != null) {
+            matchingNote.isHit = true;
+            matchingNote.hasTriggeredParticles = true;
+            _spawnHitParticles(matchingNote.targetX, matchingNote.keyTopY);
+            double diff = (matchingNote.currentY - matchingNote.keyTopY).abs();
+            bool isPerfect = diff <= 30;
+            widget.onNoteHit?.call(key.keyName, isPerfect);
+          } else {
+            // Tapped wrong key or no note is near -> Miss!
+            widget.onNoteMissed?.call();
+          }
+        }
       }
     } else {
       if (currentActiveKey != null) {
@@ -418,6 +461,7 @@ class PianoViewState extends ConsumerState<PianoView>
               fallingNotes: _fallingNotes,
               particles: _particles,
               showNoteNames: widget.showNoteNames,
+              noteLabelMode: widget.noteLabelMode,
             ),
           ),
         );
@@ -432,6 +476,7 @@ class PianoPainter extends CustomPainter {
   final List<FallingNote> fallingNotes;
   final List<HitParticle> particles;
   final bool showNoteNames;
+  final String noteLabelMode;
 
   PianoPainter({
     required this.keys,
@@ -439,6 +484,7 @@ class PianoPainter extends CustomPainter {
     required this.fallingNotes,
     required this.particles,
     required this.showNoteNames,
+    required this.noteLabelMode,
   });
 
   @override
@@ -466,7 +512,7 @@ class PianoPainter extends CustomPainter {
       canvas.drawRRect(rrect, paint);
       canvas.drawRRect(rrect, whiteBorderPaint);
 
-      if (showNoteNames) {
+      if (showNoteNames && noteLabelMode != 'off') {
         int oct = int.tryParse(key.label.substring(key.label.length - 1)) ?? 4;
         Color pillColor;
         switch (oct) {
@@ -487,7 +533,7 @@ class PianoPainter extends CustomPainter {
         }
 
         double centerX = key.rect.center.dx;
-        double pillWidth = (key.rect.width * 0.68).clamp(22.0, 40.0);
+        double pillWidth = (key.rect.width * 0.72).clamp(24.0, 44.0);
         double pillHeight = 22.0;
         double pillBottom = key.rect.bottom - 12.0;
 
@@ -504,12 +550,24 @@ class PianoPainter extends CustomPainter {
           pillPaint,
         );
 
+        String displayText = key.label;
+        if (noteLabelMode == 'solfege') {
+          displayText = displayText
+              .replaceAll('C', 'Do')
+              .replaceAll('D', 'Re')
+              .replaceAll('E', 'Mi')
+              .replaceAll('F', 'Fa')
+              .replaceAll('G', 'Sol')
+              .replaceAll('A', 'La')
+              .replaceAll('B', 'Si');
+        }
+
         TextPainter tp = TextPainter(
           text: TextSpan(
-            text: key.label,
+            text: displayText,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w800,
             ),
           ),

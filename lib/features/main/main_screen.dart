@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/theme/app_colors.dart';
+import 'widgets/custom_bottom_nav_bar.dart';
+import 'widgets/custom_header_bar.dart';
 
 class MainScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -11,9 +14,10 @@ class MainScreen extends ConsumerWidget {
   });
 
   static const List<String> _titles = [
-    "The Piano",
-    "Themes",
-    "Piano",
+    "Piano Lesssion",
+    "Piano Theme",
+    "Piano Instrument",
+    "My Song",
   ];
 
   void _onTap(int index) {
@@ -26,43 +30,29 @@ class MainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = navigationShell.currentIndex;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final currentTitle = (currentIndex >= 0 && currentIndex < _titles.length)
+        ? _titles[currentIndex]
+        : "Piano Lesssion";
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        title: Text(
-          _titles[currentIndex],
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
+      backgroundColor: AppColors.scaffoldBackground,
+      extendBody: true,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            CustomHeaderBar(title: currentTitle),
+            Expanded(child: navigationShell),
+          ],
         ),
-        backgroundColor: const Color(0xFF1E0248),
-        elevation: 0,
       ),
-      body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: _onTap,
-        backgroundColor: const Color(0xFF1F0248),
-        selectedItemColor: Colors.amber,
-        unselectedItemColor: Colors.white60,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.palette),
-            label: "Themes",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.piano),
-            label: "Piano",
-          ),
-        ],
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(bottom: bottomPadding > 0 ? bottomPadding : 12),
+        child: CustomBottomNavBar(
+          currentIndex: currentIndex,
+          onTap: _onTap,
+        ),
       ),
     );
   }

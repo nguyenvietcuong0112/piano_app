@@ -6,80 +6,160 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._();
 
-  // Headings & App Titles
-  static TextStyle get h1 => GoogleFonts.inter(
-        fontSize: 26.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-        height: 1.2,
-      );
-
-  static TextStyle get h2 => GoogleFonts.inter(
+  // --- WHITE (#FFFFFF) ---
+  static TextStyle get textWhite22 => GoogleFonts.beVietnamPro(
         fontSize: 22.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: AppColors.textWhite,
         height: 1.2,
       );
 
-  static TextStyle get h3 => GoogleFonts.inter(
+  static TextStyle get textWhite20 => GoogleFonts.beVietnamPro(
         fontSize: 20.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: AppColors.textWhite,
       );
 
-  static TextStyle get sectionHeader => GoogleFonts.inter(
+  static TextStyle get textWhite18 => GoogleFonts.beVietnamPro(
         fontSize: 18.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
+        color: AppColors.textWhite,
       );
 
-  // Subtitles & Item Titles
-  static TextStyle get titleMedium => GoogleFonts.inter(
+  static TextStyle get textWhite16 => GoogleFonts.beVietnamPro(
         fontSize: 16.sp,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: AppColors.textWhite,
       );
 
-  static TextStyle get titleSmall => GoogleFonts.inter(
-        fontSize: 15.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      );
-
-  // Body Text
-  static TextStyle get bodyLarge => GoogleFonts.inter(
+  static TextStyle get textWhite14 => GoogleFonts.beVietnamPro(
         fontSize: 14.sp,
         fontWeight: FontWeight.normal,
-        color: AppColors.textSecondary,
+        color: AppColors.textWhite,
       );
 
-  static TextStyle get bodyMedium => GoogleFonts.inter(
-        fontSize: 13.sp,
-        fontWeight: FontWeight.normal,
-        color: AppColors.textMuted,
-      );
-
-  static TextStyle get bodySmall => GoogleFonts.inter(
+  static TextStyle get textWhite12 => GoogleFonts.beVietnamPro(
         fontSize: 12.sp,
         fontWeight: FontWeight.normal,
-        color: AppColors.textMuted,
+        color: AppColors.textWhite,
       );
 
-  // Buttons & Badges
-  static TextStyle get buttonLabel => GoogleFonts.inter(
+  // --- BLACK (#000000) ---
+  static TextStyle get textBlack22 => GoogleFonts.beVietnamPro(
+        fontSize: 22.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textBlack,
+        height: 1.2,
+      );
+
+  static TextStyle get textBlack20 => GoogleFonts.beVietnamPro(
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textBlack,
+      );
+
+  static TextStyle get textBlack18 => GoogleFonts.beVietnamPro(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textBlack,
+      );
+
+  static TextStyle get textBlack16 => GoogleFonts.beVietnamPro(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textBlack,
+      );
+
+  static TextStyle get textBlack14 => GoogleFonts.beVietnamPro(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textBlack,
+      );
+
+  static TextStyle get textBlack12 => GoogleFonts.beVietnamPro(
         fontSize: 12.sp,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-        letterSpacing: 0.5,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textBlack,
       );
 
-  static TextStyle get badgeText => GoogleFonts.inter(
-        fontSize: 11.sp,
+  // --- GREY (#9592A5) ---
+  static TextStyle get textGrey22 => GoogleFonts.beVietnamPro(
+        fontSize: 22.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.primary,
+        color: AppColors.textGrey,
+        height: 1.2,
       );
 
-  static TextStyle get pianoKeyBadge => GoogleFonts.inter(
+  static TextStyle get textGrey20 => GoogleFonts.beVietnamPro(
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textGrey,
+      );
+
+  static TextStyle get textGrey18 => GoogleFonts.beVietnamPro(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textGrey,
+      );
+
+  static TextStyle get textGrey16 => GoogleFonts.beVietnamPro(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textGrey,
+      );
+
+  static TextStyle get textGrey14 => GoogleFonts.beVietnamPro(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textGrey,
+      );
+
+  static TextStyle get textGrey12 => GoogleFonts.beVietnamPro(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textGrey,
+      );
+
+  // --- PURPLE (#D065F2) ---
+  static TextStyle get textPurple22 => GoogleFonts.beVietnamPro(
+        fontSize: 22.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPurple,
+        height: 1.2,
+      );
+
+  static TextStyle get textPurple20 => GoogleFonts.beVietnamPro(
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPurple,
+      );
+
+  static TextStyle get textPurple18 => GoogleFonts.beVietnamPro(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPurple,
+      );
+
+  static TextStyle get textPurple16 => GoogleFonts.beVietnamPro(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPurple,
+      );
+
+  static TextStyle get textPurple14 => GoogleFonts.beVietnamPro(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textPurple,
+      );
+
+  static TextStyle get textPurple12 => GoogleFonts.beVietnamPro(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textPurple,
+      );
+
+  // Piano Key Label Badge
+  static TextStyle get pianoKeyBadge => GoogleFonts.beVietnamPro(
         fontSize: 12.sp,
         fontWeight: FontWeight.w800,
         color: AppColors.textDark,

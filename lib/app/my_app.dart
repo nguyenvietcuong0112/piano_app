@@ -39,7 +39,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         child: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           child: ScreenUtilInit(
-            designSize: const Size(844, 390),
+            designSize: const Size(390, 844),
             minTextAdapt: true,
             splitScreenMode: true,
             builder: (context, child) {

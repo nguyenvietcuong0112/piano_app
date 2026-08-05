@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../domain/theme_model.dart';
 import '../state/theme_provider.dart';
@@ -34,8 +36,8 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
   Widget build(BuildContext context) {
     final themesAsync = ref.watch(themesProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
+    return AppScaffold(
+      horizontalPadding: 16.w,
       body: themesAsync.when(
         loading: () =>
             const Center(child: CircularProgressIndicator(color: Colors.amber)),
@@ -102,41 +104,38 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
 
           return Column(
             children: [
-              // Top Category Chips Bar
               _buildCategoryChips(categories),
 
-              // Categorized Theme List
-              Expanded(
-                child: ValueListenableBuilder<String>(
-                  valueListenable: ThemeService.currentThemeRes,
-                  builder: (context, currentThemeRes, child) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      itemCount: filteredCategories.length,
-                      itemBuilder: (context, catIndex) {
-                        final category = filteredCategories[catIndex];
-                        return _buildCategorySection(
-                            context, category, currentThemeRes);
-                      },
-                    );
-                  },
+                // Categorized Theme List
+                Expanded(
+                  child: ValueListenableBuilder<String>(
+                    valueListenable: ThemeService.currentThemeRes,
+                    builder: (context, currentThemeRes, child) {
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: filteredCategories.length,
+                        itemBuilder: (context, catIndex) {
+                          final category = filteredCategories[catIndex];
+                          return _buildCategorySection(
+                              context, category, currentThemeRes);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
       ),
     );
   }
 
   Widget _buildCategoryChips(List<ThemeCategory> categories) {
     return Container(
-      height: 48,
-      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      height: 48.h,
+      margin: EdgeInsets.only(top: 8.h, bottom: 4.h),
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           // "All" chip
           Padding(

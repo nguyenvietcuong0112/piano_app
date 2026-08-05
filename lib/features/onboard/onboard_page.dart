@@ -133,7 +133,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
                   step.title,
                   style: const TextStyle(
                     fontSize: 20,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textWhite,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -147,7 +147,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
                   step.desc,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textGrey,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,

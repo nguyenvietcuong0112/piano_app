@@ -55,6 +55,19 @@ class LessonNoteContainer {
           .toList(),
     );
   }
+  String get calculatedDurationFormatted {
+    if (data == null || data!.isEmpty) return "03:00";
+    int totalMs = 0;
+    for (var note in data!) {
+      totalMs += note.breakTime;
+    }
+    totalMs += data!.last.duration;
+
+    int totalSec = (totalMs / 1000).round();
+    int min = totalSec ~/ 60;
+    int sec = totalSec % 60;
+    return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
+  }
 }
 
 class LessonsItem {
@@ -90,7 +103,7 @@ class LessonsItem {
       duration: json['duration'] ?? json['time'] ?? '03:00',
       lessonsData: json['lessonsData'] ?? json['urlData'] ?? '',
       thumbnail: json['thumb'] ?? json['urlThumb'] ?? json['thumbnail'] ?? '',
-      level: json['level'] ?? json['type'] ?? 1,
+      level: json['level'] ?? json['difficulty'] ?? json['star_level'] ?? json['type'] ?? 1,
       startOctave: json['startOctave'] ?? json['octave'] ?? 4,
       startKeyPosition: json['startKeyPosition'] ?? json['startPos'] ?? 0,
       visibleWhiteKeysCount: json['visibleWhiteKeysCount'] ?? json['keysCount'] ?? 14,
