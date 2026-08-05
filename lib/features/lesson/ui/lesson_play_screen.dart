@@ -24,6 +24,7 @@ class LessonPlayScreen extends ConsumerStatefulWidget {
 
 class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   final GlobalKey<PianoViewState> _pianoKey = GlobalKey<PianoViewState>();
+  LessonNoteContainer? _lessonContainer;
   List<LessonNote> _noteList = [];
   Timer? _noteTimer;
   bool _isAutoGuideMode = false;
@@ -41,10 +42,20 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   Future<void> _loadLessonNotes() async {
     final ds = LessonDataSource();
-    final notes = await ds.getLessonNotes(widget.lesson.lessonsData);
-    setState(() {
-      _noteList = notes;
-    });
+    final container = await ds.getLessonContainer(widget.lesson.lessonsData);
+    if (mounted && container != null) {
+      setState(() {
+        _lessonContainer = container;
+        _noteList = container.data ?? [];
+      });
+    } else {
+      final notes = await ds.getLessonNotes(widget.lesson.lessonsData);
+      if (mounted) {
+        setState(() {
+          _noteList = notes;
+        });
+      }
+    }
   }
 
   void _startFallingNotesSequence() {
@@ -463,9 +474,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                 Expanded(
                   child: PianoView(
                     key: _pianoKey,
-                    startOctave: widget.lesson.startOctave,
-                    startKeyPosition: widget.lesson.startKeyPosition,
-                    visibleWhiteKeysCount: widget.lesson.visibleWhiteKeysCount,
+                    startOctave: _lessonContainer?.startOctave ?? widget.lesson.startOctave,
+                    startKeyPosition: _lessonContainer?.startKeyPosition ?? widget.lesson.startKeyPosition,
+                    visibleWhiteKeysCount: _lessonContainer?.visibleWhiteKeysCount ?? widget.lesson.visibleWhiteKeysCount,
                     showNoteNames: true,
                     isLessonMode: true,
                     isAutoGuideMode: _isAutoGuideMode,

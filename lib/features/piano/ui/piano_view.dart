@@ -20,6 +20,7 @@ class PianoKey {
 
 class FallingNote {
   final String keyName;
+  final String originalKeyName;
   final String label;
   final double targetX;
   final double keyTopY;
@@ -32,6 +33,7 @@ class FallingNote {
 
   FallingNote({
     required this.keyName,
+    required this.originalKeyName,
     required this.label,
     required this.targetX,
     required this.keyTopY,
@@ -169,6 +171,7 @@ class PianoViewState extends ConsumerState<PianoView>
     setState(() {
       _fallingNotes.add(FallingNote(
         keyName: matchingKey!.keyName,
+        originalKeyName: keyName,
         label: label,
         targetX: matchingKey.rect.center.dx,
         keyTopY: matchingKey.rect.top,
@@ -227,13 +230,13 @@ class PianoViewState extends ConsumerState<PianoView>
 
           // Auto-Play Guide Mode: Automatically trigger audio, key light & score!
           if (widget.isAutoGuideMode) {
-            AudioEngine().playNote(note.keyName);
+            AudioEngine().playNote(note.originalKeyName);
             _activeKeyNames.add(note.keyName);
             int sustainMs = (note.durationMs > 0) ? note.durationMs : 250;
             Future.delayed(Duration(milliseconds: sustainMs), () {
               if (mounted) {
                 _activeKeyNames.remove(note.keyName);
-                AudioEngine().stopNote(note.keyName);
+                AudioEngine().stopNote(note.originalKeyName);
                 setState(() {});
               }
             });

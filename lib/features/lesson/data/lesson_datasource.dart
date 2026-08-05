@@ -40,8 +40,7 @@ class LessonDataSource {
     }
   }
 
-  Future<List<LessonNote>> getLessonNotes(String fileNameOrUrl) async {
-    // 1. Attempt API fetch if filename or URL provided
+  Future<LessonNoteContainer?> getLessonContainer(String fileNameOrUrl) async {
     try {
       final String targetUrl = fileNameOrUrl.startsWith('http://') ||
               fileNameOrUrl.startsWith('https://')
@@ -57,23 +56,42 @@ class LessonDataSource {
         final container = LessonNoteContainer.fromJson(jsonMap);
         if (container.data != null && container.data!.isNotEmpty) {
           debugPrint("Successfully loaded lesson notes from API: $targetUrl");
-          return container.data!;
+          return container;
         }
       }
     } catch (e) {
       debugPrint("API lesson notes fetch failed, falling back to asset: $e");
     }
 
-    // 2. Fallback to local asset files
     try {
       final jsonString =
           await rootBundle.loadString('assets/json/lesson/$fileNameOrUrl');
       final Map<String, dynamic> jsonMap = json.decode(jsonString);
       final container = LessonNoteContainer.fromJson(jsonMap);
       if (container.data != null && container.data!.isNotEmpty) {
-        return container.data!;
+        return container;
       }
     } catch (_) {}
+
+    try {
+      final jsonString =
+          await rootBundle.loadString('assets/json/$fileNameOrUrl');
+      final Map<String, dynamic> jsonMap = json.decode(jsonString);
+      final container = LessonNoteContainer.fromJson(jsonMap);
+      if (container.data != null && container.data!.isNotEmpty) {
+        return container;
+      }
+    } catch (_) {}
+
+    return null;
+  }
+
+  Future<List<LessonNote>> getLessonNotes(String fileNameOrUrl) async {
+    final container = await getLessonContainer(fileNameOrUrl);
+    if (container?.data != null && container!.data!.isNotEmpty) {
+      return container.data!;
+    }
+
 
     try {
       final jsonString =
