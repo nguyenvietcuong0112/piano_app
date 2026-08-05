@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/theme_service.dart';
 import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/no_data_widget.dart';
+import '../../../core/widgets/gradient_tab_pill.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../domain/theme_model.dart';
 import '../state/theme_provider.dart';
@@ -37,7 +39,6 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
     final themesAsync = ref.watch(themesProvider);
 
     return AppScaffold(
-      horizontalPadding: 16.w,
       body: themesAsync.when(
         loading: () =>
             const Center(child: CircularProgressIndicator(color: Colors.amber)),
@@ -111,6 +112,12 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
                   child: ValueListenableBuilder<String>(
                     valueListenable: ThemeService.currentThemeRes,
                     builder: (context, currentThemeRes, child) {
+                      if (filteredCategories.isEmpty) {
+                        return const NoDataWidget(
+                          title: "Không có chủ đề nào",
+                          subtitle: "Không tìm thấy giao diện phù hợp với danh mục này.",
+                        );
+                      }
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         itemCount: filteredCategories.length,
@@ -138,43 +145,23 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
         scrollDirection: Axis.horizontal,
         children: [
           // "All" chip
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: const Text("All"),
-              selected: _selectedCategoryId == 0,
-              selectedColor: Colors.amber,
-              backgroundColor: const Color(0xFF2A2A3D),
-              labelStyle: TextStyle(
-                color: _selectedCategoryId == 0 ? Colors.black : Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() => _selectedCategoryId = 0);
-                }
-              },
-            ),
+          GradientTabPill(
+            label: "All",
+            isSelected: _selectedCategoryId == 0,
+            onTap: () {
+              setState(() => _selectedCategoryId = 0);
+            },
           ),
           ...categories.map((cat) {
             final isSelected = _selectedCategoryId == cat.categoryID;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text(cat.categoryName),
-                selected: isSelected,
-                selectedColor: Colors.amber,
-                backgroundColor: const Color(0xFF2A2A3D),
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.black : Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedCategoryId = selected ? cat.categoryID : 0;
-                  });
-                },
-              ),
+            return GradientTabPill(
+              label: cat.categoryName,
+              isSelected: isSelected,
+              onTap: () {
+                setState(() {
+                  _selectedCategoryId = isSelected ? 0 : cat.categoryID;
+                });
+              },
             );
           }),
         ],

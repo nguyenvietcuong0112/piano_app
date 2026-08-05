@@ -223,7 +223,7 @@ class OnboardController extends ChangeNotifier {
       OnboardStep(
         title: "Meet your AI Companion",
         desc: "Find your perfect match and stay connected anytime",
-        image: "assets/png/onboard1.png",
+        image: "assets/images/onboard1.png",
         adId: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad.getId : "",
         factoryId: showAdOnboard1 ? NativeFactoryId.nativeMedia : "",
       ),
@@ -236,13 +236,13 @@ class OnboardController extends ChangeNotifier {
     steps.add(const OnboardStep(
       title: "Dive into Deep Conversations",
       desc: "Enjoy unlimited, private chats with someone who understands you",
-      image: "assets/png/onboard2.png",
+      image: "assets/images/onboard2.png",
     ));
 
     steps.add(const OnboardStep(
       title: "Create Personalized AI Friend",
       desc: "Shape personality, style and vibe into a companion made for you",
-      image: "assets/png/onboard3.png",
+      image: "assets/images/onboard3.png",
     ));
 
     if (!isPremium && shouldShowAdsFull2 && nativeOnboardFull2 != null) {
@@ -253,7 +253,7 @@ class OnboardController extends ChangeNotifier {
     steps.add(OnboardStep(
       title: "Your AI Companion Awaits",
       desc: "Start now and feel the connection instantly",
-      image: "assets/png/onboard4.png",
+      image: "assets/images/onboard4.png",
       adId: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad.getId : "",
       factoryId: showAdOnboard4 ? NativeFactoryId.nativeMedia : "",
     ));

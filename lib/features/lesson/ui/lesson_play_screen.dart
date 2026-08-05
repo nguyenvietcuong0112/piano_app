@@ -369,50 +369,55 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       // Show mode selector dialog
       showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         backgroundColor: const Color(0xFF1E1E2C),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        builder: (context) => Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "CHỌN CHẾ ĐỘ THU ÂM",
-                style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 16),
+        builder: (context) => SafeArea(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "CHỌN CHẾ ĐỘ THU ÂM",
+                    style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: const Icon(Icons.piano, color: Colors.cyanAccent),
+                    title: const Text("Internal Audio Synth (Âm sạch 100%)", style: TextStyle(color: Colors.white)),
+                    subtitle: const Text("Thu trực tiếp âm thanh tiếng đàn từ App", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      bool success = await recorder.startRecording(mode: RecordingMode.internal, songTitle: widget.lesson.titleName);
+                      if (success) {
+                        controller.toggleRecording();
+                      }
+                    },
+                  ),
+                  const Divider(color: Colors.white10),
+                  ListTile(
+                    leading: const Icon(Icons.mic, color: Colors.orangeAccent),
+                    title: const Text("Microphone Audio (Kèm tiếng ngoài)", style: TextStyle(color: Colors.white)),
+                    subtitle: const Text("Thu tiếng đàn kết hợp mic ngoài", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      bool success = await recorder.startRecording(mode: RecordingMode.mic, songTitle: widget.lesson.titleName);
+                      if (success) {
+                        controller.toggleRecording();
+                      } else if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("⚠️ Chưa được cấp quyền Microphone")),
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.piano, color: Colors.cyanAccent),
-                title: const Text("Internal Audio Synth (Âm sạch 100%)", style: TextStyle(color: Colors.white)),
-                subtitle: const Text("Thu trực tiếp âm thanh tiếng đàn từ App", style: TextStyle(color: Colors.white54, fontSize: 12)),
-                onTap: () async {
-                  Navigator.pop(context);
-                  bool success = await recorder.startRecording(mode: RecordingMode.internal, songTitle: widget.lesson.titleName);
-                  if (success) {
-                    controller.toggleRecording();
-                  }
-                },
-              ),
-              const Divider(color: Colors.white10),
-              ListTile(
-                leading: const Icon(Icons.mic, color: Colors.orangeAccent),
-                title: const Text("Microphone Audio (Kèm tiếng ngoài)", style: TextStyle(color: Colors.white)),
-                subtitle: const Text("Thu tiếng đàn kết hợp mic ngoài", style: TextStyle(color: Colors.white54, fontSize: 12)),
-                onTap: () async {
-                  Navigator.pop(context);
-                  bool success = await recorder.startRecording(mode: RecordingMode.mic, songTitle: widget.lesson.titleName);
-                  if (success) {
-                    controller.toggleRecording();
-                  } else if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("⚠️ Chưa được cấp quyền Microphone")),
-                    );
-                  }
-                },
-              ),
-            ],
+            ),
           ),
         ),
       );

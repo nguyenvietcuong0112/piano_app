@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
@@ -48,7 +49,7 @@ class MainScreen extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: bottomPadding > 0 ? bottomPadding : 12),
+        padding: EdgeInsets.only(bottom: bottomPadding > 0 ? bottomPadding : 12.sp),
         child: CustomBottomNavBar(
           currentIndex: currentIndex,
           onTap: _onTap,

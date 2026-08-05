@@ -168,12 +168,21 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
         body: Center(
           child: Lottie.asset(
             'assets/json/loading_ads.json',
+            package: 'easy_ads_flutter',
             width: 150,
             height: 150,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
-              return const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              return Lottie.asset(
+                'assets/json/loading_ads.json',
+                width: 150,
+                height: 150,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  );
+                },
               );
             },
           ),

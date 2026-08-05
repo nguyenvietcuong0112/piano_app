@@ -7,6 +7,7 @@ import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/song_thumbnail.dart';
 import '../../lesson/domain/lesson_model.dart';
 
@@ -70,7 +71,6 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
     int perfectMastered = _completedSongs.where((s) => (s['stars'] as num?)?.toInt() == 5).length;
 
     return AppScaffold(
-      horizontalPadding: 16.w,
       body: RefreshIndicator(
         onRefresh: _loadCompletedSongs,
         color: const Color(0xFFAD57E6),
@@ -188,41 +188,12 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                   ),
                 )
               else if (_completedSongs.isEmpty)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF181528),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.queue_music_rounded, size: 64, color: Colors.white24),
-                      const SizedBox(height: 14),
-                      const Text(
-                        "Chưa có bài hát luyện tập nào",
-                        style: TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        "Hãy chọn bài học bất kỳ ở màn Home và hoàn thành bài chơi để lưu lịch sử vào đây nhé!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white38, fontSize: 12),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFAD57E6),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        onPressed: () => context.go('/home'),
-                        icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                        label: const Text("Khám Phá Bài Hát Ngay"),
-                      ),
-                    ],
-                  ),
+                NoDataWidget(
+                  title: "Chưa có bài hát luyện tập nào",
+                  subtitle: "Hãy chọn bài học bất kỳ ở màn Home và hoàn thành bài chơi để lưu lịch sử vào đây nhé!",
+                  actionText: "Khám Phá Bài Hát Ngay",
+                  actionIcon: Icons.play_arrow_rounded,
+                  onActionPressed: () => context.go('/home'),
                 )
               else
                 ListView.builder(

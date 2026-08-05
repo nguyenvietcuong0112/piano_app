@@ -34,21 +34,21 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
   }
 
-  Future<void> _loadSongStars() async {
-    final lessonsResponse = ref.read(lessonsProvider).valueOrNull;
-    List<int> idsToLoad = [1, 2, 3];
-    if (lessonsResponse != null) {
-      for (var c in lessonsResponse.categories) {
+  Future<void> _loadSongStars([LessonsResponse? lessonsResponse]) async {
+    final response = lessonsResponse ?? ref.read(lessonsProvider).valueOrNull;
+    Set<String> idsToLoad = {'1', '2', '3'};
+    if (response != null) {
+      for (var c in response.categories) {
         for (var item in c.items) {
-          idsToLoad.add(item.id);
+          idsToLoad.add(item.id.toString());
         }
       }
     }
     for (var id in idsToLoad) {
-      final stars = await SharedPreferenceService.getLessonStars(id.toString());
+      final stars = await SharedPreferenceService.getLessonStars(id);
       if (mounted) {
         setState(() {
-          _songStarsMap[id.toString()] = stars;
+          _songStarsMap[id] = stars;
         });
       }
     }
@@ -85,7 +85,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final lessonsAsync = ref.watch(lessonsProvider);
 
     return AppScaffold(
-      horizontalPadding: 16.w,
       body: lessonsAsync.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: Color(0xFFAD57E6)),
@@ -97,6 +96,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
           ),
           data: (lessonsResponse) {
+            if (lessonsResponse != null && lessonsResponse.categories.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (_songStarsMap.length <= 3) {
+                  _loadSongStars(lessonsResponse);
+                }
+              });
+            }
             List<LessonsCategory> categories = lessonsResponse?.categories ?? [];
             List<LessonsItem> popularSongs = [];
             for (var c in categories) {
@@ -158,45 +164,49 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       children: [
                         Expanded(
                           flex: 6,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(text: "ACOUSTIC ", style: AppTextStyles.textWhite20), 
-                                    TextSpan(text: "PIANO", style: AppTextStyles.textPurple20),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 6.h),
-                              Text(
-                                "Learn Piano anywhere,\nanytime. Real keys, real feel.",
-                                style: AppTextStyles.textWhite12,
-                              ),
-                              SizedBox(height: 12.h),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFB158F0), Color(0xFF7E26D4)],
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(text: "ACOUSTIC ", style: AppTextStyles.textWhite20), 
+                                      TextSpan(text: "PIANO", style: AppTextStyles.textPurple20),
+                                    ],
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18.sp),
-                                    SizedBox(width: 4.w),
-                                    Text(
-                                      "Play Now",
-                                      style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                                SizedBox(height: 6.h),
+                                Text(
+                                  "Learn Piano anywhere,\nanytime. Real keys, real feel.",
+                                  style: AppTextStyles.textWhite12,
                                 ),
-                              ),
-                            ],
+                                SizedBox(height: 12.h),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFFB158F0), Color(0xFF7E26D4)],
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18.sp),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        "Play Now",
+                                        style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -268,12 +278,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                   borderRadius: 12,
                                 ),
                                 Positioned(
-                                  top: 5.sp,
-                                  left: 5.sp,
+                                  top: 6.sp,
+                                  left: 6.sp,
                                   child: SvgPicture.asset(
                                     'assets/icons/ic_reward.svg',
-                                    width: 18.sp,
-                                    height: 18.sp,
+                                    width: 24.sp,
+                                    height: 24.sp,
                                   ),
                                 ),
                               ],
@@ -334,7 +344,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8.h),
                                 GestureDetector(
                                   onTap: () async {
                                     await context.push('/lesson-play', extra: song);

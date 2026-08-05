@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
@@ -55,9 +56,9 @@ class CustomBottomNavBar extends StatelessWidget {
     const inactiveColor = Color(0xFF8A8A9E);
 
     return GradientBorderCard(
-      height: 74,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      height: 74.sp,
+      margin:  EdgeInsets.symmetric(horizontal: 8.sp),
+      padding: EdgeInsets.symmetric(horizontal: 12.sp),
       borderRadius: 16,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -74,7 +75,6 @@ class CustomBottomNavBar extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // SVG Icon with Fallback to IconData
                   _buildIcon(item, color),
                   const SizedBox(height: 4),
                   Text(
@@ -100,12 +100,12 @@ class CustomBottomNavBar extends StatelessWidget {
     if (item.svgPath != null && item.svgPath!.isNotEmpty) {
       return SvgPicture.asset(
         item.svgPath!,
-        width: 24,
-        height: 24,
+        width: 24.sp,
+        height: 24.sp,
         colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         placeholderBuilder: (context) => Icon(
           item.iconData,
-          size: 24,
+          size: 24.sp,
           color: color,
         ),
       );

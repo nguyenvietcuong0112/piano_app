@@ -105,12 +105,6 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
                   step.image,
                   fit: step.fit,
                   width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: AppColors.surface,
-                    child: const Center(
-                      child: Icon(Icons.music_note, size: 80, color: AppColors.primary),
-                    ),
-                  ),
                 ),
               ),
               SizedBox(height: hasAd ? 340 : 180),

@@ -7,6 +7,8 @@ import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/no_data_widget.dart';
+import '../../../core/widgets/gradient_tab_pill.dart';
 import '../../../core/widgets/song_thumbnail.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../domain/lesson_model.dart';
@@ -31,21 +33,23 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
     _loadSongStars();
   }
 
-  Future<void> _loadSongStars() async {
+  Future<void> _loadSongStars([List<LessonsCategory>? categoriesList]) async {
     final lessonsResponse = ref.read(lessonsProvider).valueOrNull;
-    List<int> idsToLoad = [1, 2, 3];
-    if (lessonsResponse != null) {
-      for (var c in lessonsResponse.categories) {
-        for (var item in c.items) {
-          idsToLoad.add(item.id);
-        }
+    final categories = (categoriesList != null && categoriesList.isNotEmpty)
+        ? categoriesList
+        : (widget.categories.isNotEmpty ? widget.categories : (lessonsResponse?.categories ?? []));
+
+    Set<String> idsToLoad = {'1', '2', '3'};
+    for (var c in categories) {
+      for (var item in c.items) {
+        idsToLoad.add(item.id.toString());
       }
     }
     for (var id in idsToLoad) {
-      final stars = await SharedPreferenceService.getLessonStars(id.toString());
+      final stars = await SharedPreferenceService.getLessonStars(id);
       if (mounted) {
         setState(() {
-          _songStarsMap[id.toString()] = stars;
+          _songStarsMap[id] = stars;
         });
       }
     }
@@ -84,124 +88,98 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
         ? widget.categories
         : (lessonsAsync.asData?.value?.categories ?? []);
 
-    // Filter categories based on selection
+    if (displayCategories.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_songStarsMap.length <= 3) {
+          _loadSongStars(displayCategories);
+        }
+      });
+    }
+
     final filteredCategories = _selectedCategoryId == -1
         ? displayCategories
         : displayCategories.where((c) => c.categoryID == _selectedCategoryId).toList();
 
     return AppScaffold(
-      horizontalPadding: 0,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F1E),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          "Songs",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E2C),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white10),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 18),
-            onPressed: () => context.pop(),
-          ),
-        ),
-      ),
+      backgroundColor: AppColors.scaffoldBackground,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
-
+          // Header Bar with Back Button & Title
+          Padding(
+            padding: EdgeInsets.only(top: 8.h, bottom: 12.h),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => context.pop(),
+                  child: Container(
+                    width: 40.sp,
+                    height: 40.sp,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E2C),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                    ),
+                    child:  SvgPicture.asset(
+                      'assets/icons/ic_back.svg',
+                      width: 40.sp,
+                      height: 40.sp,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Text(
+                  "Songs",
+                  style: AppTextStyles.textWhite22,
+                ),
+              ],
+            ),
+          ),
           // Horizontal Category Filter Pills Bar
           SizedBox(
             height: 42.h,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.zero,
               children: [
                 // "All song" Pill
-                GestureDetector(
+                GradientTabPill(
+                  label: "All song",
+                  isSelected: _selectedCategoryId == -1,
                   onTap: () {
                     setState(() {
                       _selectedCategoryId = -1;
                     });
                   },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _selectedCategoryId == -1 ? const Color(0xFF8B44CF) : const Color(0xFF1E1E2C),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: _selectedCategoryId == -1 ? const Color(0xFFAD57E6) : Colors.white12,
-                      ),
-                    ),
-                    child: Text(
-                      "All song",
-                      style: TextStyle(
-                        color: _selectedCategoryId == -1 ? Colors.white : Colors.white70,
-                        fontSize: 13,
-                        fontWeight: _selectedCategoryId == -1 ? FontWeight.bold : FontWeight.w500,
-                      ),
-                    ),
-                  ),
                 ),
 
                 // Category Pills
                 ...displayCategories.map((cat) {
-                  final isSelected = _selectedCategoryId == cat.categoryID;
-                  return GestureDetector(
+                  return GradientTabPill(
+                    label: cat.categoryName,
+                    isSelected: _selectedCategoryId == cat.categoryID,
                     onTap: () {
                       setState(() {
                         _selectedCategoryId = cat.categoryID;
                       });
                     },
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF8B44CF) : const Color(0xFF1E1E2C),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFFAD57E6) : Colors.white12,
-                        ),
-                      ),
-                      child: Text(
-                        cat.categoryName,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white70,
-                          fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        ),
-                      ),
-                    ),
                   );
                 }),
               ],
             ),
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           // Songs grouped by Category
           Expanded(
             child: filteredCategories.isEmpty
-                ? const Center(
-                    child: Text(
-                      "Không tìm thấy bài hát nào trong danh mục này",
-                      style: TextStyle(color: Colors.white54, fontSize: 14),
-                    ),
+                ? const NoDataWidget(
+                    title: "Không tìm thấy bài hát nào",
+                    subtitle: "Không có bài hát nào phù hợp với danh mục hoặc từ khóa bạn chọn.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 40),
+                    padding: const EdgeInsets.only(bottom: 40),
                     itemCount: filteredCategories.length,
                     itemBuilder: (context, catIndex) {
                       final category = filteredCategories[catIndex];
@@ -212,37 +190,6 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Category Section Header
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.folder_open_rounded, color: Color(0xFFAD57E6), size: 20),
-                                const SizedBox(width: 8),
-                                Text(
-                                  category.categoryName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2A233D),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    "${category.items.length} bài hát",
-                                    style: const TextStyle(color: Colors.white54, fontSize: 11),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
                           // Songs List in this Category
                           ...category.items.map((song) {
                             final songIdStr = song.id.toString();
@@ -267,15 +214,27 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  // Song Thumbnail
-                                  SongThumbnail(
-                                    thumbnailUrl: song.thumbnail,
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: 12,
+                                  // Song Thumbnail + VIP Reward Badge
+                                  Stack(
+                                    children: [
+                                      SongThumbnail(
+                                        thumbnailUrl: song.thumbnail,
+                                        width: 100.sp,
+                                        height: 80.sp,
+                                        borderRadius: 12,
+                                      ),
+                                      Positioned(
+                                        top: 6.sp,
+                                        left: 6.sp,
+                                        child: SvgPicture.asset(
+                                          'assets/icons/ic_reward.svg',
+                                          width: 24.sp,
+                                          height: 24.sp,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 12),
-
+                                  SizedBox(width: 10.w),
                                   // Song Title, Artist & Stars
                                   Expanded(
                                     child: Column(
@@ -291,7 +250,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(height: 2),
+                                        SizedBox(height: 3.h),
                                         Text(
                                           "${song.authorName} • ${song.duration}",
                                           style: const TextStyle(
@@ -299,7 +258,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                             fontSize: 12,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        SizedBox(height: 3.h),
 
                                         // Stars Rating Row
                                         Row(
@@ -326,18 +285,18 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                         decoration: BoxDecoration(
                                           color: diffColor.withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: diffColor.withValues(alpha: 0.6), width: 1),
+                                          border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
                                         ),
                                         child: Text(
                                           difficulty,
                                           style: TextStyle(
                                             color: diffColor,
-                                            fontSize: 10,
+                                            fontSize: 10.sp,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
+                                      SizedBox(height: 8.h),
                                       GestureDetector(
                                         onTap: () async {
                                           await context.push('/lesson-play', extra: song);
@@ -364,12 +323,11 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                                 'assets/icons/ic_play.svg',
                                                 width: 12.sp,
                                                 height: 12.sp,
-                                                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                                               ),
                                               SizedBox(width: 5.w),
                                               Text(
                                                 "Play",
-                                                style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
+                                                style: AppTextStyles.textPurple12,
                                               ),
                                             ],
                                           ),
@@ -381,7 +339,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                               ),
                             );
                           }),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                         ],
                       );
                     },
