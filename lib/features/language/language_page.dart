@@ -1,5 +1,6 @@
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
+import '../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -58,9 +59,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               Positioned.fill(
                 child: Container(
                   color: const Color(0xFF131722).withValues(alpha: 0.8),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  ),
+                  child: const AppLoading(),
                 ),
               ),
           ],
@@ -253,12 +252,9 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               top: 0,
               child: Center(
                 child: SizedBox(
-                  width: 25,
-                  height: 25,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.primary,
-                  ),
+                  width: 30,
+                  height: 30,
+                  child: AppLoading(width: 30, height: 30),
                 ),
               ),
             ),

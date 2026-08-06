@@ -3,7 +3,7 @@ import '../services/shared_preference_service.dart';
 
 class ThemeService {
   static final ValueNotifier<String> currentThemeRes =
-      ValueNotifier<String>("theme_jujutsu_kaisen");
+      ValueNotifier<String>("theme_1");
 
   static Future<void> init() async {
     currentThemeRes.value = await SharedPreferenceService.getSelectedThemeResName();

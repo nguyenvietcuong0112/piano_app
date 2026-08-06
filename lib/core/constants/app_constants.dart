@@ -14,10 +14,13 @@ class AppConstants {
     }
   }
 
+  static const String wallApiThemesUrl =
+      'https://api.1teps.com/wallapi/images?image_type=BG&category=all&pageNumber=1675';
+
   static const String appIdIOS = '';
 
   // GSM & Adjust Constants
-  static const String gsmAppId = '69d63797e75be4583154138a';
+  static const String gsmAppId = '';
   static const String adjustToken = '';
   static const String adjustIapToken = '';
 

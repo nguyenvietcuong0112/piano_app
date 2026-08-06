@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'gradient_border_card.dart';
 
 class RecordButton extends StatefulWidget {
   final bool isRecording;
@@ -78,34 +81,56 @@ class _RecordButtonState extends State<RecordButton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final defaultBgGradient = const LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color(0xFF141126),
+        Color(0xFF0F0F1E),
+      ],
+    );
+
+    final recordingBgGradient = const LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Color(0xFFD32F2F),
+        Color(0xFFB71C1C),
+      ],
+    );
+
+    final defaultBorderGradient = LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Colors.white.withValues(alpha: 0.1),
+        Colors.white.withValues(alpha: 0.1),
+      ],
+    );
+
+    final recordingBorderGradient = LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        const Color(0xFFFF5252).withValues(alpha: 0.8),
+        const Color(0xFFFF1744).withValues(alpha: 0.8),
+      ],
+    );
+
+    return GradientBorderCard(
+      height: 36.h,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      borderRadius: 16,
       onTap: widget.onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: widget.isRecording
-              ? const Color(0xFFD32F2F)
-              : const Color(0xFF252533),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: widget.isRecording
-                ? const Color(0xFFFF5252)
-                : Colors.white24,
-            width: 1.5,
-          ),
-          boxShadow: [
-            if (widget.isRecording)
-              BoxShadow(
-                color: Colors.redAccent.withValues(alpha: 0.5),
-                blurRadius: 10,
-                spreadRadius: 1,
-              ),
-          ],
-        ),
+      backgroundGradient: widget.isRecording ? recordingBgGradient : defaultBgGradient,
+      borderGradient: widget.isRecording ? recordingBorderGradient : defaultBorderGradient,
+      child: Align(
+        alignment: Alignment.center,
+        widthFactor: 1.0,
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Indicator Icon / Animated Pulsing Dot
             if (widget.isRecording)
@@ -121,16 +146,13 @@ class _RecordButtonState extends State<RecordButton>
                 ),
               )
             else
-              Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Colors.redAccent,
-                  shape: BoxShape.circle,
-                ),
+              SvgPicture.asset(
+                'assets/icons/ic_rec.svg',
+                width: 22.h,
+                height: 22.h,
               ),
 
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
 
             // Label Text (Shows active timer when recording, 'REC' when standby)
             Text(

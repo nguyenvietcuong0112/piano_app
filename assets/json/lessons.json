@@ -3,7 +3,7 @@
   "data": [
     {
       "categoryID": 1,
-      "categoryName": "Popular & Pop Hits",
+      "categoryName": "Starter Lessons",
       "content": [
         {
           "id": 101,
@@ -18,89 +18,6 @@
         },
         {
           "id": 102,
-          "song": "River Flows in You",
-          "artist": "Yiruma",
-          "duration": "03:08",
-          "thumb": "",
-          "lessonsData": "river_flows_in_you.json",
-          "level": 3,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 103,
-          "song": "All of Me",
-          "artist": "John Legend",
-          "duration": "03:30",
-          "thumb": "",
-          "lessonsData": "all_of_me.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 104,
-          "song": "Faded",
-          "artist": "Alan Walker",
-          "duration": "03:32",
-          "thumb": "",
-          "lessonsData": "faded.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 105,
-          "song": "Call Me Maybe",
-          "artist": "Carly Rae Jepsen",
-          "duration": "03:13",
-          "thumb": "",
-          "lessonsData": "call_me_maybe.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 106,
-          "song": "Flower",
-          "artist": "JISOO",
-          "duration": "02:53",
-          "thumb": "",
-          "lessonsData": "flower.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 107,
-          "song": "Let It Go",
-          "artist": "Disney Frozen",
-          "duration": "03:45",
-          "thumb": "",
-          "lessonsData": "let_it_go.json",
-          "level": 3,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 108,
-          "song": "Bad Style",
-          "artist": "Taylor Swift",
-          "duration": "03:20",
-          "thumb": "",
-          "lessonsData": "bad_style.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        }
-      ]
-    },
-    {
-      "categoryID": 2,
-      "categoryName": "Classical Masterpieces",
-      "content": [
-        {
-          "id": 201,
           "song": "Für Elise",
           "artist": "Ludwig van Beethoven",
           "duration": "02:50",
@@ -111,46 +28,7 @@
           "status": 1
         },
         {
-          "id": 202,
-          "song": "Canon in D",
-          "artist": "Johann Pachelbel",
-          "duration": "04:15",
-          "thumb": "",
-          "lessonsData": "canon_in_d.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 203,
-          "song": "Moonlight Sonata",
-          "artist": "Ludwig van Beethoven",
-          "duration": "05:15",
-          "thumb": "",
-          "lessonsData": "moonlight_sonata.json",
-          "level": 4,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 204,
-          "song": "5th Symphony",
-          "artist": "Ludwig van Beethoven",
-          "duration": "03:10",
-          "thumb": "",
-          "lessonsData": "beethoven_5th_symphony.json",
-          "level": 3,
-          "score": 100,
-          "status": 1
-        }
-      ]
-    },
-    {
-      "categoryID": 3,
-      "categoryName": "Nursery & Celebration",
-      "content": [
-        {
-          "id": 301,
+          "id": 103,
           "song": "Happy Birthday",
           "artist": "Traditional",
           "duration": "01:00",
@@ -161,56 +39,23 @@
           "status": 1
         },
         {
-          "id": 302,
+          "id": 104,
+          "song": "Canon in D",
+          "artist": "Johann Pachelbel",
+          "duration": "04:15",
+          "thumb": "",
+          "lessonsData": "canon_in_d.json",
+          "level": 2,
+          "score": 100,
+          "status": 1
+        },
+        {
+          "id": 105,
           "song": "Twinkle Twinkle Little Star",
           "artist": "Traditional",
           "duration": "01:15",
           "thumb": "",
           "lessonsData": "little_star.json",
-          "level": 1,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 303,
-          "song": "Happy New Year",
-          "artist": "ABBA",
-          "duration": "03:50",
-          "thumb": "",
-          "lessonsData": "happy_new_year.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 304,
-          "song": "Jingle Bells",
-          "artist": "Traditional",
-          "duration": "02:00",
-          "thumb": "",
-          "lessonsData": "jingle_bell.json",
-          "level": 1,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 305,
-          "song": "Last Christmas",
-          "artist": "Wham!",
-          "duration": "03:40",
-          "thumb": "",
-          "lessonsData": "last_christmas.json",
-          "level": 2,
-          "score": 100,
-          "status": 1
-        },
-        {
-          "id": 306,
-          "song": "We Wish You a Merry Christmas",
-          "artist": "Traditional",
-          "duration": "01:45",
-          "thumb": "",
-          "lessonsData": "we_wish_you_a_merry_christmas.json",
           "level": 1,
           "score": 100,
           "status": 1

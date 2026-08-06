@@ -10,9 +10,13 @@ import '../../features/lesson/ui/all_lessons_screen.dart';
 import '../../features/lesson/ui/lesson_play_screen.dart';
 import '../../features/piano/ui/piano_tab.dart';
 import '../../features/piano/ui/play_piano_screen.dart';
+import '../../features/themes/domain/theme_model.dart';
 import '../../features/themes/ui/theme_tab.dart';
+import '../../features/themes/ui/all_themes_screen.dart';
+import '../../features/themes/ui/theme_preview_screen.dart';
 import '../../features/my_songs/ui/my_songs_tab.dart';
 import '../../features/premium/ui/premium_screen.dart';
+import '../../features/settings/ui/settings_screen.dart';
 import '../../features/main/main_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -102,6 +106,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/premium',
         name: 'premium',
         builder: (context, state) => const PremiumScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/all-themes',
+        name: 'all-themes',
+        builder: (context, state) {
+          final category = state.extra as ThemeCategory;
+          return AllThemesScreen(category: category);
+        },
+      ),
+      GoRoute(
+        path: '/theme-preview',
+        name: 'theme-preview',
+        builder: (context, state) {
+          final theme = state.extra as ThemeItem;
+          return ThemePreviewScreen(theme: theme);
+        },
       ),
     ],
   );

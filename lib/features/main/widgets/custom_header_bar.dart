@@ -53,7 +53,7 @@ class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
               // Settings Button
               GestureDetector(
-                onTap: onSettingsTap ?? () => context.push('/language'),
+                onTap: onSettingsTap ?? () => context.push('/settings'),
                 child: Center(
                   child: SvgPicture.asset(
                     'assets/icons/ic_settings.svg',

@@ -120,6 +120,10 @@ class PianoViewState extends ConsumerState<PianoView>
   final Map<int, String> _pointerToKeyMap = {};
   final Random _rand = Random();
 
+  double _currentScrollX = 0.0;
+  double _targetScrollX = 0.0;
+  bool _isFirstLayout = true;
+
   final List<String> _noteNamesWhite = ["C", "D", "E", "F", "G", "A", "B"];
   final List<String> _noteNamesBlack = [
     "C#",
@@ -153,19 +157,61 @@ class PianoViewState extends ConsumerState<PianoView>
   void addFallingNote(String keyName, String label, bool isBlack, {int durationMs = 300}) {
     if (_keys.isEmpty) return;
 
+    int visibleOctave = (widget.startOctave + widget.octaveShift).clamp(1, 7);
+
     PianoKey? matchingKey = _keys
         .cast<PianoKey?>()
         .firstWhere((k) => k?.keyName == keyName, orElse: () => null);
+
+    final double whiteKeyWidth = _keys.isNotEmpty ? _keys.first.rect.width : 30.0;
+    final double visibleMinX = _currentScrollX + 5;
+    final double visibleMaxX =
+        _currentScrollX + (widget.visibleWhiteKeysCount * whiteKeyWidth) - 5;
+
+    if (matchingKey != null) {
+      final double keyX = matchingKey.rect.center.dx;
+
+      if (keyX < visibleMinX ||
+          keyX > visibleMaxX ||
+          (matchingKey.isBlack &&
+              (matchingKey.rect.left < _currentScrollX - 0.5 ||
+                  matchingKey.rect.right >
+                      _currentScrollX +
+                          (widget.visibleWhiteKeysCount * whiteKeyWidth) +
+                          0.5))) {
+        String keyType = keyName.startsWith("w") ? "w" : "b";
+        int posDigit = int.tryParse(keyName.substring(keyName.length - 1)) ?? 0;
+        matchingKey = _keys.cast<PianoKey?>().firstWhere(
+              (k) =>
+                  k?.keyName == "$keyType$visibleOctave$posDigit" &&
+                  (!k!.isBlack ||
+                      (k.rect.left >= _currentScrollX - 0.5 &&
+                          k.rect.right <=
+                              _currentScrollX +
+                                  (widget.visibleWhiteKeysCount *
+                                      whiteKeyWidth) +
+                                  0.5)),
+              orElse: () => null,
+            );
+        matchingKey ??= _keys.cast<PianoKey?>().firstWhere(
+              (k) =>
+                  !k!.isBlack &&
+                  k.rect.center.dx >= visibleMinX &&
+                  k.rect.center.dx <= visibleMaxX,
+              orElse: () => null,
+            );
+      }
+    }
 
     if (matchingKey == null) {
       String keyType = keyName.startsWith("w") ? "w" : "b";
       int posDigit = int.tryParse(keyName.substring(keyName.length - 1)) ?? 0;
       matchingKey = _keys.cast<PianoKey?>().firstWhere(
-            (k) => k?.keyName == "$keyType${widget.startOctave}$posDigit",
+            (k) => k?.keyName == "$keyType$visibleOctave$posDigit",
             orElse: () => null,
           );
       matchingKey ??= _keys.cast<PianoKey?>().firstWhere(
-            (k) => k?.keyName == "$keyType${widget.startOctave + 1}$posDigit",
+            (k) => k?.keyName == "$keyType${visibleOctave + 1}$posDigit",
             orElse: () => null,
           );
     }
@@ -225,6 +271,15 @@ class PianoViewState extends ConsumerState<PianoView>
 
   void _updateAnimationLoop() {
     bool needsRepaint = false;
+
+    // Smooth horizontal keyboard scrolling animation (lerp)
+    if ((_currentScrollX - _targetScrollX).abs() > 0.1) {
+      _currentScrollX += (_targetScrollX - _currentScrollX) * 0.22;
+      needsRepaint = true;
+    } else if (_currentScrollX != _targetScrollX) {
+      _currentScrollX = _targetScrollX;
+      needsRepaint = true;
+    }
 
     // Update falling notes
     if (_fallingNotes.isNotEmpty) {
@@ -314,31 +369,28 @@ class PianoViewState extends ConsumerState<PianoView>
     final List<PianoKey> whiteKeysList = [];
     final List<PianoKey> blackKeysList = [];
 
-    int whiteIndex = 0;
-    int currentOctave = (widget.startOctave + widget.octaveShift).clamp(1, 7);
-    int currentPos = widget.startKeyPosition;
+    for (int octave = 1; octave <= 7; octave++) {
+      for (int pos = 0; pos < 7; pos++) {
+        int globalWhiteIndex = (octave - 1) * 7 + pos;
+        double left = globalWhiteIndex * whiteKeyWidth;
+        double right = left + whiteKeyWidth;
+        String keyName = "w$octave$pos";
+        String label = "${_noteNamesWhite[pos]}$octave";
 
-    while (whiteIndex < widget.visibleWhiteKeysCount) {
-      double left = whiteIndex * whiteKeyWidth;
-      double right = left + whiteKeyWidth;
-      String keyName = "w$currentOctave$currentPos";
-      String label = "${_noteNamesWhite[currentPos]}$currentOctave";
+        var key = PianoKey(
+          keyName: keyName,
+          label: label,
+          isBlack: false,
+          rect: Rect.fromLTRB(left, keyboardTop, right, height),
+        );
+        whiteKeysList.add(key);
 
-      var key = PianoKey(
-        keyName: keyName,
-        label: label,
-        isBlack: false,
-        rect: Rect.fromLTRB(left, keyboardTop, right, height),
-      );
-      whiteKeysList.add(key);
-
-      int? bIndex = _getBlackKeyAudioIndex(currentPos);
-      if (bIndex != null) {
-        double bLeft = right - (blackKeyWidth / 2.0);
-        double bRight = bLeft + blackKeyWidth;
-        if (bLeft >= 0 && bRight <= width) {
-          String bKeyName = "b$currentOctave$bIndex";
-          String bLabel = "${_noteNamesBlack[currentPos]}$currentOctave";
+        int? bIndex = _getBlackKeyAudioIndex(pos);
+        if (bIndex != null) {
+          double bLeft = right - (blackKeyWidth / 2.0);
+          double bRight = bLeft + blackKeyWidth;
+          String bKeyName = "b$octave$bIndex";
+          String bLabel = "${_noteNamesBlack[pos]}$octave";
 
           var bKey = PianoKey(
             keyName: bKeyName,
@@ -350,27 +402,42 @@ class PianoViewState extends ConsumerState<PianoView>
           blackKeysList.add(bKey);
         }
       }
-
-      whiteIndex++;
-      currentPos++;
-      if (currentPos >= 7) {
-        currentPos = 0;
-        currentOctave++;
-      }
     }
 
     _keys.addAll(whiteKeysList);
     _keys.addAll(blackKeysList);
+
+    final double maxScrollX =
+        (49 - widget.visibleWhiteKeysCount) * whiteKeyWidth;
+    final int targetOctave = (widget.startOctave + widget.octaveShift).clamp(1, 7);
+    final int startPos = widget.startKeyPosition.clamp(0, 6);
+    final int startGlobalWhiteIndex = (targetOctave - 1) * 7 + startPos;
+    _targetScrollX = (startGlobalWhiteIndex * whiteKeyWidth)
+        .clamp(0.0, maxScrollX < 0 ? 0.0 : maxScrollX);
+
+    if (_isFirstLayout) {
+      _currentScrollX = _targetScrollX;
+      _isFirstLayout = false;
+    }
   }
 
   PianoKey? _getKeyAt(Offset position) {
+    final Offset worldPos = Offset(position.dx + _currentScrollX, position.dy);
+    final double whiteKeyWidth = _keys.isNotEmpty ? _keys.first.rect.width : 30.0;
+    final double visibleLeft = _currentScrollX;
+    final double visibleRight =
+        _currentScrollX + (widget.visibleWhiteKeysCount * whiteKeyWidth);
+
     for (var key in _keys.where((k) => k.isBlack)) {
-      if (key.rect.contains(position)) {
-        return key;
+      if (key.rect.left >= visibleLeft - 0.5 &&
+          key.rect.right <= visibleRight + 0.5) {
+        if (key.rect.contains(worldPos)) {
+          return key;
+        }
       }
     }
     for (var key in _keys.where((k) => !k.isBlack)) {
-      if (key.rect.contains(position)) {
+      if (key.rect.contains(worldPos)) {
         return key;
       }
     }
@@ -453,15 +520,18 @@ class PianoViewState extends ConsumerState<PianoView>
               _handleTouch(event.pointer, event.localPosition),
           onPointerUp: (event) => _handleTouchUp(event.pointer),
           onPointerCancel: (event) => _handleTouchUp(event.pointer),
-          child: CustomPaint(
-            size: size,
-            painter: PianoPainter(
-              keys: _keys,
-              activeKeyNames: _activeKeyNames,
-              fallingNotes: _fallingNotes,
-              particles: _particles,
-              showNoteNames: widget.showNoteNames,
-              noteLabelMode: widget.noteLabelMode,
+          child: ClipRect(
+            child: CustomPaint(
+              size: size,
+              painter: PianoPainter(
+                keys: _keys,
+                activeKeyNames: _activeKeyNames,
+                fallingNotes: _fallingNotes,
+                particles: _particles,
+                showNoteNames: widget.showNoteNames,
+                noteLabelMode: widget.noteLabelMode,
+                scrollX: _currentScrollX,
+              ),
             ),
           ),
         );
@@ -477,6 +547,7 @@ class PianoPainter extends CustomPainter {
   final List<HitParticle> particles;
   final bool showNoteNames;
   final String noteLabelMode;
+  final double scrollX;
 
   PianoPainter({
     required this.keys,
@@ -485,10 +556,13 @@ class PianoPainter extends CustomPainter {
     required this.particles,
     required this.showNoteNames,
     required this.noteLabelMode,
+    this.scrollX = 0.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.translate(-scrollX, 0);
     final Paint whiteKeyPaint = Paint()..color = const Color(0x22FFFFFF);
     final Paint whiteBorderPaint = Paint()
       ..color = const Color(0x66000000)
@@ -583,7 +657,14 @@ class PianoPainter extends CustomPainter {
     }
 
     // Draw Black Piano Keys
+    final double visibleLeft = scrollX;
+    final double visibleRight = scrollX + size.width;
+
     for (var key in keys.where((k) => k.isBlack)) {
+      if (key.rect.left < visibleLeft - 0.5 || key.rect.right > visibleRight + 0.5) {
+        continue;
+      }
+
       final isPressed = activeKeyNames.contains(key.keyName);
       final paint = isPressed ? pressedBlackKeyPaint : blackKeyPaint;
 
@@ -659,7 +740,7 @@ class PianoPainter extends CustomPainter {
         ..color = Colors.white.withValues(alpha: 0.7)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2;
-      canvas.drawRRect(roundedBar, borderPaint);
+      canvas.drawRRect(roundedBar, borderPaint);  
 
       // Note Name Label
       if (showNoteNames && note.label.isNotEmpty) {
@@ -689,6 +770,7 @@ class PianoPainter extends CustomPainter {
         ..color = particle.color.withValues(alpha: particle.opacity);
       canvas.drawCircle(Offset(particle.x, particle.y), particle.radius, pPaint);
     }
+    canvas.restore();
   }
 
   @override

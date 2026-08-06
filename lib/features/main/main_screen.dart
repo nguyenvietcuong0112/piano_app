@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/exit_confirmation_dialog.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
 import 'widgets/custom_header_bar.dart';
 
@@ -36,23 +38,49 @@ class MainScreen extends ConsumerWidget {
         ? _titles[currentIndex]
         : "Piano Lesssion";
 
-    return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      extendBody: true,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            CustomHeaderBar(title: currentTitle),
-            Expanded(child: navigationShell),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+
+        // If not on first tab (Home), go back to Home tab first
+        if (navigationShell.currentIndex != 0) {
+          _onTap(0);
+          return;
+        }
+
+        // Show reusable ExitConfirmationDialog when backing out of main screen
+        final shouldExit = await ExitConfirmationDialog.show(
+          context,
+          title: "Exit App",
+          message: "Are you sure you want to exit the app?",
+          confirmText: "Exit",
+          cancelText: "Cancel",
+        );
+
+        if (shouldExit) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.scaffoldBackground,
+        extendBody: true,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              CustomHeaderBar(title: currentTitle),
+              Expanded(child: navigationShell),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: bottomPadding > 0 ? bottomPadding : 12.sp),
-        child: CustomBottomNavBar(
-          currentIndex: currentIndex,
-          onTap: _onTap,
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.only(
+              bottom: bottomPadding > 0 ? bottomPadding : 12.sp),
+          child: CustomBottomNavBar(
+            currentIndex: currentIndex,
+            onTap: _onTap,
+          ),
         ),
       ),
     );

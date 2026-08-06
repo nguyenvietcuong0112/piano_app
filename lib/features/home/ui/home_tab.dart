@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -86,9 +87,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
     return AppScaffold(
       body: lessonsAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: Color(0xFFAD57E6)),
-          ),
+          loading: () => const AppLoading(),
           error: (err, stack) => Center(
             child: Text(
               "Error: $err",
@@ -243,7 +242,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: popularSongs.length,
+                    itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
                     itemBuilder: (context, index) {
                       final song = popularSongs[index];
                       final songIdStr = song.id.toString();
@@ -251,106 +250,106 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       final difficulty = _getDifficultyText(song.level);
                       final diffColor = _getDifficultyColor(song.level);
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.10),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            // Song Thumbnail + VIP Crown Badge
-                            Stack(
-                              children: [
-                                SongThumbnail(
-                                  thumbnailUrl: song.thumbnail,
-                                  width: 100.sp,
-                                  height: 80.sp,
-                                  borderRadius: 12,
-                                ),
-                                Positioned(
-                                  top: 6.sp,
-                                  left: 6.sp,
-                                  child: SvgPicture.asset(
-                                    'assets/icons/ic_reward.svg',
-                                    width: 24.sp,
-                                    height: 24.sp,
-                                  ),
-                                ),
-                              ],
+                      return GestureDetector(
+                        onTap: () async {
+                          await context.push('/lesson-play', extra: song);
+                          _loadSongStars();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                             ),
-                             SizedBox(width: 10.w),
-                            // Song Title, Author & 5-Star Rating
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.10),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              // Song Thumbnail + VIP Crown Badge
+                              Stack(
                                 children: [
-                                  Text(
-                                    song.titleName,
-                                    style:  AppTextStyles.textWhite14,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  SongThumbnail(
+                                    thumbnailUrl: song.thumbnail,
+                                    width: 100.sp,
+                                    height: 80.sp,
+                                    borderRadius: 12,
                                   ),
-                                   SizedBox(height: 4.h),
-                                  Text(
-                                    song.authorName,
-                                    style: AppTextStyles.textGrey12,
-                                  ),
-                                  SizedBox(height: 4.h),
-                                  // Star Rating Row
-                                  Row(
-                                    children: List.generate(5, (starIndex) {
-                                      bool isStarFilled = starIndex < starCount;
-                                      return Padding(
-                                        padding: const EdgeInsets.only(right: 2),
-                                        child: Icon(
-                                          isStarFilled ? Icons.star_rounded : Icons.star_outline_rounded,
-                                          size: 14.sp,
-                                          color: isStarFilled ? Colors.amber : Colors.white24,
-                                        ),
-                                      );
-                                    }),
+                                  Positioned(
+                                    top: 6.sp,
+                                    left: 6.sp,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/ic_reward.svg',
+                                      width: 24.sp,
+                                      height: 24.sp,
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(width: 10.w),
+                              // Song Title, Author & 5-Star Rating
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      song.titleName,
+                                      style: AppTextStyles.textWhite14,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      song.authorName,
+                                      style: AppTextStyles.textGrey12,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    // Star Rating Row
+                                    Row(
+                                      children: List.generate(5, (starIndex) {
+                                        bool isStarFilled = starIndex < starCount;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(right: 2),
+                                          child: Icon(
+                                            Icons.star_rounded,
+                                            size: 14.sp,
+                                            color: isStarFilled ? AppColors.levelMedium : AppColors.keyWhiteBorder,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
-                            // Difficulty Tag & Play Button
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: diffColor.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
-                                  ),
-                                  child: Text(
-                                    difficulty,
-                                    style: TextStyle(
-                                      color: diffColor,
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.bold,
+                              // Difficulty Tag & Play Button
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: diffColor.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
+                                    ),
+                                    child: Text(
+                                      difficulty,
+                                      style: TextStyle(
+                                        color: diffColor,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: 8.h),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await context.push('/lesson-play', extra: song);
-                                    _loadSongStars();
-                                  },
-                                  child: Container(
+                                  SizedBox(height: 8.h),
+                                  Container(
                                     padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFD065F2),
@@ -381,10 +380,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                       ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

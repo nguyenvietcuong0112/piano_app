@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
@@ -99,13 +100,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                         const SizedBox(height: 10),
                         Container(
                           padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: LinearProgressIndicator(
-                            value: controller.percentLoading,
-                            color: AppColors.primary,
-                            minHeight: 10,
-                            borderRadius: BorderRadius.circular(10),
-                            backgroundColor: const Color(0xFFEAEAEA),
-                          ),
+                          child: const AppLoading(width: 80, height: 80),
                         ),
                         if (!AppConstants.isPremiumUser.value) ...[
                           const SizedBox(height: 10),

@@ -38,13 +38,13 @@ class LessonResultDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 460),
-        padding: const EdgeInsets.all(20),
+        constraints: const BoxConstraints(maxWidth: 480),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: const Color(0xFF1E1E2C),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.amber.withValues(alpha: 0.5), width: 2),
           boxShadow: [
             BoxShadow(
@@ -54,144 +54,157 @@ class LessonResultDialog extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title
-            Text(
-              _title,
-              style: AppTextStyles.textWhite20.copyWith(color: Colors.amberAccent),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              songTitle,
-              style: AppTextStyles.textGrey14,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-
-            // Star Rating Display
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                final isFilled = index < state.stars;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Icon(
-                    isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: isFilled ? Colors.amber : Colors.white24,
-                    size: 38,
-                  ),
-                );
-              }),
-            ),
-            const SizedBox(height: 16),
-
-            // Stats Card
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A3D),
-                borderRadius: BorderRadius.circular(16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              Text(
+                _title,
+                style: AppTextStyles.textWhite20.copyWith(color: Colors.amberAccent, fontSize: 18),
+                textAlign: TextAlign.center,
               ),
-              child: Column(
+              const SizedBox(height: 2),
+              Text(
+                songTitle,
+                style: AppTextStyles.textGrey14,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+
+              // Star Rating Display
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  final isFilled = index < state.stars;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Icon(
+                      isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+                      color: isFilled ? Colors.amber : Colors.white24,
+                      size: 30,
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 10),
+
+              // Stats Card
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A3D),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    _buildStatRow(
+                      "Độ chính xác",
+                      "${state.accuracy.toStringAsFixed(1)}%",
+                      Colors.lightBlueAccent,
+                    ),
+                    const Divider(color: Colors.white10, height: 8),
+                    _buildStatRow(
+                      "Tổng điểm",
+                      "${state.score}",
+                      Colors.amberAccent,
+                    ),
+                    const Divider(color: Colors.white10, height: 8),
+                    _buildStatRow(
+                      "Max Combo",
+                      "${state.maxCombo}",
+                      Colors.greenAccent,
+                    ),
+                    const Divider(color: Colors.white10, height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildHitBadge("Perfect", state.perfectCount, Colors.green),
+                        _buildHitBadge("Good", state.goodCount, Colors.orange),
+                        _buildHitBadge("Miss", state.missCount, Colors.redAccent),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Action Buttons
+              Row(
                 children: [
-                  _buildStatRow(
-                    "Độ chính xác (Accuracy)",
-                    "${state.accuracy.toStringAsFixed(1)}%",
-                    Colors.lightBlueAccent,
-                  ),
-                  const Divider(color: Colors.white10, height: 12),
-                  _buildStatRow(
-                    "Tổng điểm (Score)",
-                    "${state.score}",
-                    Colors.amberAccent,
-                  ),
-                  const Divider(color: Colors.white10, height: 12),
-                  _buildStatRow(
-                    "Max Combo",
-                    "${state.maxCombo}",
-                    Colors.greenAccent,
-                  ),
-                  const Divider(color: Colors.white10, height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildHitBadge("Perfect", state.perfectCount, Colors.green),
-                      _buildHitBadge("Good", state.goodCount, Colors.orange),
-                      _buildHitBadge("Miss", state.missCount, Colors.redAccent),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white30),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context.pop();
-                    },
-                    icon: const Icon(Icons.list_rounded, size: 18),
-                    label: Text("Danh sách", style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber.shade700,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onReplay();
-                    },
-                    icon: const Icon(Icons.replay_rounded, size: 18),
-                    label: Text("Chơi lại", style: AppTextStyles.textBlack14),
-                  ),
-                ),
-                if (onNextSong != null) ...[
-                  const SizedBox(width: 8),
                   Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(color: Colors.white30),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop();
-                        onNextSong!();
+                        context.pop();
                       },
-                      icon: const Icon(Icons.skip_next_rounded, size: 18),
-                      label: Text("Bài tiếp", style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold)),
+                      icon: const Icon(Icons.list_rounded, size: 16),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text("Danh sách", style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold)),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade700,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onReplay();
+                      },
+                      icon: const Icon(Icons.replay_rounded, size: 16),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text("Chơi lại", style: AppTextStyles.textBlack14),
+                      ),
+                    ),
+                  ),
+                  if (onNextSong != null) ...[
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade600,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          onNextSong!();
+                        },
+                        icon: const Icon(Icons.skip_next_rounded, size: 16),
+                        label: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text("Bài tiếp", style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -201,9 +214,12 @@ class LessonResultDialog extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.textGrey14,
+        Expanded(
+          child: Text(
+            label,
+            style: AppTextStyles.textGrey14,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         Text(
           value,

@@ -21,6 +21,36 @@ class AppColors {
   static const Color primaryLight = Color(0xFFFFD54F);
   static const Color primaryDark = Color(0xFFFFB300);
 
+  // Exact Design Spec Button Gradients
+  static const LinearGradient primaryButtonGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFCF6BEE),
+      Color(0xFF7A44DA),
+    ],
+  );
+
+  static const LinearGradient secondaryButtonGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF2D1E4B),
+      Color(0xFF1E1338),
+    ],
+  );
+
+  static const LinearGradient secondaryBorderGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    stops: [0.0, 0.5, 1.0],
+    colors: [
+      Color(0x80FFFFFF), // #FFFFFF 50%
+      Color(0x00999999), // #999999 0%
+      Color(0x80CE64F0), // #CE64F0 50%
+    ],
+  );
+
   // Difficulty Level Colors
   static const Color levelEasy = Color(0xFF63F27B);
   static const Color levelMedium = Color(0xFFF2EE63);

@@ -48,17 +48,7 @@ class GradientBorderCard extends StatelessWidget {
           ],
         );
 
-    final effectiveBorderGradient = borderGradient ??
-        const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          stops: [0.0, 0.5, 1.0],
-          colors: [
-            Color(0x80FFFFFF),
-            Color(0x00FFFFFF),
-            Color(0x80AD57E6),
-          ],
-        );
+    final effectiveBorderGradient = borderGradient ?? AppColors.secondaryBorderGradient;
 
     // Build Background Image Widget if provided
     Widget? bgImageWidget;
@@ -87,6 +77,7 @@ class GradientBorderCard extends StatelessWidget {
     }
 
     Widget innerContent = Stack(
+      alignment: Alignment.center,
       children: [
         if (bgImageWidget != null)
           Positioned.fill(

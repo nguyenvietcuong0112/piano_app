@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -183,9 +184,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
               if (_isLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFFAD57E6)),
-                  ),
+                  child: AppLoading(),
                 )
               else if (_completedSongs.isEmpty)
                 NoDataWidget(
@@ -226,135 +225,135 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                       thumbnail: thumbUrl,
                     );
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.10),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Music Thumbnail Container
-                          SongThumbnail(
-                            thumbnailUrl: thumbUrl,
-                            width: 50,
-                            height: 50,
-                            borderRadius: 14,
+                    return GestureDetector(
+                      onTap: () async {
+                        await context.push('/lesson-play', extra: lessonItem);
+                        _loadCompletedSongs();
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
-                          const SizedBox(width: 14),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.10),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            // Music Thumbnail Container
+                            SongThumbnail(
+                              thumbnailUrl: thumbUrl,
+                              width: 50,
+                              height: 50,
+                              borderRadius: 14,
+                            ),
+                            const SizedBox(width: 14),
 
-                          // Song Info & Stars
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  artist,
-                                  style: const TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-
-                                // Stars Rating
-                                Row(
-                                  children: [
-                                    ...List.generate(5, (starIdx) {
-                                      return Icon(
-                                        starIdx < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-                                        color: starIdx < stars ? Colors.amber : Colors.white24,
-                                        size: 15,
-                                      );
-                                    }),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      "$accuracy% ACC",
-                                      style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                            // Song Info & Stars
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    artist,
+                                    style: const TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+
+                                  // Stars Rating
+                                  Row(
+                                    children: [
+                                      ...List.generate(5, (starIdx) {
+                                        return Icon(
+                                          starIdx < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                                          color: starIdx < stars ? Colors.amber : Colors.white24,
+                                          size: 15,
+                                        );
+                                      }),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "$accuracy% ACC",
+                                        style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Difficulty Badge & Play Button
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: diffColor.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: diffColor.withValues(alpha: 0.6), width: 1),
+                                  ),
+                                  child: Text(
+                                    difficulty,
+                                    style: TextStyle(
+                                      color: diffColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD065F2),
+                                    borderRadius: BorderRadius.circular(16.r),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        const Color(0xFFCC69EE).withValues(alpha: 0.25),
+                                        const Color(0xFF7745D3).withValues(alpha: 0.25),
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.replay_rounded, size: 14, color: Colors.white),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        "Luyện lại",
+                                        style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          // Difficulty Badge & Play Button
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: diffColor.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: diffColor.withValues(alpha: 0.6), width: 1),
-                                ),
-                                child: Text(
-                                  difficulty,
-                                  style: TextStyle(
-                                    color: diffColor,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                               GestureDetector(
-                                 onTap: () async {
-                                   await context.push('/lesson-play', extra: lessonItem);
-                                   _loadCompletedSongs();
-                                 },
-                                 child: Container(
-                                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFD065F2),
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color(0xFFCC69EE).withValues(alpha: 0.25),
-                                          const Color(0xFF7745D3).withValues(alpha: 0.25),
-                                        ],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
-                                    ),
-                                   child: Row(
-                                     mainAxisSize: MainAxisSize.min,
-                                     children: [
-                                       const Icon(Icons.replay_rounded, size: 14, color: Colors.white),
-                                       SizedBox(width: 4.w),
-                                       Text(
-                                         "Luyện lại",
-                                         style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
-                                       ),
-                                     ],
-                                   ),
-                                 ),
-                               ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },

@@ -72,5 +72,4 @@ flutter:
     - assets/sounds/organ_v2/
     - assets/sounds/rhodes/
     - assets/sounds/synth/
-    - assets/themes/backgrounds/
-    - assets/themes/key_skins/
+    - assets/themes/default/

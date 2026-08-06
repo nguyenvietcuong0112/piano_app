@@ -40,10 +40,10 @@ class SharedPreferenceService {
   // --- Selected Theme ---
   static Future<String> getSelectedThemeResName() async {
     try {
-      return (await getInstance()).getString(keySelectedThemeResName) ?? 'theme_jujutsu_kaisen';
+      return (await getInstance()).getString(keySelectedThemeResName) ?? 'theme_1';
     } catch (e) {
       debugPrint('SharedPreferenceService getSelectedThemeResName error: $e');
-      return 'theme_jujutsu_kaisen';
+      return 'theme_1';
     }
   }
 
@@ -63,6 +63,25 @@ class SharedPreferenceService {
       return await prefs.setString(keySelectedThemeResName, resName);
     } catch (e) {
       debugPrint('SharedPreferenceService setSelectedTheme error: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> isThemeDownloaded(String resName) async {
+    try {
+      if (resName == 'theme_1' || resName == 'anime_1' || resName == 'theme1') return true;
+      final prefs = await getInstance();
+      return prefs.getBool('THEME_DOWNLOADED_$resName') ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> setThemeDownloaded(String resName) async {
+    try {
+      final prefs = await getInstance();
+      return await prefs.setBool('THEME_DOWNLOADED_$resName', true);
+    } catch (e) {
       return false;
     }
   }

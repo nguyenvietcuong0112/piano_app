@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/audio_engine.dart';
 import '../../../core/theme/theme_service.dart';
+import '../../../core/widgets/exit_confirmation_dialog.dart';
+import '../../../core/widgets/gradient_border_card.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/mini_piano_overview.dart';
 import '../../../core/widgets/record_button.dart';
@@ -30,6 +34,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
@@ -47,9 +52,9 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
     final controller = ref.read(pianoPlayControllerProvider.notifier);
     final savedPath = await controller.toggleRecording();
     if (savedPath != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Saved: $savedPath")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Saved: $savedPath")));
     }
   }
 
@@ -58,7 +63,22 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
     final playState = ref.watch(pianoPlayControllerProvider);
     final controller = ref.read(pianoPlayControllerProvider.notifier);
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldExit = await ExitConfirmationDialog.show(
+          context,
+          title: "Exit Piano",
+          message: "Are you sure you want to leave the piano free play mode?",
+          confirmText: "Leave",
+          cancelText: "Continue",
+        );
+        if (shouldExit && mounted) {
+          context.pop();
+        }
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF101014),
       body: SafeArea(
         child: Stack(
@@ -78,66 +98,44 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
             Column(
               children: [
                 Container(
-                  height: 48,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  width: double.infinity,
+                  height: 40.sp,
                   color: const Color(0xFF14141A),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: () => context.pop(),
-                          child: Image.asset(
-                            'assets/icons/ic_home.png',
-                            width: 34,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.home, color: Colors.white),
+                          onTap: () async {
+                            final shouldExit = await ExitConfirmationDialog.show(
+          context,
+          title: "Exit Piano",
+          message: "Are you sure you want to leave the piano free play mode?",
+          confirmText: "Leave",
+          cancelText: "Continue",
+        );
+                            if (shouldExit && context.mounted) {
+                              context.pop();
+                            }
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_back_home.svg',
+                            width: 48.w,
+                            height: 36.h,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 16),
 
                         GestureDetector(
                           onTap: controller.toggleNoteNames,
-                          child: Image.asset(
-                            'assets/icons/ic_settings.png',
-                            width: 34,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.settings, color: Colors.white),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_setting_piano.svg',
+                            width: 48.w,
+                            height: 36.h,
                           ),
                         ),
-                        const SizedBox(width: 4),
-
-                        GestureDetector(
-                          onTap: controller.volumeDown,
-                          child: Image.asset(
-                            'assets/icons/ic_decrease_volume.png',
-                            width: 32,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.volume_down,
-                                    color: Colors.white, size: 20),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-
-                        GestureDetector(
-                          onTap: controller.volumeUp,
-                          child: Image.asset(
-                            'assets/icons/ic_increase_volume.png',
-                            width: 32,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.volume_up,
-                                    color: Colors.white, size: 20),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 16),
 
                         GestureDetector(
                           onTap: () {
@@ -153,97 +151,80 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                               ),
                             );
                           },
-                          child: Container(
-                            height: 30,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A38),
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Colors.white12),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.music_note,
-                                    color: Colors.amber, size: 16),
-                                SizedBox(width: 4),
-                                Text(
-                                  "Game",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
+                          child: GradientBorderCard(
+                            height: 36.h,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            backgroundGradient: const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color(0xFF141126),
+                                Color(0xFF0F0F1E),
                               ],
+                            ),
+                            borderRadius: 8,
+                            borderGradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
+                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
+                              ],
+                            ),
+                            child: Center(
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/ic_music.svg',
+                                    width: 24.h,
+                                    height: 24.h,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    "Game",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 16),
 
                         GestureDetector(
                           onTap: controller.zoomOut,
-                          child: Image.asset(
-                            'assets/icons/ic_key_minus_active.png',
-                            width: 34,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2A2A38),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Center(
-                                child: Text("-",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_key_minus_active.svg',
+                            width: 48.h,
+                            height: 36.h,
                           ),
                         ),
+                        const SizedBox(width: 16),
 
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: SizedBox(
-                            width: 140,
-                            child: MiniPianoOverview(
-                              currentStartOctave: playState.currentOctave,
-                              visibleWhiteKeysCount: playState.visibleWhiteKeysCount,
-                              onScrollOctave: controller.setOctave,
-                            ),
+                        SizedBox(
+                          width: 150.w,
+                          child: MiniPianoOverview(
+                            currentStartOctave: playState.currentOctave,
+                            visibleWhiteKeysCount:
+                                playState.visibleWhiteKeysCount,
+                            onScrollOctave: controller.setOctave,
                           ),
                         ),
+                        const SizedBox(width: 16),
 
                         GestureDetector(
                           onTap: controller.zoomIn,
-                          child: Image.asset(
-                            'assets/icons/ic_key_plus_active.png',
-                            width: 34,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2A2A38),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Center(
-                                child: Text("+",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_key_plus_active.svg',
+                            width: 48.h,
+                            height: 36.h,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 16),
 
                         GestureDetector(
                           onTap: () {
@@ -251,17 +232,13 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                               const SnackBar(content: Text("Recordings List")),
                             );
                           },
-                          child: Image.asset(
-                            'assets/icons/ic_list_records.png',
-                            width: 34,
-                            height: 30,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.playlist_play,
-                                    color: Colors.white),
+                          child: SvgPicture.asset(
+                            'assets/icons/ic_list_records.svg',
+                            width: 48.h,
+                            height: 36.h,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 16),
 
                         RecordButton(
                           isRecording: playState.isRecording,
@@ -286,6 +263,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }
