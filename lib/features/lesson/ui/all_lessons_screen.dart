@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -200,6 +201,9 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                             return GestureDetector(
                               onTap: () async {
                                 await context.push('/lesson-play', extra: song);
+                                await SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.portraitUp,
+                                ]);
                                 _loadSongStars();
                               },
                               child: Container(

@@ -356,9 +356,6 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     _stopPlaybackTicker();
     AudioEngine().stopAllNotes();
     _noteTimer?.cancel();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
     super.dispose();
   }
 
@@ -372,12 +369,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       cancelText: "Stay",
     );
     if (shouldExit && mounted) {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
-      if (mounted) {
-        context.pop();
-      }
+      context.pop();
     }
   }
 

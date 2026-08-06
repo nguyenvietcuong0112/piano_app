@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -253,6 +254,9 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       return GestureDetector(
                         onTap: () async {
                           await context.push('/lesson-play', extra: song);
+                          await SystemChrome.setPreferredOrientations([
+                            DeviceOrientation.portraitUp,
+                          ]);
                           _loadSongStars();
                         },
                         child: Container(

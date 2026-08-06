@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -13,10 +14,13 @@ class PianoTab extends ConsumerWidget {
   const PianoTab({super.key});
 
   void _openPianoWithInstrument(
-      BuildContext context, WidgetRef ref, String instrumentFolder) {
+      BuildContext context, WidgetRef ref, String instrumentFolder) async {
     ref.read(pianoSettingsProvider.notifier).setSoundPreset(instrumentFolder);
     AudioEngine().loadInstrument(instrumentFolder);
-    context.push('/play');
+    await context.push('/play');
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
   }
 
   @override

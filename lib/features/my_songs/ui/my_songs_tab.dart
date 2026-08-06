@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/shared_preference_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/no_data_widget.dart';
@@ -26,6 +26,9 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     _loadCompletedSongs();
   }
 
@@ -37,32 +40,6 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
         _completedSongs = list;
         _isLoading = false;
       });
-    }
-  }
-
-  String _getDifficultyText(int level) {
-    switch (level) {
-      case 1:
-        return "Easy";
-      case 2:
-        return "Medium";
-      case 3:
-        return "Hard";
-      default:
-        return "Easy";
-    }
-  }
-
-  Color _getDifficultyColor(int level) {
-    switch (level) {
-      case 1:
-        return AppColors.levelEasy;
-      case 2:
-        return AppColors.levelMedium;
-      case 3:
-        return AppColors.levelHard;
-      default:
-        return AppColors.levelEasy;
     }
   }
 
@@ -210,9 +187,6 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                     final int stars = (item['stars'] as num?)?.toInt() ?? 0;
                     final int accuracy = (item['accuracy'] as num?)?.toInt() ?? 0;
 
-                    final difficulty = _getDifficultyText(level);
-                    final diffColor = _getDifficultyColor(level);
-
                     final thumbUrl = (item['thumb'] ?? item['thumbnail'] ?? '').toString();
 
                     final lessonItem = LessonsItem(
@@ -228,6 +202,9 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                     return GestureDetector(
                       onTap: () async {
                         await context.push('/lesson-play', extra: lessonItem);
+                        await SystemChrome.setPreferredOrientations([
+                          DeviceOrientation.portraitUp,
+                        ]);
                         _loadCompletedSongs();
                       },
                       child: Container(
@@ -250,8 +227,8 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                             // Music Thumbnail Container
                             SongThumbnail(
                               thumbnailUrl: thumbUrl,
-                              width: 50,
-                              height: 50,
+                              width: 80.sp,
+                              height: 80.sp,
                               borderRadius: 14,
                             ),
                             const SizedBox(width: 14),
@@ -263,67 +240,50 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                 children: [
                                   Text(
                                     title,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: AppTextStyles.textWhite14,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     artist,
-                                    style: const TextStyle(
-                                      color: Colors.white54,
-                                      fontSize: 12,
-                                    ),
+                                    style: AppTextStyles.textGrey12,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 6),
 
                                   // Stars Rating
-                                  Row(
-                                    children: [
-                                      ...List.generate(5, (starIdx) {
-                                        return Icon(
-                                          starIdx < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-                                          color: starIdx < stars ? Colors.amber : Colors.white24,
-                                          size: 15,
-                                        );
-                                      }),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "$accuracy% ACC",
-                                        style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ...List.generate(5, (starIdx) {
+                                          return Icon(
+                                            starIdx < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+                                            color: starIdx < stars ? Colors.amber : Colors.white24,
+                                            size: 12,
+                                          );
+                                        }),
+                                        const SizedBox(width: 6), 
+                                        Text(
+                                          "$accuracy% ACC",
+                                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 8),
 
-                            // Difficulty Badge & Play Button
+                            // Play Button
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: diffColor.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: diffColor.withValues(alpha: 0.6), width: 1),
-                                  ),
-                                  child: Text(
-                                    difficulty,
-                                    style: TextStyle(
-                                      color: diffColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
                                 Container(
                                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                                   decoration: BoxDecoration(

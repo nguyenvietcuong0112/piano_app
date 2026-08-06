@@ -16,7 +16,6 @@ import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/mini_piano_overview.dart';
 import '../../../core/widgets/record_button.dart';
 import '../../../core/widgets/recording_dialogs.dart';
-import '../../lesson/domain/lesson_model.dart';
 import '../state/piano_provider.dart';
 import '../controller/piano_play_controller.dart';
 import 'piano_view.dart';
@@ -194,17 +193,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
 
                           GestureDetector(
                             onTap: () {
-                              context.push(
-                                '/lesson-play',
-                                extra: LessonsItem(
-                                  id: 101,
-                                  titleName: "Kiss the Rain",
-                                  authorName: "Yiruma",
-                                  duration: "02:45",
-                                  lessonsData: "kiss_the_rain.json",
-                                  thumbnail: "",
-                                ),
-                              );
+                              context.push('/songs-landscape');
                             },
                             child: GradientBorderCard(
                               height: 36.h,

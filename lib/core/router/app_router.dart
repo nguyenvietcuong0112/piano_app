@@ -8,6 +8,7 @@ import '../../features/onboard/onboard_page.dart';
 import '../../features/home/ui/home_tab.dart';
 import '../../features/lesson/domain/lesson_model.dart';
 import '../../features/lesson/ui/all_lessons_screen.dart';
+import '../../features/lesson/ui/songs_landscape_screen.dart';
 import '../../features/lesson/ui/lesson_play_screen.dart';
 import '../../features/piano/ui/piano_tab.dart';
 import '../../features/piano/ui/play_piano_screen.dart';
@@ -109,6 +110,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/all-lessons',
         name: 'all-lessons',
         builder: (context, state) => const AllLessonsScreen(),
+      ),
+      GoRoute(
+        path: '/songs-landscape',
+        name: 'songs-landscape',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const SongsLandscapeScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 200),
+          );
+        },
       ),
       GoRoute(
         path: '/lesson-play',

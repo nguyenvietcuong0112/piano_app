@@ -51,7 +51,7 @@ class GradientTabPill extends StatelessWidget {
               heightFactor: 1.0,
               child: Text(
                 label,
-                style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
+                style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold,fontSize: 14),
               ),
             ),
           ),
@@ -74,7 +74,7 @@ class GradientTabPill extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: AppTextStyles.textGrey14,
+          style: AppTextStyles.textGrey14.copyWith(fontWeight: FontWeight.bold,fontSize: 14),
         ),
       ),
     );
