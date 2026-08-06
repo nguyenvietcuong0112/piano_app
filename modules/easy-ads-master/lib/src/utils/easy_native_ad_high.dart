@@ -11,6 +11,8 @@ class EasyNativeAdHigh extends StatefulWidget {
   final String factoryId;
   final String adId;
   final String adIdHigh;
+  final String? adIdName;
+  final String? adIdNameHigh;
   final double height;
   final VoidCallback? onLoaded;
   final VoidCallback? onFailedToLoad;
@@ -20,6 +22,8 @@ class EasyNativeAdHigh extends StatefulWidget {
     required this.factoryId,
     required this.adId,
     required this.adIdHigh,
+    this.adIdName,
+    this.adIdNameHigh,
     required this.height,
     this.onLoaded,
     this.onFailedToLoad,
@@ -50,6 +54,7 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
       adNetwork: widget.adNetwork,
       factoryId: widget.factoryId,
       adId: widget.adIdHigh,
+      adIdName: widget.adIdNameHigh ?? widget.adIdName,
       height: widget.height,
     );
     _nativeAdHigh?.load();
@@ -73,6 +78,7 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
           adNetwork: widget.adNetwork,
           factoryId: widget.factoryId,
           adId: widget.adId,
+          adIdName: widget.adIdName,
           height: widget.height,
         );
         _nativeAd?.load();

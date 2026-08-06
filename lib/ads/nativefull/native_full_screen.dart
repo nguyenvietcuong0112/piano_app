@@ -10,6 +10,8 @@ import '../const/ad_id_name.dart';
 class NativeFullScreen extends StatefulWidget {
   final String nativeFullId;
   final String? nativeFullHighId;
+  final String? adIdName;
+  final String? adIdNameHigh;
   final VoidCallback handleNavigate;
 
   const NativeFullScreen({
@@ -17,6 +19,8 @@ class NativeFullScreen extends StatefulWidget {
     required this.nativeFullId,
     required this.handleNavigate,
     this.nativeFullHighId,
+    this.adIdName,
+    this.adIdNameHigh,
   });
 
   @override
@@ -136,9 +140,10 @@ class _NativeFullScreenState extends State<NativeFullScreen>
           children: [
             widget.nativeFullHighId != null
                 ? EasyNativeAdHigh(
-                    factoryId: MyAdIdName.nativeFull,
+                    factoryId: NativeFactoryId.nativeFull,
                     adId: widget.nativeFullId,
                     adIdHigh: widget.nativeFullHighId!,
+                    adIdName: widget.adIdName ?? MyAdIdName.nativeFull,
                     height: screenHeight,
                     onImpression: () {
                       debugPrint('✅ NativeFull ad impression - _navigated: $_navigated');
@@ -169,6 +174,7 @@ class _NativeFullScreenState extends State<NativeFullScreen>
                 : EasyNativeAd(
                     factoryId: NativeFactoryId.nativeFull,
                     adId: widget.nativeFullId,
+                    adIdName: widget.adIdName ?? MyAdIdName.nativeFull,
                     height: screenHeight,
                     onImpression: () {
                       debugPrint('✅ NativeFull ad impression');

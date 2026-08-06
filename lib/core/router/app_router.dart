@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,8 +22,11 @@ import '../../features/main/main_screen.dart';
 
 import '../../features/recording/ui/recordings_screen.dart';
 
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     debugLogDiagnostics: false,
     routes: [
@@ -36,7 +40,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/language',
         name: 'language',
-        builder: (context, state) => const LanguagePage(isFirstLaunch: true),
+        builder: (context, state) {
+          final isFirstLaunch = (state.extra as bool?) ?? false;
+          return LanguagePage(isFirstLaunch: isFirstLaunch);
+        },
       ),
       GoRoute(
         path: '/onboard',
@@ -89,7 +96,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/play',
         name: 'play',
-        builder: (context, state) => const PlayPianoScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const PlayPianoScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 200),
+        ),
       ),
       GoRoute(
         path: '/all-lessons',
@@ -99,9 +113,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/lesson-play',
         name: 'lesson-play',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final lesson = state.extra as LessonsItem;
-          return LessonPlayScreen(lesson: lesson);
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: LessonPlayScreen(lesson: lesson),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 200),
+          );
         },
       ),
       GoRoute(

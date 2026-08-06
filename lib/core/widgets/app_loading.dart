@@ -22,8 +22,8 @@ class AppLoading extends StatelessWidget {
         height: height,
         fit: fit,
         errorBuilder: (context, error, stackTrace) => const SizedBox(
-          width: 40,
-          height: 40,
+          width: 100,
+          height: 100,
           child: CircularProgressIndicator(
             color: Color(0xFFCF6BEE),
             strokeWidth: 2,

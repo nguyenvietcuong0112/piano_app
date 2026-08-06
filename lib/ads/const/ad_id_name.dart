@@ -6,6 +6,7 @@ class MyAdIdName {
       : "ca-app-pub-3940256099942544~3347511713";
 
   static const appOpenResume = "appOpenResume";
+  static const bannerSplash = "bannerSplash";
   static const interSplash = "interSplash";
   static const interSplashHigh = "interSplashHigh";
   static const nativeLanguage = "nativeLanguage";

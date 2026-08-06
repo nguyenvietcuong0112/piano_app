@@ -357,11 +357,28 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     AudioEngine().stopAllNotes();
     _noteTimer?.cancel();
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
       DeviceOrientation.portraitUp,
     ]);
     super.dispose();
+  }
+
+  Future<void> _exitScreen() async {
+    final shouldExit = await ExitConfirmationDialog.show(
+      context,
+      title: "Quit Lesson",
+      message:
+          "If you quit now, your current lesson progress will be lost.\nAre you sure you want to quit?",
+      confirmText: "Quit",
+      cancelText: "Stay",
+    );
+    if (shouldExit && mounted) {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      if (mounted) {
+        context.pop();
+      }
+    }
   }
 
   @override
@@ -390,17 +407,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final shouldExit = await ExitConfirmationDialog.show(
-          context,
-          title: "Quit Lesson",
-          message:
-              "If you quit now, your current lesson progress will be lost.\nAre you sure you want to quit?",
-          confirmText: "Quit",
-          cancelText: "Stay",
-        );
-        if (shouldExit && mounted) {
-          context.pop();
-        }
+        _exitScreen();
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF121212),
@@ -431,19 +438,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () async {
-                              final shouldExit = await ExitConfirmationDialog.show(
-                                context,
-                                title: "Quit Lesson",
-                                message:
-                                    "If you quit now, your current lesson progress will be lost.\nAre you sure you want to quit?",
-                                confirmText: "Quit",
-                                cancelText: "Stay",
-                              );
-                              if (shouldExit && context.mounted) {
-                                context.pop();
-                              }
-                            },
+                            onTap: _exitScreen,
                             child: SvgPicture.asset(
                               'assets/icons/ic_back_home.svg',
                               width: 48.w,

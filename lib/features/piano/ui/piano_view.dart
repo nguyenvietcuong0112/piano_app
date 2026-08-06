@@ -288,39 +288,42 @@ class PianoViewState extends ConsumerState<PianoView>
         note.currentY += note.speed;
         needsRepaint = true;
 
+        // If note was hit by user tap, remove it immediately!
+        if (note.isHit) {
+          _fallingNotes.removeAt(i);
+          continue;
+        }
+
         // Trigger particle fireworks right when the note reaches key top Y line!
-        if (note.currentY >= note.keyTopY && !note.hasTriggeredParticles) {
-          note.hasTriggeredParticles = true;
-          _spawnHitParticles(note.targetX, note.keyTopY);
+        if (note.currentY >= note.keyTopY) {
+          if (!note.hasTriggeredParticles) {
+            note.hasTriggeredParticles = true;
+            _spawnHitParticles(note.targetX, note.keyTopY);
 
-          // Auto-Play Guide Mode: Automatically trigger audio, key light & score!
-          if (widget.isAutoGuideMode) {
-            AudioEngine().playNote(note.originalKeyName);
-            _activeKeyNames.add(note.keyName);
-            int sustainMs = (note.durationMs > 0) ? note.durationMs : 250;
-            Future.delayed(Duration(milliseconds: sustainMs), () {
-              if (mounted) {
-                _activeKeyNames.remove(note.keyName);
-                AudioEngine().stopNote(note.originalKeyName);
-                setState(() {});
+            // Auto-Play Guide Mode: Automatically trigger audio, key light & score!
+            if (widget.isAutoGuideMode) {
+              AudioEngine().playNote(note.originalKeyName);
+              _activeKeyNames.add(note.keyName);
+              int sustainMs = (note.durationMs > 0) ? note.durationMs : 250;
+              Future.delayed(Duration(milliseconds: sustainMs), () {
+                if (mounted) {
+                  _activeKeyNames.remove(note.keyName);
+                  AudioEngine().stopNote(note.originalKeyName);
+                  setState(() {});
+                }
+              });
+
+              if (widget.onNotePressed != null) {
+                widget.onNotePressed!(note.keyName, note.label);
               }
-            });
-
-            if (widget.onNotePressed != null) {
-              widget.onNotePressed!(note.keyName, note.label);
+            } else if (widget.isLessonMode && !note.hasMissed) {
+              // Missed note (reached keyboard top line without user hitting it)
+              note.hasMissed = true;
+              widget.onNoteMissed?.call();
             }
           }
-        }
 
-        // Check for missed notes
-        if (note.currentY > note.keyTopY + 30 && !note.isHit && !note.hasMissed) {
-          note.hasMissed = true;
-          if (!widget.isAutoGuideMode && widget.isLessonMode) {
-            widget.onNoteMissed?.call();
-          }
-        }
-
-        if (note.currentY > note.keyTopY + 60) {
+          // Disappear immediately upon hitting top line of piano!
           _fallingNotes.removeAt(i);
         }
       }
@@ -362,7 +365,7 @@ class PianoViewState extends ConsumerState<PianoView>
     final double whiteKeyWidth = width / widget.visibleWhiteKeysCount;
     final double blackKeyWidth = whiteKeyWidth * 0.60;
 
-    final double keyboardTop = widget.isLessonMode ? height * 0.48 : 0.0;
+    final double keyboardTop = widget.isLessonMode ? height * 0.55 : 0.0;
     final double keyboardHeight = height - keyboardTop;
     final double blackKeyHeight = keyboardHeight * 0.62;
 
@@ -697,7 +700,11 @@ class PianoPainter extends CustomPainter {
       }
     }
 
-    // Draw Golden Synthesia Falling Tiles (Bars with Outer Glow)
+    // Draw Purple Synthesia Falling Tiles (Bars with Outer Glow)
+    final double keyboardTop = keys.isNotEmpty ? keys.first.rect.top : size.height * 0.48;
+    canvas.save();
+    canvas.clipRect(Rect.fromLTWH(-scrollX, 0, size.width + scrollX * 2, keyboardTop));
+
     for (var note in fallingNotes) {
       double tileWidth = (note.keyWidth * 0.72).clamp(18.0, 36.0);
       double tileHeight = 44.0;
@@ -715,21 +722,21 @@ class PianoPainter extends CustomPainter {
         const Radius.circular(10),
       );
 
-      // Outer Glow Effect
+      // Outer Glow Effect (Purple)
       Paint glowPaint = Paint()
-        ..color = const Color(0xFFFFB300).withValues(alpha: 0.6)
+        ..color = const Color(0xFFB158F0).withValues(alpha: 0.6)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
       canvas.drawRRect(roundedBar, glowPaint);
 
-      // Golden Gradient Tile Body
+      // Purple Gradient Tile Body
       Paint tilePaint = Paint()
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFFFFF176), // Bright yellow-gold top
-            Color(0xFFFFB300), // Amber gold
-            Color(0xFFF57C00), // Deep warm orange bottom
+            Color(0xFFE599FF), // Bright lavender purple top
+            Color(0xFFB158F0), // Vibrant purple
+            Color(0xFF7E26D4), // Deep purple bottom
           ],
         ).createShader(barRect);
 
@@ -742,13 +749,14 @@ class PianoPainter extends CustomPainter {
         ..strokeWidth = 1.2;
       canvas.drawRRect(roundedBar, borderPaint);  
 
-      // Note Name Label
-      if (showNoteNames && note.label.isNotEmpty) {
+      // Note Name Label (Remove numbers/digits from label)
+      final cleanLabel = note.label.replaceAll(RegExp(r'[0-9]'), '');
+      if (showNoteNames && cleanLabel.isNotEmpty) {
         TextPainter tp = TextPainter(
           text: TextSpan(
-            text: note.label,
+            text: cleanLabel,
             style: const TextStyle(
-              color: Color(0xFF3E2723),
+              color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.w900,
             ),
@@ -763,6 +771,7 @@ class PianoPainter extends CustomPainter {
         );
       }
     }
+    canvas.restore();
 
     // Draw Fireworks Particle Sparks
     for (var particle in particles) {

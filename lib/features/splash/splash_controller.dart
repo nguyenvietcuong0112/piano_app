@@ -67,6 +67,8 @@ class SplashController extends ChangeNotifier {
           context,
           interSplashHigh: MyAdIdName.interSplashHigh.getId,
           interSplashAll: MyAdIdName.interSplash.getId,
+          interSplashHighName: MyAdIdName.interSplashHigh,
+          interSplashAllName: MyAdIdName.interSplash,
           onShowed: () {
           },
           adDissmissed: () {
@@ -85,7 +87,7 @@ class SplashController extends ChangeNotifier {
 
   void goNextScreen(BuildContext context, {required VoidCallback onFinished}) {
     EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(false);
-    if (isNoFirstOpenApp) {
+    if (isNoFirstOpenApp && AppConstants.skipLangOnboardOnReopen) {
       onFinished();
     } else {
       Navigator.pushReplacement(

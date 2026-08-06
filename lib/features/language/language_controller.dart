@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/localization/locale_provider.dart';
+import '../../core/services/shared_preference_service.dart';
 
 class LanguageModel {
   final String pngAsset;
@@ -110,9 +112,16 @@ class LanguageController extends ChangeNotifier {
     Navigator.pop(context);
   }
 
-  void onClickNext(BuildContext context, {required VoidCallback onNavigateNext}) {
+  void onClickNext(
+    BuildContext context, {
+    required WidgetRef ref,
+    required VoidCallback onNavigateNext,
+  }) {
     if (selectedIndex >= 0 && selectedIndex < itemsList.length) {
-      AppConstants.selectedLanguageCode = itemsList[selectedIndex].languageCode;
+      final code = itemsList[selectedIndex].languageCode;
+      AppConstants.selectedLanguageCode = code;
+      SharedPreferenceService.setSelectedLanguageCode(code);
+      ref.read(localeProvider.notifier).setLocale(code);
     }
 
     if (!isFirstLaunch) {

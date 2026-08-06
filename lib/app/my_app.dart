@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+import '../core/localization/app_localizations.dart';
+import '../core/localization/locale_provider.dart';
 import '../core/router/app_router.dart';
 import '../core/theme/app_theme.dart';
 import 'app_initializer.dart';
@@ -32,6 +34,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
+    final locale = ref.watch(localeProvider);
 
     return FGBGNotifier(
       onEvent: AppInitializer.handleStateApp,
@@ -47,6 +50,11 @@ class _MyAppState extends ConsumerState<MyApp> {
                 title: 'Real Piano',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.darkTheme,
+                locale: locale,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                ],
                 routerConfig: router,
                 builder: (context, myWidget) {
                   myWidget = MediaQuery(

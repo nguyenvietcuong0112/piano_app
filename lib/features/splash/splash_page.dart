@@ -42,7 +42,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
           children: [
             Positioned.fill(
               child: Image.asset(
-                "assets/png/splash_background.png",
+                "assets/images/bg_splash.webp",
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                     Container(color: AppColors.background),
@@ -105,7 +105,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                         if (!AppConstants.isPremiumUser.value) ...[
                           const SizedBox(height: 10),
                           EasyBannerAd(
-                            adId: MyAdIdName.bannerAll.getId,
+                            adId: MyAdIdName.bannerSplash.getId,
+                            adIdName: MyAdIdName.bannerSplash,
                           ),
                         ]
                       ],

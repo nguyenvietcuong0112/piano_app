@@ -7,6 +7,7 @@ import 'package:lottie/lottie.dart';
 class EasyInterstitialAd extends StatefulWidget {
   final AdNetwork adNetwork;
   final String adId;
+  final String? adIdName;
   final void Function()? onShowed;
   final void Function()? onFailed;
   final void Function()? adDismissed;
@@ -16,6 +17,7 @@ class EasyInterstitialAd extends StatefulWidget {
     super.key,
     this.adNetwork = AdNetwork.admob,
     required this.adId,
+    this.adIdName,
     this.onShowed,
     this.adDismissed,
     this.onFailed,
@@ -31,6 +33,7 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
   late final EasyAdBase? _interstitialAd = EasyAds.instance.createInterstitial(
     adNetwork: widget.adNetwork,
     adId: widget.adId,
+    adIdName: widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? null : widget.adId),
     immersiveModeEnabled: true,
   );
 

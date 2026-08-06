@@ -3,18 +3,33 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/exit_confirmation_dialog.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
 import 'widgets/custom_header_bar.dart';
 
-class MainScreen extends ConsumerWidget {
+class MainScreen extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainScreen({
     super.key,
     required this.navigationShell,
   });
+
+  @override
+  ConsumerState<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends ConsumerState<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(false);
+      EasyAds.instance.appLifecycleReactor?.setAllowAppOpenAd(true);
+    });
+  }
 
   static const List<String> _titles = [
     "Piano Lesssion",
@@ -24,15 +39,15 @@ class MainScreen extends ConsumerWidget {
   ];
 
   void _onTap(int index) {
-    navigationShell.goBranch(
+    widget.navigationShell.goBranch(
       index,
-      initialLocation: index == navigationShell.currentIndex,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = navigationShell.currentIndex;
+  Widget build(BuildContext context) {
+    final currentIndex = widget.navigationShell.currentIndex;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final currentTitle = (currentIndex >= 0 && currentIndex < _titles.length)
         ? _titles[currentIndex]
@@ -44,7 +59,7 @@ class MainScreen extends ConsumerWidget {
         if (didPop) return;
 
         // If not on first tab (Home), go back to Home tab first
-        if (navigationShell.currentIndex != 0) {
+        if (widget.navigationShell.currentIndex != 0) {
           _onTap(0);
           return;
         }
@@ -70,7 +85,7 @@ class MainScreen extends ConsumerWidget {
           child: Column(
             children: [
               CustomHeaderBar(title: currentTitle),
-              Expanded(child: navigationShell),
+              Expanded(child: widget.navigationShell),
             ],
           ),
         ),

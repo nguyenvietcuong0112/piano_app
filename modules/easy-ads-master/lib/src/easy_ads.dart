@@ -288,6 +288,7 @@ class EasyAds {
     required AdNetwork adNetwork,
     required AdSize? adSize,
     required String adId,
+    String? adIdName,
     required bool isCollapsible,
   }) {
     EasyAdBase? ad;
@@ -298,7 +299,7 @@ class EasyAds {
         ad = EasyAdmobBannerAd(
           realAdUnitId,
           adSize: adSize,
-          adIdName: adId,
+          adIdName: adIdName ?? adId,
           adRequest: isCollapsible
               ? AdRequest(
                   httpTimeoutMillis: _adRequest.httpTimeoutMillis,
@@ -318,6 +319,7 @@ class EasyAds {
     required AdNetwork adNetwork,
     required String factoryId,
     required String adId,
+    String? adIdName,
     required double height,
   }) {
     EasyAdBase? ad;
@@ -326,7 +328,7 @@ class EasyAds {
       realAdUnitId,
       factoryId,
       height,
-      adIdName: adId,
+      adIdName: adIdName ?? adId,
       adRequest: _adRequest,
     );
     if (ad != null) _eventController.setupEvents(ad);
@@ -336,11 +338,12 @@ class EasyAds {
   EasyAdBase? createInterstitial({
     required AdNetwork adNetwork,
     required String adId,
+    String? adIdName,
     bool immersiveModeEnabled = true,
   }) {
     EasyAdBase? ad;
     final realAdUnitId = resolveAdUnitId(adId);
-    ad = EasyAdmobInterstitialAd(realAdUnitId, _adRequest, immersiveModeEnabled, adIdName: adId);
+    ad = EasyAdmobInterstitialAd(realAdUnitId, _adRequest, immersiveModeEnabled, adIdName: adIdName ?? adId);
     _eventController.setupEvents(ad);
     return ad;
   }
@@ -348,11 +351,12 @@ class EasyAds {
   EasyAdBase? createReward({
     required AdNetwork adNetwork,
     required String adId,
+    String? adIdName,
     bool immersiveModeEnabled = true,
   }) {
     EasyAdBase? ad;
     final realAdUnitId = resolveAdUnitId(adId);
-    ad = EasyAdmobRewardedAd(realAdUnitId, _adRequest, immersiveModeEnabled, adIdName: adId);
+    ad = EasyAdmobRewardedAd(realAdUnitId, _adRequest, immersiveModeEnabled, adIdName: adIdName ?? adId);
     _eventController.setupEvents(ad);
     return ad;
   }
@@ -360,11 +364,12 @@ class EasyAds {
   EasyAdBase? createAppOpenAd({
     required AdNetwork adNetwork,
     required String adId,
+    String? adIdName,
     // int orientation = AppOpenAd.orientationPortrait,
   }) {
     EasyAdBase? ad;
     final realAdUnitId = resolveAdUnitId(adId);
-    ad = EasyAdmobAppOpenAd(realAdUnitId, _adRequest, adIdName: adId);
+    ad = EasyAdmobAppOpenAd(realAdUnitId, _adRequest, adIdName: adIdName ?? adId);
     _eventController.setupEvents(ad);
     return ad;
   }
@@ -372,6 +377,7 @@ class EasyAds {
   /// Preloads a native ad with a specific ID, factory ID, and height, and stores it in the cache under a unique cacheKey.
   Future<void> preloadNativeAd({
     required String adId,
+    String? adIdName,
     required String factoryId,
     required double height,
     required String cacheKey,
@@ -393,6 +399,7 @@ class EasyAds {
       adNetwork: adNetwork,
       factoryId: factoryId,
       adId: adId,
+      adIdName: adIdName,
       height: height,
     );
 
@@ -427,11 +434,16 @@ class EasyAds {
 
   Future<void> initAdmob({
     String? appOpenAdUnitId,
+    String? appOpenAdIdName,
     // int appOpenAdOrientation = AppOpenAd.orientationPortrait,
   }) async {
     if (appOpenAdUnitId != null &&
         _appOpenAds.doesNotContain(AdNetwork.admob, AdUnitType.appOpen)) {
-      final appOpenAdManager = EasyAdmobAppOpenAd(appOpenAdUnitId, _adRequest);
+      final appOpenAdManager = EasyAdmobAppOpenAd(
+        appOpenAdUnitId,
+        _adRequest,
+        adIdName: appOpenAdIdName ?? (appOpenAdUnitId.startsWith('ca-app-pub-') ? null : appOpenAdUnitId),
+      );
       _appOpenAds.add(appOpenAdManager);
       _eventController.setupEvents(appOpenAdManager);
       try {
@@ -718,6 +730,7 @@ class EasyAds {
     BuildContext context, {
     AdNetwork adNetwork = AdNetwork.admob,
     required String adId,
+    String? adIdName,
     Function()? onShowed,
     Function()? adDissmissed,
     Function()? onFailed,
@@ -737,6 +750,7 @@ class EasyAds {
         pageBuilder: (context, animation, secondaryAnimation) => EasyInterstitialAd(
           adNetwork: adNetwork,
           adId: adId,
+          adIdName: adIdName ?? (adId.startsWith('ca-app-pub-') ? null : adId),
           onShowed: onShowed,
           onFailed: onFailed,
           adDismissed: adDissmissed,
@@ -820,6 +834,8 @@ class EasyAds {
     AdNetwork adNetwork = AdNetwork.admob,
     required String interSplashHigh,
     required String interSplashAll,
+    String? interSplashHighName,
+    String? interSplashAllName,
     Function()? onShowed,
     Function()? adDissmissed,
     Function()? onFailed,
@@ -839,6 +855,8 @@ class EasyAds {
           adNetwork: adNetwork,
           adIdHigh: interSplashHigh,
           adIdAll: interSplashAll,
+          adIdNameHigh: interSplashHighName ?? (interSplashHigh.startsWith('ca-app-pub-') ? null : interSplashHigh),
+          adIdNameAll: interSplashAllName ?? (interSplashAll.startsWith('ca-app-pub-') ? null : interSplashAll),
           onShowed: onShowed,
           onFailed: onFailed,
           adDismissed: adDissmissed,

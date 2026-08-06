@@ -7,6 +7,8 @@ class EasyInterstitialAdSplashWith2Id extends StatefulWidget {
   final AdNetwork adNetwork;
   final String adIdHigh;
   final String adIdAll;
+  final String? adIdNameHigh;
+  final String? adIdNameAll;
   final void Function()? onShowed;
   final void Function()? onFailed;
   final void Function()? adDismissed;
@@ -17,6 +19,8 @@ class EasyInterstitialAdSplashWith2Id extends StatefulWidget {
     this.adNetwork = AdNetwork.admob,
     required this.adIdHigh,
     required this.adIdAll,
+    this.adIdNameHigh,
+    this.adIdNameAll,
     this.onShowed,
     this.adDismissed,
     this.onFailed,
@@ -97,9 +101,11 @@ class _EasyInterstitialAdSplashWith2IdState
       // Dispose previous ad if any
       _currentAd?.dispose();
       // Create only the current ad we are trying to load
+      final adIdName = i == 0 ? widget.adIdNameHigh : widget.adIdNameAll;
       _currentAd = EasyAds.instance.createInterstitial(
         adNetwork: widget.adNetwork,
         adId: _adIds[i],
+        adIdName: adIdName,
         immersiveModeEnabled: true,
       );
 

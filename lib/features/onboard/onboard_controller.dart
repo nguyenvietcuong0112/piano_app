@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ads/const/ad_id_extension.dart';
@@ -17,6 +18,7 @@ class OnboardStep {
   final String desc;
   final String image;
   final String adId;
+  final String? adIdName;
   final String factoryId;
   final EasyAdBase? fullAd;
   final BoxFit fit;
@@ -26,6 +28,7 @@ class OnboardStep {
     this.desc = '',
     this.image = '',
     this.adId = '',
+    this.adIdName,
     this.factoryId = '',
     this.fullAd,
     this.fit = BoxFit.cover,
@@ -147,7 +150,8 @@ class OnboardController extends ChangeNotifier {
         adNetwork: AdNetwork.admob,
         factoryId: NativeFactoryId.nativeFull,
         adId: MyAdIdName.nativeOnboardFull1Ad.getId,
-        height: 800,
+        adIdName: MyAdIdName.nativeOnboardFull1Ad,
+        height: 1.sh,
       );
       final originalLoaded = nativeOnboardFull1?.onAdLoaded;
       nativeOnboardFull1?.onAdLoaded = (adNetwork, adUnitType, data) {
@@ -163,7 +167,8 @@ class OnboardController extends ChangeNotifier {
         adNetwork: AdNetwork.admob,
         factoryId: NativeFactoryId.nativeFull,
         adId: MyAdIdName.nativeOnboardFull2Ad.getId,
-        height: 800,
+        adIdName: MyAdIdName.nativeOnboardFull2Ad,
+        height: 1.sh,
       );
       final originalLoaded = nativeOnboardFull2?.onAdLoaded;
       nativeOnboardFull2?.onAdLoaded = (adNetwork, adUnitType, data) {
@@ -225,6 +230,7 @@ class OnboardController extends ChangeNotifier {
         desc: "Find your perfect match and stay connected anytime",
         image: "assets/images/onboard1.png",
         adId: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad.getId : "",
+        adIdName: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad : null,
         factoryId: showAdOnboard1 ? NativeFactoryId.nativeMedia : "",
       ),
     ];
@@ -255,6 +261,7 @@ class OnboardController extends ChangeNotifier {
       desc: "Start now and feel the connection instantly",
       image: "assets/images/onboard4.png",
       adId: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad.getId : "",
+      adIdName: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad : null,
       factoryId: showAdOnboard4 ? NativeFactoryId.nativeMedia : "",
     ));
 
@@ -348,6 +355,7 @@ class OnboardController extends ChangeNotifier {
       EasyAds.instance.showInterstitialAd(
         context,
         adId: MyAdIdName.interstitialOnboard.getId,
+        adIdName: MyAdIdName.interstitialOnboard,
         adDissmissed: () {
           if (context.mounted) context.go('/home');
         },

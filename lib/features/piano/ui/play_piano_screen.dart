@@ -45,11 +45,27 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
   void dispose() {
     AudioEngine().stopAllNotes();
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
       DeviceOrientation.portraitUp,
     ]);
     super.dispose();
+  }
+
+  Future<void> _exitScreen() async {
+    final shouldExit = await ExitConfirmationDialog.show(
+      context,
+      title: "Exit Piano",
+      message: "Are you sure you want to leave the piano free play mode?",
+      confirmText: "Leave",
+      cancelText: "Continue",
+    );
+    if (shouldExit && mounted) {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      if (mounted) {
+        context.pop();
+      }
+    }
   }
 
   void _handleToggleRecording() async {
@@ -59,7 +75,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
 
     if (playState.isRecording) {
       final savedPath = await controller.toggleRecording();
-      final item = await recorder.stopRecording(title: "Free Play");
+      await recorder.stopRecording(title: "Free Play");
 
       if (!mounted) return;
 
@@ -126,16 +142,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final shouldExit = await ExitConfirmationDialog.show(
-          context,
-          title: "Exit Piano",
-          message: "Are you sure you want to leave the piano free play mode?",
-          confirmText: "Leave",
-          cancelText: "Continue",
-        );
-        if (shouldExit && mounted) {
-          context.pop();
-        }
+        _exitScreen();
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF101014),
@@ -166,19 +173,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                       child: Row(
                         children: [
                           GestureDetector(
-                            onTap: () async {
-                              final shouldExit = await ExitConfirmationDialog.show(
-                                context,
-                                title: "Exit Piano",
-                                message:
-                                    "Are you sure you want to leave the piano free play mode?",
-                                confirmText: "Leave",
-                                cancelText: "Continue",
-                              );
-                              if (shouldExit && context.mounted) {
-                                context.pop();
-                              }
-                            },
+                            onTap: _exitScreen,
                             child: SvgPicture.asset(
                               'assets/icons/ic_back_home.svg',
                               width: 48.w,

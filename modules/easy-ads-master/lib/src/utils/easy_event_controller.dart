@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
 import '../services/easy_adjust_service.dart';
+import '../services/easy_firebase_service.dart';
 import '../services/easy_shared_pref_service.dart';
 
 /// Easy Event controller manages events received from all type of ad units
@@ -132,7 +133,12 @@ class EasyEventController {
       double valueMicros, {
       String? adIdName,
       }) {
-
+    EasyFirebaseService().logAdImpression(
+      adNetwork: adNetwork,
+      ad: ad,
+      valueMicros: valueMicros,
+      currencyCode: currencyCode,
+    );
 
     _onEventController.add(AdEvent(
       type: AdEventType.onAdImpression,

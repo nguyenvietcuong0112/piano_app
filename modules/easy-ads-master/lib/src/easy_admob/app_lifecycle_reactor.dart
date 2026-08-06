@@ -88,6 +88,21 @@ class AppLifecycleReactor with WidgetsBindingObserver {
       if (_onSplashScreen) return;
       if (!_allowAppOpenAd) return;
 
+      // Ignore landscape orientation
+      Orientation? currentOrientation;
+      if (navigatorKey.currentContext != null) {
+        try {
+          currentOrientation = MediaQuery.maybeOf(navigatorKey.currentContext!)?.orientation;
+        } catch (e) {
+          currentOrientation = null;
+        }
+      }
+
+      if (currentOrientation == Orientation.landscape) {
+        debugPrint("AppLifecycleReactor: Suppressing app open ad (Landscape orientation)");
+        return;
+      }
+
       // Ignore transient resumes within 2 seconds of leaving the splash screen
       if (_onSplashScreenFalseTime != null &&
           DateTime.now().difference(_onSplashScreenFalseTime!).inSeconds < 2) {

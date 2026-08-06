@@ -1,0 +1,22 @@
+const Map<String, String> en = {
+  'app_title': 'Real Piano',
+  'language': 'Language',
+  'settings': 'Settings',
+  'rate_app': 'Rate app',
+  'share_app': 'Share app',
+  'policy': 'Privacy Policy',
+  'version': 'Version',
+  'home': 'Home',
+  'themes': 'Themes',
+  'piano': 'Piano',
+  'my_songs': 'My Songs',
+  'recordings': 'Recordings',
+  'rate_dialog_title': 'Rate App',
+  'rate_dialog_desc': 'Do you like our app? Please rate us 5 stars!',
+  'later': 'Later',
+  'submit': 'Submit',
+  'sharing': 'Sharing Piano App...',
+  'privacy_policy_desc':
+      'We value your privacy. This application respects and protects your personal data. No personal sensitive information is collected or shared with third parties without your consent.',
+  'close': 'Close',
+};

@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -10,87 +15,116 @@ import '../../../core/widgets/app_scaffold.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _shareApp() async {
+    try {
+      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      final String packageName = packageInfo.packageName;
+      final String shareUrl =
+          'https://play.google.com/store/apps/details?id=$packageName';
+      await Share.share(shareUrl);
+    } catch (e) {
+      debugPrint('Error sharing app: $e');
+    }
+  }
+
+  Future<void> _openPolicyUrl() async {
+    final Uri uri = Uri.parse('https://everprofit.ltd/privacy');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(uri);
+      }
+    } catch (e) {
+      debugPrint('Error launching policy url: $e');
+    }
+  }
+
   void _showRateDialog(BuildContext context) {
+    int selectedRating = 5;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2C),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: const Text(
-          "Rate App",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Do you like our app? Please rate us 5 stars!",
-              style: TextStyle(color: Colors.white70),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1E1E2C),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            title: Text(
+              context.tr('rate_dialog_title'),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return Icon(
-                  Icons.star_rounded,
-                  color: Colors.amber,
-                  size: 32.sp,
-                );
-              }),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  context.tr('rate_dialog_desc'),
+                  style: const TextStyle(color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 16.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    final starIndex = index + 1;
+                    final isFilled = starIndex <= selectedRating;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedRating = starIndex;
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        child: Icon(
+                          isFilled
+                              ? Icons.star_rounded
+                              : Icons.star_outline_rounded,
+                          color: isFilled ? Colors.amber : Colors.grey,
+                          size: 36.sp,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Later", style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF9E54E5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Submit", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(context.tr('later'),
+                    style: const TextStyle(color: Colors.white54)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF9E54E5),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r)),
+                ),
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  await SharedPreferenceService.setBool('is_app_rated', true);
+                  await SharedPreferenceService.setInt(
+                      'user_app_rating', selectedRating);
 
-  void _showShareDialog(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Sharing Piano App..."),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _showPolicyDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2C),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: const Text(
-          "Privacy Policy",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        content: const SingleChildScrollView(
-          child: Text(
-            "We value your privacy. This application respects and protects your personal data. No personal sensitive information is collected or shared with third parties without your consent.",
-            style: TextStyle(color: Colors.white70, fontSize: 13),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close", style: TextStyle(color: Color(0xFF9E54E5))),
-          ),
-        ],
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Thank you for rating us $selectedRating stars!'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                child: Text(context.tr('submit'),
+                    style: const TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -118,7 +152,8 @@ class SettingsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E1E2C),
                         borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                        border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.10)),
                       ),
                       child: SvgPicture.asset(
                         'assets/icons/ic_back.svg',
@@ -129,8 +164,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Settings",
-                  style: AppTextStyles.textWhite22.copyWith(fontWeight: FontWeight.bold),
+                  context.tr('settings'),
+                  style: AppTextStyles.textWhite22
+                      .copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -143,27 +179,27 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _buildSettingTile(
                   icon: Icons.language_rounded,
-                  title: "Language",
-                  onTap: () => context.push('/language'),
+                  title: context.tr('language'),
+                  onTap: () => context.push('/language', extra: false),
                 ),
                 _buildSettingTile(
                   icon: Icons.star_outline_rounded,
-                  title: "Rate app",
+                  title: context.tr('rate_app'),
                   onTap: () => _showRateDialog(context),
                 ),
                 _buildSettingTile(
                   icon: Icons.thumb_up_alt_outlined,
-                  title: "Share app",
-                  onTap: () => _showShareDialog(context),
+                  title: context.tr('share_app'),
+                  onTap: _shareApp,
                 ),
                 _buildSettingTile(
                   icon: Icons.shield_outlined,
-                  title: "Policy",
-                  onTap: () => _showPolicyDialog(context),
+                  title: context.tr('policy'),
+                  onTap: _openPolicyUrl,
                 ),
                 _buildSettingTile(
                   icon: Icons.menu_book_rounded,
-                  title: "Version",
+                  title: context.tr('version'),
                   trailingText: "0.0.1",
                   onTap: () {},
                 ),

@@ -7,6 +7,7 @@ class EasyBannerAd extends StatefulWidget {
   final AdNetwork adNetwork;
   final AdSize? adSize;
   final String adId;
+  final String? adIdName;
   final bool isCollapsible;
   final int? reloadInterval;
 
@@ -14,6 +15,7 @@ class EasyBannerAd extends StatefulWidget {
     this.adNetwork = AdNetwork.admob,
     this.adSize,
     required this.adId,
+    this.adIdName,
     this.isCollapsible = false,
     this.reloadInterval,
     Key? key,
@@ -45,6 +47,7 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
       adNetwork: widget.adNetwork,
       adSize: adSize,
       adId: widget.adId,
+      adIdName: widget.adIdName,
       isCollapsible: widget.isCollapsible,
     );
     _bannerAd?.load();
@@ -74,6 +77,7 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
       adNetwork: widget.adNetwork,
       adSize: adSize,
       adId: widget.adId,
+      adIdName: widget.adIdName,
       isCollapsible: widget.isCollapsible,
     );
     _bannerAd?.load();

@@ -7,6 +7,7 @@ class EasyNativeAd extends StatefulWidget {
   final AdNetwork adNetwork;
   final String factoryId;
   final String adId;
+  final String? adIdName;
   final double height;
   final VoidCallback? onLoaded;
   final VoidCallback? onFailedToLoad;
@@ -15,6 +16,7 @@ class EasyNativeAd extends StatefulWidget {
     this.adNetwork = AdNetwork.admob,
     required this.factoryId,
     required this.adId,
+    this.adIdName,
     required this.height,
     this.onLoaded,
     this.onFailedToLoad,
@@ -31,6 +33,7 @@ class _EasyNativeAdState extends State<EasyNativeAd> {
     adNetwork: widget.adNetwork,
     factoryId: widget.factoryId,
     adId: widget.adId,
+    adIdName: widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? null : widget.adId),
     height: widget.height,
   );
   StreamSubscription? _streamSubscription;

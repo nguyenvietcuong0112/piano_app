@@ -7,10 +7,30 @@ class SharedPreferenceService {
 
   // Key definitions
   static const String keyIsNoFirstOpenApp = 'is_no_first_open_app';
+  static const String keySelectedLanguageCode = 'selected_language_code';
   static const String keySelectedThemeId = 'SELECTED_THEME_ID';
   static const String keySelectedThemeResName = 'SELECTED_THEME_RES_NAME';
   static const String keySelectedInstrument = 'SELECTED_INSTRUMENT';
   static const String keyAudioVolume = 'AUDIO_VOLUME';
+
+  // --- Selected Language ---
+  static Future<String> getSelectedLanguageCode() async {
+    try {
+      return (await getInstance()).getString(keySelectedLanguageCode) ?? 'en';
+    } catch (e) {
+      debugPrint('SharedPreferenceService getSelectedLanguageCode error: $e');
+      return 'en';
+    }
+  }
+
+  static Future<bool> setSelectedLanguageCode(String code) async {
+    try {
+      return await (await getInstance()).setString(keySelectedLanguageCode, code);
+    } catch (e) {
+      debugPrint('SharedPreferenceService setSelectedLanguageCode error: $e');
+      return false;
+    }
+  }
 
   /// Ensures SharedPreferences instance is initialized and cached.
   static Future<SharedPreferences> getInstance() async {

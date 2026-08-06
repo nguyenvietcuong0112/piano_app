@@ -8,8 +8,9 @@ Map<String, Map<String, String>> myAdsId = {
       ? {}
       : {
           MyAdIdName.appOpenResume: 'ca-app-pub-3940256099942544/9257395921',
-          MyAdIdName.interSplash: '',
-          MyAdIdName.interSplashHigh: '',
+          MyAdIdName.bannerSplash: 'ca-app-pub-3940256099942544/6300978111',
+          MyAdIdName.interSplash: 'ca-app-pub-3940256099942544/1033173712',
+          MyAdIdName.interSplashHigh: 'ca-app-pub-3940256099942544/1033173712',
           MyAdIdName.nativeLanguage: 'ca-app-pub-3940256099942544/1044960115',
           MyAdIdName.nativeLanguageHigh: 'ca-app-pub-3940256099942544/1044960115',
           MyAdIdName.nativeLanguageClick: 'ca-app-pub-3940256099942544/1044960115',
@@ -29,6 +30,7 @@ Map<String, Map<String, String>> myAdsId = {
       ? {}
       : {
           MyAdIdName.appOpenResume: 'ca-app-pub-1190669921094353/3659713444',
+          MyAdIdName.bannerSplash: 'ca-app-pub-3940256099942544/6300978111',
           MyAdIdName.interSplash: 'ca-app-pub-1190669921094353/1223440182',
           MyAdIdName.interSplashHigh: 'ca-app-pub-1190669921094353/6968403063',
           MyAdIdName.nativeLanguage: 'ca-app-pub-1190669921094353/7541436520',

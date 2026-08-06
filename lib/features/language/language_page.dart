@@ -1,7 +1,7 @@
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
-import '../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ads/const/ad_id_extension.dart';
@@ -9,6 +9,7 @@ import '../../ads/const/ad_id_factory.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import 'language_controller.dart';
 
@@ -25,6 +26,9 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
   @override
   void initState() {
     super.initState();
+    if (widget.isFirstLaunch) {
+      EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(true);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(languageControllerProvider)
@@ -59,7 +63,11 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               Positioned.fill(
                 child: Container(
                   color: const Color(0xFF131722).withValues(alpha: 0.8),
-                  child: const AppLoading(),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -82,6 +90,8 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             factoryId: NativeFactoryId.nativeMedia2,
             adId: MyAdIdName.nativeLanguageClick.getId,
             adIdHigh: MyAdIdName.nativeLanguageClickHigh.getId,
+            adIdName: MyAdIdName.nativeLanguageClick,
+            adIdNameHigh: MyAdIdName.nativeLanguageClickHigh,
             height: AdDimen.mediumNativeHeight,
           )
         : EasyNativeAdHigh(
@@ -89,11 +99,14 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             factoryId: NativeFactoryId.nativeMedia,
             adId: MyAdIdName.nativeLanguage.getId,
             adIdHigh: MyAdIdName.nativeLanguageHigh.getId,
+            adIdName: MyAdIdName.nativeLanguage,
+            adIdNameHigh: MyAdIdName.nativeLanguageHigh,
             height: AdDimen.mediumNativeHeight,
           );
   }
 
   Widget _buildContent(LanguageController controller) {
+    final bool hideAd = AppConstants.isPremiumUser.value || !controller.isFirstLaunch;
     return ListView.builder(
       itemCount: controller.itemsList.length,
       scrollDirection: Axis.vertical,
@@ -101,7 +114,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
         left: 20,
         right: 20,
         top: 10,
-        bottom: AppConstants.isPremiumUser.value ? 20 : AdDimen.mediumNativeHeight + 10,
+        bottom: hideAd ? 20 : AdDimen.mediumNativeHeight + 10,
       ),
       itemBuilder: (context, index) {
         final isSelected = controller.selectedIndex == index;
@@ -181,11 +194,11 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
       width: double.infinity,
       child: Stack(
         children: [
-          const Positioned.fill(
+          Positioned.fill(
             child: Center(
               child: Text(
-                "Language",
-                style: TextStyle(
+                context.tr('language'),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textWhite,
@@ -195,21 +208,32 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
           ),
           if (!controller.isFirstLaunch)
             Positioned(
-              left: 0,
+              left: 16,
               bottom: 0,
               top: 0,
-              child: GestureDetector(
-                onTap: () => controller.onSelectBack(context),
-                child: const AspectRatio(
-                  aspectRatio: 1,
-                  child: Center(
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.textWhite,
-                        size: 25,
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => controller.onSelectBack(context),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E2C),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.10),
+                      ),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_back.svg',
+                        width: 40,
+                        height: 40,
+                        errorBuilder: (context, error, stackTrace) => const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.textWhite,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ),
@@ -225,6 +249,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                 onTap: () {
                   controller.onClickNext(
                     context,
+                    ref: ref,
                     onNavigateNext: () => context.go('/onboard'),
                   );
                 },
@@ -252,9 +277,12 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               top: 0,
               child: Center(
                 child: SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: AppLoading(width: 30, height: 30),
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.textWhite,
+                  ),
                 ),
               ),
             ),

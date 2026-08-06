@@ -34,4 +34,9 @@ class AppConstants {
   static int adImpressionCount = 0;
   static String selectedLanguageCode = 'en';
   static String GSMAccessToken = '';
+
+  /// Cấu hình luồng mở app từ lần thứ 2 trở đi:
+  /// - `true`: Từ lần 2 mở app -> Splash vào thẳng Main
+  /// - `false`: Lần nào mở app cũng qua Splash -> Language -> Onboard -> Main
+  static bool skipLangOnboardOnReopen = true;
 }

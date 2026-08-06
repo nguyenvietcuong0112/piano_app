@@ -1,0 +1,22 @@
+const Map<String, String> vi = {
+  'app_title': 'Real Piano',
+  'language': 'Ngôn ngữ',
+  'settings': 'Cài đặt',
+  'rate_app': 'Đánh giá ứng dụng',
+  'share_app': 'Chia sẻ ứng dụng',
+  'policy': 'Chính sách bảo mật',
+  'version': 'Phiên bản',
+  'home': 'Trang chủ',
+  'themes': 'Giao diện',
+  'piano': 'Đàn Piano',
+  'my_songs': 'Bài hát của tôi',
+  'recordings': 'Bản thu âm',
+  'rate_dialog_title': 'Đánh giá ứng dụng',
+  'rate_dialog_desc': 'Bạn thấy ứng dụng thế nào? Hãy dành tặng 5 sao nhé!',
+  'later': 'Để sau',
+  'submit': 'Gửi',
+  'sharing': 'Đang chia sẻ ứng dụng Piano...',
+  'privacy_policy_desc':
+      'Chúng tôi tôn trọng quyền riêng tư của bạn. Ứng dụng này tôn trọng và bảo vệ dữ liệu cá nhân của bạn.',
+  'close': 'Đóng',
+};

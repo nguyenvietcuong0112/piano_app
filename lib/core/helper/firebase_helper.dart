@@ -75,29 +75,36 @@ class FirebaseHelper {
     debugPrint(
         'DEBUG_TRACE getAdPlacementEventName: adUnitId=$adUnitId, adIdName=$adIdName, adUnitType=$adUnitType');
     if (adUnitId == null && adIdName == null) return null;
-    final prodMap = myAdsId[Environment.prod] ?? {};
-    final devMap = myAdsId[Environment.dev] ?? {};
 
-    String? matchKey = adIdName;
+    String? keyName = adIdName;
 
-    if (matchKey == null && adUnitId != null) {
+    // If adIdName is null or is an ad unit ID (starts with ca-app-pub-), try to look up in maps
+    if (keyName == null || keyName.startsWith('ca-app-pub-')) {
+      final searchId = adUnitId ?? adIdName;
+      final prodMap = myAdsId[Environment.prod] ?? {};
+      final devMap = myAdsId[Environment.dev] ?? {};
+
+      keyName = null;
       prodMap.forEach((key, val) {
-        if (val == adUnitId) matchKey = key;
+        if (val == searchId && keyName == null) keyName = key;
       });
-      if (matchKey == null) {
+      if (keyName == null) {
         devMap.forEach((key, val) {
-          if (val == adUnitId && matchKey == null) matchKey = key;
+          if (val == searchId && keyName == null) keyName = key;
         });
       }
     }
 
-    debugPrint('DEBUG_TRACE matchKey resolved: $matchKey');
+    debugPrint('DEBUG_TRACE keyName resolved: $keyName');
 
-    if (matchKey != null) {
-      switch (matchKey) {
+    if (keyName != null) {
+      switch (keyName) {
         case MyAdIdName.appOpenResume:
           return "resume_open_app";
+        case MyAdIdName.bannerSplash:
+          return "banner_splash_view";
         case MyAdIdName.interSplashHigh:
+          return "inter_splash_view";
         case MyAdIdName.interSplash:
           return "inter_splash_view";
         case MyAdIdName.interClick:
@@ -118,13 +125,23 @@ class FirebaseHelper {
           return "native_onboarding_full_2_view";
         case MyAdIdName.nativeOnboard3Ad:
           return "native_onboarding_4_view";
+        case MyAdIdName.bannerAll:
+          return "banner_all_view";
+        case MyAdIdName.interstitialOnboard:
+          return "interstitial_onboard_view";
+        case MyAdIdName.nativeHome:
+          return "native_home_view";
+        case MyAdIdName.nativeFull:
+          return "native_full_view";
+        case MyAdIdName.rewardedAd:
+          return "rewarded_ad_view";
       }
     }
 
     return null;
   }
 
-  static logAdmobAdImpression(
+  static Future<void> logAdmobAdImpression(
       {required Ad ad, String? adIdName, AdUnitType? adUnitType}) async {
     try {
       debugPrint(

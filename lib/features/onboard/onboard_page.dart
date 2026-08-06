@@ -1,7 +1,6 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
-import '../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../ads/dimens/ad_dimen.dart';
@@ -20,6 +19,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
   @override
   void initState() {
     super.initState();
+    EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(onboardControllerProvider).init();
     });
@@ -171,6 +171,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
                   key: ValueKey(step.adId),
                   factoryId: step.factoryId,
                   adId: step.adId,
+                  adIdName: step.adIdName,
                   height: AdDimen.mediumNativeHeight,
                 ),
               ] else ...[
@@ -220,7 +221,14 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
         alignment: Alignment.centerRight,
         height: 40,
         child: const Center(
-          child: AppLoading(width: 30, height: 30),
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: AppColors.primary,
+            ),
+          ),
         ),
       );
     }
