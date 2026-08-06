@@ -42,7 +42,7 @@ class ExitConfirmationDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: GradientBorderCard(
-        width: 320.w,
+        width: 200.w,
         borderRadius: 20,
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
         backgroundGradient: const LinearGradient(

@@ -19,6 +19,8 @@ import '../../features/premium/ui/premium_screen.dart';
 import '../../features/settings/ui/settings_screen.dart';
 import '../../features/main/main_screen.dart';
 
+import '../../features/recording/ui/recordings_screen.dart';
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
@@ -127,6 +129,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final theme = state.extra as ThemeItem;
           return ThemePreviewScreen(theme: theme);
         },
+      ),
+      GoRoute(
+        path: '/recordings',
+        name: 'recordings',
+        builder: (context, state) => const RecordingsScreen(),
       ),
     ],
   );

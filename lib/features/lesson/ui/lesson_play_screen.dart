@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,8 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/audio_engine.dart';
 import '../../../core/services/audio_recorder_service.dart';
+import '../../../core/services/recording_storage_service.dart';
 import '../../../core/services/shared_preference_service.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_service.dart';
 import '../../../core/widgets/exit_confirmation_dialog.dart';
@@ -17,6 +18,7 @@ import '../../../core/widgets/gradient_border_card.dart';
 import '../../../core/widgets/gradient_slider_track_shape.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/record_button.dart';
+import '../../../core/widgets/recording_dialogs.dart';
 import '../../piano/ui/piano_view.dart';
 import '../data/lesson_datasource.dart';
 import '../domain/lesson_model.dart';
@@ -226,6 +228,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     }
 
     final state = ref.read(lessonPlayControllerProvider);
+    if (state.isRecording) {
+      await _stopRecordingAndPromptSave();
+    }
+
     final lessonIdStr = widget.lesson.id.toString();
 
     // Save high score / stars & completed song record
@@ -264,102 +270,84 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     );
   }
 
+  Future<void> _stopRecordingAndPromptSave() async {
+    final controller = ref.read(lessonPlayControllerProvider.notifier);
+    final state = ref.read(lessonPlayControllerProvider);
+    final recorder = AudioRecorderService();
+
+    if (!state.isRecording) return;
+    controller.toggleRecording();
+
+    final item = await recorder.stopRecording(title: widget.lesson.titleName);
+
+    if (!mounted) return;
+
+    final now = DateTime.now();
+    final dateStr =
+        "${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}";
+    final timeStr = now.millisecondsSinceEpoch.toString().substring(5);
+    final defaultTitle = "Record_$timeStr";
+
+    final savedTitle = await RecordSaveDialog.show(
+      context,
+      defaultTitle: defaultTitle,
+    );
+
+    if (savedTitle != null && savedTitle.isNotEmpty && item != null) {
+      final minutes = (_elapsedTimeSeconds ~/ 60).toString().padLeft(2, '0');
+      final seconds = (_elapsedTimeSeconds % 60).toString().padLeft(2, '0');
+      final durationStr = "$minutes:$seconds";
+
+      final newItem = RecordingItemModel(
+        id: item.id,
+        title: savedTitle,
+        date: dateStr,
+        duration: durationStr == "00:00" ? "00:07" : durationStr,
+        filePath: item.filePath,
+      );
+
+      await RecordingStorageService.addRecording(newItem);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFF7E48F0),
+            content: Text("✅ Saved recording: $savedTitle"),
+          ),
+        );
+      }
+    } else {
+      if (item != null) {
+        final f = File(item.filePath);
+        if (await f.exists()) await f.delete();
+      }
+    }
+  }
+
   void _handleRecordTap() async {
     final controller = ref.read(lessonPlayControllerProvider.notifier);
     final state = ref.read(lessonPlayControllerProvider);
     final recorder = AudioRecorderService();
 
     if (state.isRecording) {
-      controller.toggleRecording();
-      final item = await recorder.stopRecording(title: widget.lesson.titleName);
-      if (mounted && item != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green.shade800,
-            content: Text("✅ Đã lưu bản ghi: ${item.title}"),
-          ),
-        );
-      }
+      await _stopRecordingAndPromptSave();
     } else {
-      // Show mode selector dialog
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: const Color(0xFF1E1E2C),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) => SafeArea(
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "CHỌN CHẾ ĐỘ THU ÂM",
-                    style: TextStyle(
-                      color: Colors.amberAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ListTile(
-                    leading: const Icon(Icons.piano, color: Colors.cyanAccent),
-                    title: const Text(
-                      "Internal Audio Synth (Âm sạch 100%)",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: const Text(
-                      "Thu trực tiếp âm thanh tiếng đàn từ App",
-                      style: TextStyle(color: Colors.white54, fontSize: 12),
-                    ),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      bool success = await recorder.startRecording(
-                        mode: RecordingMode.internal,
-                        songTitle: widget.lesson.titleName,
-                      );
-                      if (success) {
-                        controller.toggleRecording();
-                      }
-                    },
-                  ),
-                  const Divider(color: Colors.white10),
-                  ListTile(
-                    leading: const Icon(Icons.mic, color: Colors.orangeAccent),
-                    title: const Text(
-                      "Microphone Audio (Kèm tiếng ngoài)",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: const Text(
-                      "Thu tiếng đàn kết hợp mic ngoài",
-                      style: TextStyle(color: Colors.white54, fontSize: 12),
-                    ),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      bool success = await recorder.startRecording(
-                        mode: RecordingMode.mic,
-                        songTitle: widget.lesson.titleName,
-                      );
-                      if (success) {
-                        controller.toggleRecording();
-                      } else if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("⚠️ Chưa được cấp quyền Microphone"),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ],
-              ),
+      final selectedMode = await RecordSelectionDialog.show(context);
+      if (selectedMode != null) {
+        bool success = await recorder.startRecording(
+          mode: selectedMode,
+          songTitle: widget.lesson.titleName,
+        );
+        if (success) {
+          controller.toggleRecording();
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("⚠️ Microphone permission required"),
             ),
-          ),
-        ),
-      );
+          );
+        }
+      }
     }
   }
 
@@ -435,7 +423,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                   // Toolbar Header
                   Container(
                     width: double.infinity,
-                    height: 40.sp,
+                    height: 100.r, 
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     color: const Color(0xFF14141A),
                     child: SingleChildScrollView(
@@ -558,7 +546,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                 const SizedBox(width: 4),
 
                                 SizedBox(
-                                  width: 110.w,
+                                  width: 100.w,
                                   child: SliderTheme(
                                     data: SliderTheme.of(context).copyWith(
                                       trackHeight: 3,
@@ -598,6 +586,15 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          GestureDetector(
+                            onTap: () => context.push('/recordings'),
+                            child: SvgPicture.asset(
+                              'assets/icons/ic_list_records.svg',
+                              width: 48.h,
+                              height: 36.h,
                             ),
                           ),
                           const SizedBox(width: 12),

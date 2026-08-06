@@ -40,7 +40,7 @@ class NoDataWidget extends StatelessWidget {
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Icon(
                   Icons.inbox_rounded,
-                  size: imageHeight ?? 100.h,
+                  size: (imageHeight ?? 100).r,
                   color: Colors.white24,
                 ),
               ),
@@ -50,7 +50,7 @@ class NoDataWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 17.sp,
+                fontSize: 17.r,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -61,7 +61,7 @@ class NoDataWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white54,
-                  fontSize: 13.sp,
+                  fontSize: 13.r,
                   height: 1.4,
                 ),
               ),
@@ -79,11 +79,11 @@ class NoDataWidget extends StatelessWidget {
                   elevation: 4,
                 ),
                 onPressed: onActionPressed,
-                icon: Icon(actionIcon ?? Icons.explore_rounded, size: 18.sp),
+                icon: Icon(actionIcon ?? Icons.explore_rounded, size: 18.r),
                 label: Text(
                   actionText!,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 14.r,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
