@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
+import '../../../core/helper/iap_helper.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -20,183 +23,270 @@ class _PremiumScreenState extends State<PremiumScreen> {
   String _selectedPackage = 'monthly';
 
   @override
+  void initState() {
+    super.initState();
+    AppConstants.isPremiumUser.addListener(_onPremiumStatusChanged);
+    IAPHelper.queryProducts();
+  }
+
+  @override
+  void dispose() {
+    AppConstants.isPremiumUser.removeListener(_onPremiumStatusChanged);
+    super.dispose();
+  }
+
+  void _onPremiumStatusChanged() {
+    if (AppConstants.isPremiumUser.value && mounted) {
+      EasyLoading.showSuccess('Premium Unlocked!');
+      if (context.canPop()) {
+        context.pop();
+      }
+    }
+  }
+
+  Future<void> _handleBuy() async {
+    final productId = _selectedPackage == 'weekly'
+        ? IAPHelper.weeklyProductId
+        : IAPHelper.monthlyProductId;
+
+    final productDetails = IAPHelper.productsMap.value[productId];
+
+    if (productDetails != null) {
+      final success = await IAPHelper.buyProduct(productDetails);
+      if (!success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not initiate purchase. Please try again.'),
+          ),
+        );
+      }
+    } else {
+      // Fallback if products could not be fetched from store (e.g. Sandbox/Emulator without Store login)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Store products not available. Check your internet or Google Play / App Store connection.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleRestore() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Restoring purchases...'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    await IAPHelper.restorePurchases();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0XFF06012F),
-      body: Stack(
-        children: [
-          // Full Screen Background Image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/img_bg_premium.webp',
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          // Scrollable Content
-          SafeArea(
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 0.35.sh),
-
-                      // Title: "Learn Piano"
-                      Text(
-                        context.tr('app_title'),
-                        style: AppTextStyles.textWhite22.copyWith(
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-
-                      SizedBox(height: 12.h),
-
-                      // 2. Feature Checklist (6 items)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildFeatureItem("🚫", context.tr('remove_ads')),
-                            SizedBox(height: 8.h),
-                            _buildFeatureItem("🎵", context.tr('my_song_collection')),
-                            SizedBox(height: 8.h),
-                            _buildFeatureItem("🎨", context.tr('piano_keyboard_themes')),
-                            SizedBox(height: 8.h),
-                            _buildFeatureItem("🎹", context.tr('piano')),
-                            SizedBox(height: 8.h),
-                            _buildFeatureItem("🎙️", context.tr('recordings')),
-                            SizedBox(height: 8.h),
-                            _buildFeatureItem("⭐", context.tr('unlock_all_features')),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 24.h),
-
-                      // 3. Package Selection Cards (Weekly vs Monthly)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        child: Column(
-                          children: [
-                            // Weekly Package Card
-                            _buildPackageCard(
-                              packageKey: 'weekly',
-                              title: "Weekly PRO",
-                              price: "\$3.99",
-                              isPopular: false,
-                            ),
-
-                            SizedBox(height: 12.h),
-
-                            // Monthly Package Card
-                            _buildPackageCard(
-                              packageKey: 'monthly',
-                              title: "Monthly PRO",
-                              price: "\$8.99",
-                              subtitle: "Save 44% compared to weekly",
-                              isPopular: true,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 16.h),
-
-                      // Pricing Note
-                      Text(
-                        "\$1.99/week. Cancel Anytime",
-                        style: AppTextStyles.textWhite12.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      SizedBox(height: 24.h),
-
-                      // 4. CTA Button
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        child: PrimaryButton(
-                          backgroundGradient: const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color(0xFF7A44DA),
-                              Color(0xFFCF6BEE),
-                            ],
-                          ),
-                          borderGradient: null,
-                          innerShadows:  [
-                            BoxShadow(
-                              offset: Offset(1, 2),
-                              blurRadius: 2,
-                              color: Color(0xFFFFFF).withOpacity(0.25),
-                            ),
-                            BoxShadow(
-                              offset: Offset(-1, -2),
-                              blurRadius: 2,
-                              color: Color(0xFFFFFF).withOpacity(0.25),
-                            ),
-                          ],
-                          text: context.tr('continue'),
-                          onTap: () {
-                            context.pop();
-                          },
-                        ),
-                      ),
-
-                      SizedBox(height: 24.h),
-
-                      // 5. Footer Links (Restore Purchase | Privacy Policy | Terms of Use)
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildFooterLink(context.tr('restore_purchase')),
-                            Text("|", style: AppTextStyles.textGrey12),
-                            _buildFooterLink(context.tr('policy')),
-                            Text("|", style: AppTextStyles.textGrey12),
-                            _buildFooterLink(context.tr('terms_of_use')),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 30.h),
-                    ],
-                  ),
+      body: ValueListenableBuilder<bool>(
+        valueListenable: IAPHelper.isLoading,
+        builder: (context, isLoading, child) {
+          return Stack(
+            children: [
+              // Full Screen Background Image
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/img_bg_premium.webp',
+                  fit: BoxFit.contain,
                 ),
+              ),
 
-                // Top Close Button (Top-Right)
-                Positioned(
-                  top: 8.h,
-                  right: 16.w,
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      width: 36.r,
-                      height: 36.r,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white24),
-                      ),
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: Colors.white,
-                        size: 20.sp,
+              // Scrollable Content
+              SafeArea(
+                child: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 0.35.sh),
+
+                          // Title: "Learn Piano"
+                          Text(
+                            context.tr('app_title'),
+                            style: AppTextStyles.textWhite22.copyWith(
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+
+                          SizedBox(height: 12.h),
+
+                          // 2. Feature Checklist (6 items)
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 40.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFeatureItem("🚫", context.tr('remove_ads')),
+                                SizedBox(height: 8.h),
+                                _buildFeatureItem("🎵", context.tr('my_song_collection')),
+                                SizedBox(height: 8.h),
+                                _buildFeatureItem("🎨", context.tr('piano_keyboard_themes')),
+                                SizedBox(height: 8.h),
+                                _buildFeatureItem("🎹", context.tr('piano')),
+                                SizedBox(height: 8.h),
+                                _buildFeatureItem("🎙️", context.tr('recordings')),
+                                SizedBox(height: 8.h),
+                                _buildFeatureItem("⭐", context.tr('unlock_all_features')),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: 24.h),
+
+                          // 3. Package Selection Cards (Weekly vs Monthly)
+                          ValueListenableBuilder(
+                            valueListenable: IAPHelper.productsMap,
+                            builder: (context, products, child) {
+                              final weeklyProduct = products[IAPHelper.weeklyProductId];
+                              final monthlyProduct = products[IAPHelper.monthlyProductId];
+
+                              final weeklyPrice = weeklyProduct?.price ?? "\$3.99";
+                              final monthlyPrice = monthlyProduct?.price ?? "\$8.99";
+
+                              return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                                child: Column(
+                                  children: [
+                                    // Weekly Package Card
+                                    _buildPackageCard(
+                                      packageKey: 'weekly',
+                                      title: "Weekly PRO",
+                                      price: weeklyPrice,
+                                      isPopular: false,
+                                    ),
+
+                                    SizedBox(height: 12.h),
+
+                                    // Monthly Package Card
+                                    _buildPackageCard(
+                                      packageKey: 'monthly',
+                                      title: "Monthly PRO",
+                                      price: monthlyPrice,
+                                      subtitle: "Save 44% compared to weekly",
+                                      isPopular: true,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+
+                          SizedBox(height: 16.h),
+
+                          // Pricing Note
+                          Text(
+                            "\$1.99/week. Cancel Anytime",
+                            style: AppTextStyles.textWhite12.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          SizedBox(height: 24.h),
+
+                          // 4. CTA Button
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w),
+                            child: PrimaryButton(
+                              backgroundGradient: const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF7A44DA),
+                                  Color(0xFFCF6BEE),
+                                ],
+                              ),
+                              borderGradient: null,
+                              innerShadows: [
+                                BoxShadow(
+                                  offset: const Offset(1, 2),
+                                  blurRadius: 2,
+                                  color: const Color(0xFFFFFFFF).withValues(alpha: 0.25),
+                                ),
+                                BoxShadow(
+                                  offset: const Offset(-1, -2),
+                                  blurRadius: 2,
+                                  color: const Color(0xFFFFFFFF).withValues(alpha: 0.25),
+                                ),
+                              ],
+                              text: isLoading ? '...' : context.tr('continue'),
+                              onTap: isLoading ? () {} : _handleBuy,
+                            ),
+                          ),
+
+                          SizedBox(height: 24.h),
+
+                          // 5. Footer Links (Restore Purchase | Privacy Policy | Terms of Use)
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildFooterLink(
+                                  context.tr('restore_purchase'),
+                                  onTap: _handleRestore,
+                                ),
+                                Text("|", style: AppTextStyles.textGrey12),
+                                _buildFooterLink(context.tr('policy')),
+                                Text("|", style: AppTextStyles.textGrey12),
+                                _buildFooterLink(context.tr('terms_of_use')),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: 30.h),
+                        ],
                       ),
                     ),
-                  ),
+
+                    // Top Close Button (Top-Right)
+                    Positioned(
+                      top: 8.h,
+                      right: 16.w,
+                      child: GestureDetector(
+                        onTap: () => context.pop(),
+                        child: Container(
+                          width: 36.r,
+                          height: 36.r,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: Colors.white,
+                            size: 20.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    if (isLoading)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black38,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFCF6BEE),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -270,23 +360,23 @@ class _PremiumScreenState extends State<PremiumScreen> {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                Color(0xFFFFFFFF).withValues(alpha: 0.25),
-                Color(0xFFFFFFFF).withValues(alpha: 0.1),  
-                Color(0xFFFFFFFF).withValues(alpha: 0.25),   
+                const Color(0xFFFFFFFF).withValues(alpha: 0.25),
+                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
+                const Color(0xFFFFFFFF).withValues(alpha: 0.25),
               ],
               stops: const [0.0, 0.5, 1.0],
             ),
       innerShadows: isSelected
-          ?  [
+          ? [
               BoxShadow(
-                offset: Offset(-1, -2),
+                offset: const Offset(-1, -2),
                 blurRadius: 2,
-                color: Color(0xFFFFFF).withOpacity(0.25),
+                color: const Color(0xFFFFFFFF).withValues(alpha: 0.25),
               ),
               BoxShadow(
-                offset: Offset(1, 2),
+                offset: const Offset(1, 2),
                 blurRadius: 2,
-                color: Color(0xFFFFFF).withOpacity(0.25),
+                color: const Color(0xFFFFFFFF).withValues(alpha: 0.25),
               ),
             ]
           : null,
@@ -364,16 +454,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildFooterLink(String title) {
+  Widget _buildFooterLink(String title, {VoidCallback? onTap}) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(title),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      },
+      onTap: onTap ??
+          () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(title),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          },
       child: Text(
         title,
         style: AppTextStyles.textGrey12.copyWith(

@@ -20,9 +20,9 @@ class AppInitializer {
     configLoading();
     AdsService.initOrganic();
     _initCommonSDK();
+    IAPHelper.initIAP();
 
     Future.delayed(const Duration(seconds: 5), () {
-      IAPHelper.initIAP();
       NotificationHelper.initializeNotifications();
     });
   }

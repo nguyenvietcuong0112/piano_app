@@ -12,6 +12,26 @@ class SharedPreferenceService {
   static const String keySelectedThemeResName = 'SELECTED_THEME_RES_NAME';
   static const String keySelectedInstrument = 'SELECTED_INSTRUMENT';
   static const String keyAudioVolume = 'AUDIO_VOLUME';
+  static const String keyIsPremiumUser = 'IS_PREMIUM_USER';
+
+  // --- Premium User ---
+  static Future<bool> getIsPremiumUser() async {
+    try {
+      return (await getInstance()).getBool(keyIsPremiumUser) ?? false;
+    } catch (e) {
+      debugPrint('SharedPreferenceService getIsPremiumUser error: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> setIsPremiumUser(bool value) async {
+    try {
+      return await (await getInstance()).setBool(keyIsPremiumUser, value);
+    } catch (e) {
+      debugPrint('SharedPreferenceService setIsPremiumUser error: $e');
+      return false;
+    }
+  }
 
   // --- Selected Language ---
   static Future<String> getSelectedLanguageCode() async {

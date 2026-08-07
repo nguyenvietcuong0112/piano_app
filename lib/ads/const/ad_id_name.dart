@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 class MyAdIdName {
   static final appID = GetPlatform.isIOS
       ? ""
-      : "ca-app-pub-3940256099942544~3347511713";
+      : "ca-app-pub-9900730300733887~4813290623";
 
   static const appOpenResume = "appOpenResume";
   static const bannerSplash = "bannerSplash";
