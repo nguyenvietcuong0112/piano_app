@@ -28,7 +28,7 @@ const Map<String, String> hi = {
 
   // Home Tab
   'piano_lessons': 'पियानो पाठ',
-  'home_banner_sub': '50+ लोकप्रिय गानों के साथ आसानी से पियानो सीखें',
+  'home_banner_sub': 'कहीं भी,\nकभी भी पियानो सीखें। असली कुंजियाँ, असली अहसास।',
   'start_now': 'अभी शुरू करें',
   'lesson_list': 'पाठों की सूची',
   'view_all': 'सभी देखें',

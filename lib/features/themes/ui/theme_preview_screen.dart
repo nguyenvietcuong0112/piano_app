@@ -150,6 +150,7 @@ class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
                         child: ThemeImage(
                           resName: widget.theme.resName,
                           fit: BoxFit.cover,
+                          showOverlay: true,
                         ),
                       ),
                     ),

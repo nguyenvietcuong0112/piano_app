@@ -28,10 +28,10 @@ const Map<String, String> en = {
 
   // Home Tab
   'piano_lessons': 'PIANO LESSONS',
-  'home_banner_sub': 'Learn Piano Easily With 50+ Hot Songs',
+  'home_banner_sub': 'Learn Piano anywhere,\nanytime. Real keys, real feel.',
   'start_now': 'START NOW',
-  'lesson_list': 'Lesson List',
-  'view_all': 'View All',
+  'lesson_list': 'Popular Songs',
+  'view_all': 'See All',
   'practice_now': 'Play',
   'learn_now': 'Learn Now',
 
@@ -131,5 +131,6 @@ const Map<String, String> en = {
   'unlock_all_features': 'Unlock All Features',
   'remove_ads': 'Remove Ads',
   'subscribe_now': 'Subscribe Now',
+  'continue': 'Continue',
   'terms_of_use': 'Terms of Use',
 };

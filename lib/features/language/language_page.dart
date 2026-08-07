@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 
 import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_factory.dart';
@@ -159,8 +160,20 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: isSelected ? AppColors.primary : AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                    ),
+                    border: GradientBoxBorder(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFFFF).withOpacity(0.5), // opacity 0.5
+                          Color(0xFFFFFF), // opacity 0.5
+                          Color(0xAD57E6).withOpacity(0.5),
+                        ],
+                      ),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -192,7 +205,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                               height: 22,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(width: 1, color: Colors.white),
+                                border: Border.all(width: 1, color: AppColors.textPurple),
                               ),
                               child: Center(
                                 child: Container(
@@ -200,7 +213,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                                   height: 15,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white,
+                                    color: AppColors.textPurple,
                                   ),
                                 ),
                               ),

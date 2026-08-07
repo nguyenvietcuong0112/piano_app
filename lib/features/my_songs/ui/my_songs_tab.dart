@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,95 +62,95 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Summary Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3B1E63), Color(0xFF1A1438)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border: Border.all(color: const Color(0x66AD57E6), width: 1),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFAD57E6).withValues(alpha: 0.15),
-                      blurRadius: 15,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFAD57E6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.music_note_rounded, color: Colors.white, size: 30),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.tr('my_song_collection'),
-                            style: AppTextStyles.textWhite16,
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white10,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  "🎵 ${context.tr('learned_count')} $totalCompleted",
-                                  style: AppTextStyles.textWhite12.copyWith(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  "🌟 ${context.tr('stars_count')} $perfectMastered",
-                                  style: AppTextStyles.textWhite12.copyWith(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 22),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.tr('completed_list'),
-                    style: AppTextStyles.textWhite18,
-                  ),
-                  IconButton(
-                    onPressed: _loadCompletedSongs,
-                    icon: const Icon(Icons.refresh_rounded, color: Color(0xFFAD57E6), size: 20),
-                    tooltip: context.tr('refresh'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
+              // Container(
+              //   width: double.infinity,
+              //   padding: const EdgeInsets.all(18),
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(20),
+              //     gradient: const LinearGradient(
+              //       colors: [Color(0xFF3B1E63), Color(0xFF1A1438)],
+              //       begin: Alignment.topLeft,
+              //       end: Alignment.bottomRight,
+              //     ),
+              //     border: Border.all(color: const Color(0x66AD57E6), width: 1),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: const Color(0xFFAD57E6).withValues(alpha: 0.15),
+              //         blurRadius: 15,
+              //         offset: const Offset(0, 4),
+              //       ),
+              //     ],
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Container(
+              //         padding: const EdgeInsets.all(14),
+              //         decoration: const BoxDecoration(
+              //           color: Color(0xFFAD57E6),
+              //           shape: BoxShape.circle,
+              //         ),
+              //         child: const Icon(Icons.music_note_rounded, color: Colors.white, size: 30),
+              //       ),
+              //       const SizedBox(width: 16),
+              //       Expanded(
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             Text(
+              //               context.tr('my_song_collection'),
+              //               style: AppTextStyles.textWhite16,
+              //             ),
+              //             const SizedBox(height: 6),
+              //             Row(
+              //               children: [
+              //                 Container(
+              //                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              //                   decoration: BoxDecoration(
+              //                     color: Colors.white10,
+              //                     borderRadius: BorderRadius.circular(10),
+              //                   ),
+              //                   child: Text(
+              //                     "🎵 ${context.tr('learned_count')} $totalCompleted",
+              //                     style: AppTextStyles.textWhite12.copyWith(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
+              //                   ),
+              //                 ),
+              //                 const SizedBox(width: 8),
+              //                 Container(
+              //                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              //                   decoration: BoxDecoration(
+              //                     color: Colors.amber.withValues(alpha: 0.15),
+              //                     borderRadius: BorderRadius.circular(10),
+              //                   ),
+              //                   child: Text(
+              //                     "🌟 ${context.tr('stars_count')} $perfectMastered",
+              //                     style: AppTextStyles.textWhite12.copyWith(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
+              //                   ),
+              //                 ),
+              //               ],
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 22),
+              //
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       context.tr('completed_list'),
+              //       style: AppTextStyles.textWhite18,
+              //     ),
+              //     IconButton(
+              //       onPressed: _loadCompletedSongs,
+              //       icon: const Icon(Icons.refresh_rounded, color: Color(0xFFAD57E6), size: 20),
+              //       tooltip: context.tr('refresh'),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10),
 
               if (_isLoading)
                 const Padding(
@@ -284,8 +285,8 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                     borderRadius: BorderRadius.circular(16.r),
                                     gradient: LinearGradient(
                                       colors: [
-                                        const Color(0xFFCC69EE).withValues(alpha: 0.25),
                                         const Color(0xFF7745D3).withValues(alpha: 0.25),
+                                        const Color(0xFFCC69EE).withValues(alpha: 0.25),
                                       ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
@@ -294,11 +295,11 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.replay_rounded, size: 14, color: Colors.white),
+                                      const Icon(Icons.replay_rounded, size: 14, color: AppColors.textPurple),
                                       SizedBox(width: 4.w),
                                       Text(
                                         context.tr('replay'),
-                                        style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
+                                        style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
                                       ),
                                     ],
                                   ),

@@ -13,6 +13,7 @@ class PrimaryButton extends StatelessWidget {
   final double borderRadius;
   final Gradient? backgroundGradient;
   final Gradient? borderGradient;
+  final List<BoxShadow>? innerShadows;
   final Widget? icon;
   final Widget? child;
 
@@ -25,6 +26,7 @@ class PrimaryButton extends StatelessWidget {
     this.borderRadius = 26,
     this.backgroundGradient,
     this.borderGradient,
+    this.innerShadows,
     this.icon,
     this.child,
   });
@@ -33,6 +35,19 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveBgGradient = backgroundGradient ?? AppColors.primaryButtonGradient;
     final effectiveBorderGradient = borderGradient ?? AppColors.secondaryBorderGradient;
+    final effectiveInnerShadows = innerShadows ??
+        const [
+          BoxShadow(
+            offset: Offset(1, 2),
+            blurRadius: 2,
+            color: Color(0x40FFFFFF),
+          ),
+          BoxShadow(
+            offset: Offset(-1, -2),
+            blurRadius: 2,
+            color: Color(0x40FFFFFF),
+          ),
+        ];
 
     return GradientBorderCard(
       width: width,
@@ -41,6 +56,7 @@ class PrimaryButton extends StatelessWidget {
       strokeWidth: 1.0,
       backgroundGradient: effectiveBgGradient,
       borderGradient: effectiveBorderGradient,
+      innerShadows: effectiveInnerShadows,
       onTap: onTap,
       child: Center(
         child: child ??

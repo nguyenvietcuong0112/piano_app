@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import '../../../core/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -154,7 +155,17 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20.r),
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFB158F0), Color(0xFF7E26D4)],
+                                      colors: [Color(0xFF7A44DA), Color(0xFFCF6BEE)],
+                                    ),
+                                    border: GradientBoxBorder(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                           Color(0xFFFFFF).withOpacity(0.5), // opacity 0.5
+                                           Color(0xFFFFFF), // opacity 0.5
+                                           Color(0xAD57E6).withOpacity(0.5),
+                                        ],
+                                      ),
+                                      width: 1,
                                     ),
                                   ),
                                   child: Row(
@@ -300,7 +311,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: diffColor.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(16),
                                       border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
                                     ),
                                     child: Text(

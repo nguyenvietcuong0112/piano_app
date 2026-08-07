@@ -28,7 +28,7 @@ const Map<String, String> tr = {
 
   // Home Tab
   'piano_lessons': 'PİYANO DERSLERİ',
-  'home_banner_sub': '50+ popüler şarkı ile kolayca piyano öğrenin',
+  'home_banner_sub': 'Her yerde,\nher zaman Piyano öğrenin. Gerçek tuşlar, gerçek his.',
   'start_now': 'ŞİMDİ BAŞLA',
   'lesson_list': 'Ders Listesi',
   'view_all': 'Tümünü Gör',

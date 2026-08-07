@@ -4,10 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/theme/theme_service.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../domain/theme_model.dart';
@@ -22,20 +20,6 @@ class AllThemesScreen extends ConsumerStatefulWidget {
 }
 
 class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
-  Future<void> _applyTheme(ThemeItem theme) async {
-    await ThemeService.setTheme(theme.resName, theme.id);
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("${context.tr('applied_theme')} ${theme.titleName}"),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
@@ -133,9 +117,11 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
                   borderRadius: BorderRadius.circular(12.r),
                   child: SizedBox(
                     height: 140.h,
+                    width: double.infinity,
                     child: ThemeImage(
                       resName: theme.resName,
                       fit: BoxFit.cover,
+                      showOverlay: true,
                     ),
                   ),
                 ),

@@ -28,7 +28,7 @@ const Map<String, String> bn = {
 
   // Home Tab
   'piano_lessons': 'পিয়ানো পাঠ',
-  'home_banner_sub': '৫০+ জনপ্রিয় গানের সাথে সহজে পিয়ানো শিখুন',
+  'home_banner_sub': 'যেকোনো স্থানে,\nযেকোনো সময় পিয়ানো শিখুন। আসল চাবি, আসল অনুভূতি।',
   'start_now': 'এখনই শুরু করুন',
   'lesson_list': 'পাঠের তালিকা',
   'view_all': 'সব দেখুন',

@@ -28,7 +28,7 @@ const Map<String, String> fil = {
 
   // Home Tab
   'piano_lessons': 'MGA ARALIN SA PIYANO',
-  'home_banner_sub': 'Matutong mag-piyano nang madali gamit ang 50+ sikat na kanta',
+  'home_banner_sub': 'Matutong mag-piyano kahit saan,\nkahit kailan. Tunay na mga pindutan, tunay na pakiramdam.',
   'start_now': 'MAGSIMULA NA',
   'lesson_list': 'Talaan ng Aralin',
   'view_all': 'Tingnan Lahat',

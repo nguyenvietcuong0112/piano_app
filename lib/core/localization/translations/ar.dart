@@ -28,7 +28,7 @@ const Map<String, String> ar = {
 
   // Home Tab
   'piano_lessons': 'دروس البيانو',
-  'home_banner_sub': 'تعلم البيانو بسهولة مع أكثر من 50 أغنية شهيرة',
+  'home_banner_sub': 'تعلم البيانو في أي مكان،\nوفي أي وقت. مفاتيح حقيقية، إحساس واقعی.',
   'start_now': 'ابدأ الآن',
   'lesson_list': 'قائمة الدروس',
   'view_all': 'عرض الكل',

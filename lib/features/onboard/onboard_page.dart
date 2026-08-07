@@ -244,10 +244,12 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
       child: Container(
         width: double.infinity,
         alignment: Alignment.center,
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-          color: AppColors.primary,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            colors: [ Color(0xFF7A44DA),Color(0xFFCF6BEE)],
+          ),
         ),
         height: 50,
         child: Center(

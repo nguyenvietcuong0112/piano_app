@@ -238,17 +238,16 @@ class OnboardController extends ChangeNotifier {
         adIdName: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad : null,
         factoryId: showAdOnboard1 ? NativeFactoryId.nativeMedia : "",
       ),
+      const OnboardStep(
+        titleKey: "onboard_title_2",
+        descKey: "onboard_desc_2",
+        image: "assets/images/onboard2.png",
+      ),
     ];
 
     if (!isPremium && shouldShowAdsFull1 && nativeOnboardFull1 != null) {
       steps.add(OnboardStep(fullAd: nativeOnboardFull1));
     }
-
-    steps.add(const OnboardStep(
-      titleKey: "onboard_title_2",
-      descKey: "onboard_desc_2",
-      image: "assets/images/onboard2.png",
-    ));
 
     steps.add(const OnboardStep(
       titleKey: "onboard_title_3",

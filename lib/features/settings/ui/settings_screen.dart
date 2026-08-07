@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,6 +15,90 @@ import '../../../core/widgets/app_scaffold.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Bar with Back Button & Centered Title
+          Padding(
+            padding: EdgeInsets.only(top: 8.h, bottom: 20.h),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: 40.sp,
+                      height: 40.sp,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E2C),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.10)),
+                      ),
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_back.svg',
+                        width: 40.sp,
+                        height: 40.sp,
+                      ),
+                    ),
+                  ),
+                ),
+                Text(
+                  context.tr('settings'),
+                  style: AppTextStyles.textWhite22
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+
+          // Menu List
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _buildSettingTile(
+                  svgPath: 'assets/icons/ic_settings_language.svg',
+                  title: context.tr('language'),
+                  onTap: () => context.push('/language', extra: false),
+                ),
+                _buildSettingTile(
+                  svgPath: 'assets/icons/ic_settings_rate.svg',
+                  title: context.tr('rate_app'),
+                  onTap: () => _showRateDialog(context),
+                ),
+                _buildSettingTile(
+                  svgPath: 'assets/icons/ic_settings_share.svg',
+                  title: context.tr('share_app'),
+                  onTap: _shareApp,
+                ),
+                _buildSettingTile(
+                  svgPath: 'assets/icons/ic_settings_policy.svg',
+                  title: context.tr('policy'),
+                  onTap: _openPolicyUrl,
+                ),
+                _buildSettingTile(
+                  svgPath: 'assets/icons/ic_settings_version.svg',
+                  title: context.tr('version'),
+                  trailingText: "0.0.1",
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Future<void> _shareApp() async {
     try {
@@ -50,7 +135,7 @@ class SettingsScreen extends StatelessWidget {
           return AlertDialog(
             backgroundColor: const Color(0xFF1E1E2C),
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
             title: Text(
               context.tr('rate_dialog_title'),
               style: AppTextStyles.textWhite18,
@@ -128,90 +213,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AppScaffold(
-      backgroundColor: AppColors.scaffoldBackground,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Bar with Back Button & Centered Title
-          Padding(
-            padding: EdgeInsets.only(top: 8.h, bottom: 20.h),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      width: 40.sp,
-                      height: 40.sp,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E2C),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.10)),
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/icons/ic_back.svg',
-                        width: 40.sp,
-                        height: 40.sp,
-                      ),
-                    ),
-                  ),
-                ),
-                Text(
-                  context.tr('settings'),
-                  style: AppTextStyles.textWhite22
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-
-          // Menu List
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildSettingTile(
-                  icon: Icons.language_rounded,
-                  title: context.tr('language'),
-                  onTap: () => context.push('/language', extra: false),
-                ),
-                _buildSettingTile(
-                  icon: Icons.star_outline_rounded,
-                  title: context.tr('rate_app'),
-                  onTap: () => _showRateDialog(context),
-                ),
-                _buildSettingTile(
-                  icon: Icons.thumb_up_alt_outlined,
-                  title: context.tr('share_app'),
-                  onTap: _shareApp,
-                ),
-                _buildSettingTile(
-                  icon: Icons.shield_outlined,
-                  title: context.tr('policy'),
-                  onTap: _openPolicyUrl,
-                ),
-                _buildSettingTile(
-                  icon: Icons.menu_book_rounded,
-                  title: context.tr('version'),
-                  trailingText: "0.0.1",
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSettingTile({
-    required IconData icon,
+    String? svgPath,
+    IconData? icon,
     required String title,
     String? trailingText,
     required VoidCallback onTap,
@@ -219,14 +223,18 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
           colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
         ),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.10),
+        border: GradientBoxBorder(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFFFFF).withOpacity(0.5), // opacity 0.5
+              Color(0xFFFFFF), // opacity 0.5
+              Color(0xAD57E6).withOpacity(0.5),
+            ],
+          ),
           width: 1,
         ),
       ),
@@ -239,24 +247,30 @@ class SettingsScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
             child: Row(
               children: [
-                // Circular Purple Icon Badge
-                Container(
-                  width: 42.sp,
-                  height: 42.sp,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF9E54E5), Color(0xFF6C38CC)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                if (svgPath != null)
+                  SvgPicture.asset(
+                    svgPath,
+                    width: 40,
+                    height: 40,
+                  )
+                else if (icon != null)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF9E54E5), Color(0xFF6C38CC)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 22.sp,
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 22.sp,
-                  ),
-                ),
                 SizedBox(width: 14.w),
                 // Title
                 Expanded(

@@ -12,6 +12,7 @@ class GradientBorderCard extends StatelessWidget {
   final double strokeWidth;
   final Gradient? backgroundGradient;
   final Gradient? borderGradient;
+  final List<BoxShadow>? innerShadows;
   final String? bgImageAsset;
   final String? bgImageUrl;
   final BoxFit imageFit;
@@ -29,6 +30,7 @@ class GradientBorderCard extends StatelessWidget {
     this.strokeWidth = 1.0,
     this.backgroundGradient,
     this.borderGradient,
+    this.innerShadows,
     this.bgImageAsset,
     this.bgImageUrl,
     this.imageFit = BoxFit.fill, // fitXY
@@ -106,6 +108,7 @@ class GradientBorderCard extends StatelessWidget {
           radius: borderRadius.r,
           strokeWidth: strokeWidth,
           gradient: effectiveBorderGradient,
+          innerShadows: innerShadows,
         ),
         child: innerContent,
       ),
@@ -126,25 +129,70 @@ class GradientBorderPainter extends CustomPainter {
   final double radius;
   final double strokeWidth;
   final Gradient gradient;
+  final List<BoxShadow>? innerShadows;
 
   GradientBorderPainter({
     required this.radius,
     required this.strokeWidth,
     required this.gradient,
+    this.innerShadows,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
-    final paint = Paint()
-      ..shader = gradient.createShader(rect)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
 
-    canvas.drawRRect(rrect, paint);
+    // Paint inner shadows if present
+    if (innerShadows != null && innerShadows!.isNotEmpty) {
+      canvas.save();
+      canvas.clipRRect(rrect);
+      for (final shadow in innerShadows!) {
+        final shadowRect = rect.inflate(
+          shadow.blurRadius * 3 + shadow.spreadRadius + shadow.offset.distance * 2,
+        );
+        final outerPath = Path()..addRect(shadowRect);
+        final innerPath = Path()..addRRect(rrect);
+        final shadowPath = Path.combine(PathOperation.difference, outerPath, innerPath);
+
+        final shadowPaint = Paint()
+          ..color = shadow.color
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, shadow.blurRadius);
+
+        canvas.save();
+        canvas.translate(shadow.offset.dx, shadow.offset.dy);
+        canvas.drawPath(shadowPath, shadowPaint);
+        canvas.restore();
+      }
+      canvas.restore();
+    }
+
+    if (strokeWidth > 0) {
+      final borderRect = Rect.fromLTWH(
+        strokeWidth / 2,
+        strokeWidth / 2,
+        size.width - strokeWidth,
+        size.height - strokeWidth,
+      );
+      final borderRRect = RRect.fromRectAndRadius(
+        borderRect,
+        Radius.circular((radius - strokeWidth / 2).clamp(0.0, double.infinity)),
+      );
+
+      final paint = Paint()
+        ..shader = gradient.createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth;
+
+      canvas.drawRRect(borderRRect, paint);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant GradientBorderPainter oldDelegate) {
+    return oldDelegate.radius != radius ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.gradient != gradient ||
+        oldDelegate.innerShadows != innerShadows;
+  }
 }

@@ -28,7 +28,7 @@ const Map<String, String> fr = {
 
   // Home Tab
   'piano_lessons': 'COURS DE PIANO',
-  'home_banner_sub': 'Apprenez le piano facilement avec plus de 50 chansons populaires',
+  'home_banner_sub': 'Apprenez le piano n\'importe où,\nn\'importe quand. Vraies touches, vraie sensation.',
   'start_now': 'COMMENCER',
   'lesson_list': 'Liste des cours',
   'view_all': 'Tout voir',

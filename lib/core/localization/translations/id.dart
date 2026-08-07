@@ -28,7 +28,7 @@ const Map<String, String> id = {
 
   // Home Tab
   'piano_lessons': 'PELAJARAN PIANO',
-  'home_banner_sub': 'Belajar piano dengan mudah dengan 50+ lagu populer',
+  'home_banner_sub': 'Belajar Piano di mana saja,\nkapan saja. Tuts asli, sensasi nyata.',
   'start_now': 'MULAI SEKARANG',
   'lesson_list': 'Daftar Pelajaran',
   'view_all': 'Lihat Semua',

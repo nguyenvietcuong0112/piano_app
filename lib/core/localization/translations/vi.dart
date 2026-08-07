@@ -28,9 +28,9 @@ const Map<String, String> vi = {
 
   // Home Tab
   'piano_lessons': 'BÀI HỌC PIANO',
-  'home_banner_sub': 'Học Đàn Piano Dễ Dàng Với 50+ Bài Hát Hot',
+  'home_banner_sub': 'Học Piano mọi lúc,\nmọi nơi. Phím chân thực, cảm giác thật.',
   'start_now': 'BẮT ĐẦU NGAY',
-  'lesson_list': 'Danh Sách Bài Học',
+  'lesson_list': 'Bài Hát Phổ Biến',
   'view_all': 'Xem tất cả',
   'practice_now': 'Chơi',
   'learn_now': 'Học ngay',
@@ -131,5 +131,6 @@ const Map<String, String> vi = {
   'unlock_all_features': 'Mở khóa tất cả tính năng',
   'remove_ads': 'Xóa quảng cáo',
   'subscribe_now': 'Đăng ký ngay',
+  'continue': 'Tiếp tục',
   'terms_of_use': 'Điều khoản sử dụng',
 };
