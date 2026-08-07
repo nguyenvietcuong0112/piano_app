@@ -116,14 +116,23 @@ class LessonPlayController extends StateNotifier<LessonPlayState> {
   void recordHit({required bool isPerfect}) {
     final newCombo = state.currentCombo + 1;
     final newMaxCombo = newCombo > state.maxCombo ? newCombo : state.maxCombo;
-    final addedScore = isPerfect ? 100 : 50;
+    final newPerfect = isPerfect ? state.perfectCount + 1 : state.perfectCount;
+    final newGood = !isPerfect ? state.goodCount + 1 : state.goodCount;
+
+    int calculatedScore = state.score;
+    if (state.totalNotesInSong > 0) {
+      final weightedHit = newPerfect + (0.7 * newGood);
+      calculatedScore = ((weightedHit / state.totalNotesInSong) * 100.0)
+          .round()
+          .clamp(0, 100);
+    }
 
     state = state.copyWith(
-      perfectCount: isPerfect ? state.perfectCount + 1 : state.perfectCount,
-      goodCount: !isPerfect ? state.goodCount + 1 : state.goodCount,
+      perfectCount: newPerfect,
+      goodCount: newGood,
       currentCombo: newCombo,
       maxCombo: newMaxCombo,
-      score: state.score + addedScore,
+      score: calculatedScore,
     );
   }
 

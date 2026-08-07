@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -13,6 +15,8 @@ import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/song_thumbnail.dart';
 import '../../lesson/domain/lesson_model.dart';
+import '../../lesson/state/lesson_provider.dart';
+import '../../lesson/ui/difficulty_selection_dialog.dart';
 
 class MySongsTab extends ConsumerStatefulWidget {
   const MySongsTab({super.key});
@@ -47,6 +51,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final unlockedLessons = ref.watch(unlockedLessonsProvider);
     int totalCompleted = _completedSongs.length;
     int perfectMastered = _completedSongs.where((s) => (s['stars'] as num?)?.toInt() == 5).length;
 
@@ -182,6 +187,8 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                     final int accuracy = (item['accuracy'] as num?)?.toInt() ?? 0;
 
                     final thumbUrl = (item['thumb'] ?? item['thumbnail'] ?? '').toString();
+                    final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                        !unlockedLessons.contains(songId);
 
                     final lessonItem = LessonsItem(
                       id: int.tryParse(songId) ?? DateTime.now().millisecondsSinceEpoch,
@@ -195,11 +202,18 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
 
                     return GestureDetector(
                       onTap: () async {
-                        await context.push('/lesson-play', extra: lessonItem);
-                        await SystemChrome.setPreferredOrientations([
-                          DeviceOrientation.portraitUp,
-                        ]);
-                        _loadCompletedSongs();
+                        final selectedLevel = await DifficultySelectionDialog.show(
+                          context,
+                          song: lessonItem,
+                        );
+                        if (selectedLevel != null && context.mounted) {
+                          final updatedItem = lessonItem.copyWith(level: selectedLevel);
+                          await context.push('/lesson-play', extra: updatedItem);
+                          await SystemChrome.setPreferredOrientations([
+                            DeviceOrientation.portraitUp,
+                          ]);
+                          _loadCompletedSongs();
+                        }
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 10),
@@ -219,11 +233,25 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                         child: Row(
                           children: [
                             // Music Thumbnail Container
-                            SongThumbnail(
-                              thumbnailUrl: thumbUrl,
-                              width: 80.sp,
-                              height: 80.sp,
-                              borderRadius: 14,
+                            Stack(
+                              children: [
+                                SongThumbnail(
+                                  thumbnailUrl: thumbUrl,
+                                  width: 80.sp,
+                                  height: 80.sp,
+                                  borderRadius: 14,
+                                ),
+                                if (showRewardBadge)
+                                  Positioned(
+                                    top: 4.sp,
+                                    left: 4.sp,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/ic_reward.svg',
+                                      width: 20.sp,
+                                      height: 20.sp,
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(width: 14),
 

@@ -26,15 +26,33 @@ class EasyRewardAd extends StatefulWidget {
 
 class _EasyRewardAdState extends State<EasyRewardAd>
     with WidgetsBindingObserver {
-  late final EasyAdBase? _rewardAd = EasyAds.instance.getOrCreateCachedRewardAd(
+  late final EasyAdBase? _rewardAd =
+      EasyAds.instance.getOrCreateCachedRewardAd(
     adNetwork: widget.adNetwork,
     adId: widget.adId,
     immersiveModeEnabled: true,
   );
 
   StreamSubscription? _streamSubscription;
+  Timer? _timeoutTimer;
 
-  Future<void> _showAd([Duration delay = const Duration(seconds: 1)]) => Future.delayed(
+  void _handleTimeout() {
+    _timeoutTimer?.cancel();
+    if (mounted) {
+      EasyAds.instance.setFullscreenAdShowing(false);
+      _streamSubscription?.cancel();
+      if (_rewardAd?.isAdLoaded != true && _rewardAd?.isAdLoading != true) {
+        EasyAds.instance.disposeCachedRewardAd(widget.adId);
+      }
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      widget.onFailed?.call();
+    }
+  }
+
+  Future<void> _showAd([Duration delay = const Duration(seconds: 1)]) =>
+      Future.delayed(
         delay,
         () {
           if (_appLifecycleState == AppLifecycleState.resumed) {
@@ -52,6 +70,8 @@ class _EasyRewardAdState extends State<EasyRewardAd>
     WidgetsBinding.instance.addObserver(this);
     EasyAds.instance.setFullscreenAdShowing(true);
 
+    _timeoutTimer = Timer(const Duration(seconds: 10), _handleTimeout);
+
     if (_rewardAd?.isAdLoaded == true) {
       _showAd(const Duration(milliseconds: 100));
     } else {
@@ -63,7 +83,9 @@ class _EasyRewardAdState extends State<EasyRewardAd>
     _streamSubscription = EasyAds.instance.onEvent.listen((event) {
       final resolvedId = EasyAds.instance.resolveAdUnitId(widget.adId);
       if (event.adUnitType == AdUnitType.rewarded &&
-          (event.adUnitId == widget.adId || event.adUnitId == resolvedId)) {
+          (event.adUnitId == widget.adId ||
+              event.adUnitId == resolvedId ||
+              event.adUnitId == _rewardAd?.adUnitId)) {
         switch (event.type) {
           case AdEventType.adLoaded:
             if (_appLifecycleState == AppLifecycleState.resumed) {
@@ -76,6 +98,7 @@ class _EasyRewardAdState extends State<EasyRewardAd>
             widget.onShowed?.call();
             break;
           case AdEventType.adFailedToLoad:
+            _timeoutTimer?.cancel();
             EasyAds.instance.setFullscreenAdShowing(false);
             EasyAds.instance.disposeCachedRewardAd(widget.adId);
             _streamSubscription?.cancel();
@@ -85,6 +108,7 @@ class _EasyRewardAdState extends State<EasyRewardAd>
             widget.onFailed?.call();
             break;
           case AdEventType.adDismissed:
+            _timeoutTimer?.cancel();
             EasyAds.instance.setFullscreenAdShowing(false);
             EasyAds.instance.disposeCachedRewardAd(widget.adId);
             _streamSubscription?.cancel();
@@ -94,6 +118,7 @@ class _EasyRewardAdState extends State<EasyRewardAd>
             widget.adDismissed?.call();
             break;
           case AdEventType.adFailedToShow:
+            _timeoutTimer?.cancel();
             if (_appLifecycleState != AppLifecycleState.resumed) {
               _adFailedToShow = true;
             } else {
@@ -128,6 +153,7 @@ class _EasyRewardAdState extends State<EasyRewardAd>
 
   @override
   void dispose() {
+    _timeoutTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

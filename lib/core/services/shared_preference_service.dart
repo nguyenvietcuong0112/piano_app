@@ -13,6 +13,33 @@ class SharedPreferenceService {
   static const String keySelectedInstrument = 'SELECTED_INSTRUMENT';
   static const String keyAudioVolume = 'AUDIO_VOLUME';
   static const String keyIsPremiumUser = 'IS_PREMIUM_USER';
+  static const String keyUnlockedLessons = 'UNLOCKED_LESSONS';
+
+  // --- Unlocked Lessons ---
+  static Future<List<String>> getUnlockedLessons() async {
+    try {
+      final prefs = await getInstance();
+      return prefs.getStringList(keyUnlockedLessons) ?? [];
+    } catch (e) {
+      debugPrint('SharedPreferenceService getUnlockedLessons error: $e');
+      return [];
+    }
+  }
+
+  static Future<bool> unlockLesson(String songId) async {
+    try {
+      final prefs = await getInstance();
+      final currentList = prefs.getStringList(keyUnlockedLessons) ?? [];
+      if (!currentList.contains(songId)) {
+        currentList.add(songId);
+        return await prefs.setStringList(keyUnlockedLessons, currentList);
+      }
+      return true;
+    } catch (e) {
+      debugPrint('SharedPreferenceService unlockLesson error: $e');
+      return false;
+    }
+  }
 
   // --- Premium User ---
   static Future<bool> getIsPremiumUser() async {

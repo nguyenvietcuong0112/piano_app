@@ -46,13 +46,28 @@ class LessonNoteContainer {
   });
 
   factory LessonNoteContainer.fromJson(Map<String, dynamic> json) {
+    final noteList = (json['data'] as List<dynamic>?)
+        ?.map((e) => LessonNote.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    int rawOctave = json['startOctave'] ?? json['octave'] ?? 4;
+    int effectiveOctave = rawOctave;
+
+    if (noteList != null && noteList.isNotEmpty) {
+      int minGroup = noteList.map((e) => e.group).reduce((a, b) => a < b ? a : b);
+      int maxGroup = noteList.map((e) => e.group).reduce((a, b) => a > b ? a : b);
+
+      // Auto-correct if API returns startOctave that is out of range of note groups
+      if (rawOctave < minGroup - 1 || rawOctave > maxGroup) {
+        effectiveOctave = minGroup;
+      }
+    }
+
     return LessonNoteContainer(
-      startOctave: json['startOctave'] ?? json['octave'] ?? 4,
+      startOctave: effectiveOctave,
       startKeyPosition: json['startKeyPosition'] ?? json['startPos'] ?? 0,
       visibleWhiteKeysCount: json['visibleWhiteKeysCount'] ?? json['keysCount'] ?? 14,
-      data: (json['data'] as List<dynamic>?)
-          ?.map((e) => LessonNote.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      data: noteList,
     );
   }
   String get calculatedDurationFormatted {
@@ -94,6 +109,21 @@ class LessonsItem {
     this.startKeyPosition = 0,
     this.visibleWhiteKeysCount = 14,
   });
+
+  LessonsItem copyWith({int? level}) {
+    return LessonsItem(
+      id: id,
+      titleName: titleName,
+      authorName: authorName,
+      duration: duration,
+      lessonsData: lessonsData,
+      thumbnail: thumbnail,
+      level: level ?? this.level,
+      startOctave: startOctave,
+      startKeyPosition: startKeyPosition,
+      visibleWhiteKeysCount: visibleWhiteKeysCount,
+    );
+  }
 
   factory LessonsItem.fromJson(Map<String, dynamic> json) {
     return LessonsItem(

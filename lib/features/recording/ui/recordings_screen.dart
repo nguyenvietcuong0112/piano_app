@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../ads/dimens/ad_dimen.dart';
 import '../../../core/services/recording_storage_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -153,9 +154,14 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
                 FirebaseRemoteConfigService.getBoolConfigByKey(
                   FirebaseRemoteConfigService.banner_all,
                 ))
-              EasyBannerAd(
-                adId: MyAdIdName.bannerAll.getId,
-                adIdName: MyAdIdName.bannerAll,
+              SizedBox(
+                width: double.infinity,
+                child: EasyNativeAd(
+                  factoryId: MyAdIdName.nativeBanner,
+                  adId: MyAdIdName.nativeBanner.getId,
+                  adIdName: MyAdIdName.nativeBanner,
+                  height: AdDimen.nativeBannerHeight,
+                ),
               ),
           ],
         ),

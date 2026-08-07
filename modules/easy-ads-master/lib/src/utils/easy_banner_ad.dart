@@ -31,7 +31,15 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
   Timer? _reloadTimer;
 
   @override
-  Widget build(BuildContext context) => _bannerAd?.show() ?? const SizedBox();
+  Widget build(BuildContext context) {
+    final adWidget = _bannerAd?.show();
+    if (adWidget == null) return const SizedBox();
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.center,
+      child: adWidget,
+    );
+  }
 
   AdSize? adSize;
   Future<void> _initAd() async {
@@ -41,7 +49,14 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
     if (widget.adSize != null) {
       adSize = widget.adSize!;
     } else {
-      adSize = EasyAds.instance.adSize;
+      final currentWidth = MediaQuery.of(context).size.width.round();
+      if (currentWidth > 0) {
+        adSize = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(currentWidth) ??
+            EasyAds.instance.adSize ??
+            AdSize.banner;
+      } else {
+        adSize = EasyAds.instance.adSize ?? AdSize.banner;
+      }
     }
     _bannerAd = EasyAds.instance.createBanner(
       adNetwork: widget.adNetwork,

@@ -125,8 +125,8 @@ class FirebaseHelper {
           return "native_onboarding_full_2_view";
         case MyAdIdName.nativeOnboard4Ad:
           return "native_onboarding_4_view";
-        case MyAdIdName.bannerAll:
-          return "banner_all_view";
+        case MyAdIdName.nativeBanner:
+          return "native_banner_view";
         case MyAdIdName.interstitialOnboard:
           return "interstitial_onboard_view";
         case MyAdIdName.nativeHome:

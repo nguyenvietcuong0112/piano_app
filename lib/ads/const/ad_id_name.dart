@@ -1,9 +1,34 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../main.dart' as app_main;
 
 class MyAdIdName {
-  static final appID = GetPlatform.isIOS
-      ? ""
-      : "ca-app-pub-9900730300733887~4813290623";
+
+  static String get appID {
+    final isProd = app_main.env == Environment.prod;
+    if (isProd) {
+      if (Platform.isAndroid) {
+        return "ca-app-pub-9900730300733887~4813290623";
+      } else {
+        return "";
+      }
+    } else {
+      if (Platform.isAndroid) {
+        return "ca-app-pub-3940256099942544~3347511713";
+      } else {
+        return "";
+      }
+    }
+  }
+  // static final appID = GetPlatform.isIOS
+  //     ? ""
+  //     : "ca-app-pub-3940256099942544~3347511713";
+
+  //ca-app-pub-9900730300733887~4813290623
+  //ca-app-pub-3940256099942544~3347511713
 
   static const appOpenResume = "appOpenResume";
   static const bannerSplash = "bannerSplash";
@@ -20,7 +45,7 @@ class MyAdIdName {
   static const interAll = "interAll";
   static const nativeFull = "nativeFull";
   static const rewardedAd = "rewardedAd";
-  static const bannerAll = "bannerAll";
+  static const nativeBanner = "nativeBanner";
   static const interstitialOnboard = "interstitialOnboard";
   static const nativeHome = "nativeHome";
   static const nativeAll = "nativeAll";

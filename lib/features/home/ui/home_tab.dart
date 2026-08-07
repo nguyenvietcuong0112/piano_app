@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -16,6 +17,7 @@ import '../../../core/widgets/gradient_border_card.dart';
 import '../../../core/widgets/song_thumbnail.dart';
 import '../../lesson/domain/lesson_model.dart';
 import '../../lesson/state/lesson_provider.dart';
+import '../../lesson/ui/difficulty_selection_dialog.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
@@ -58,35 +60,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     }
   }
 
-  String _getDifficultyText(BuildContext context, int level) {
-    switch (level) {
-      case 1:
-        return context.tr('easy');
-      case 2:
-        return context.tr('medium');
-      case 3:
-        return context.tr('hard');
-      default:
-        return context.tr('easy');
-    }
-  }
 
-  Color _getDifficultyColor(int level) {
-    switch (level) {
-      case 1:
-        return AppColors.levelEasy;
-      case 2:
-        return AppColors.levelMedium;
-      case 3:
-        return AppColors.levelHard;
-      default:
-        return AppColors.levelEasy;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsProvider);
+    final unlockedLessons = ref.watch(unlockedLessonsProvider);
 
     return AppScaffold(
       body: lessonsAsync.when(
@@ -219,16 +198,23 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       final song = popularSongs[index];
                       final songIdStr = song.id.toString();
                       final starCount = _songStarsMap[songIdStr] ?? 0;
-                      final difficulty = _getDifficultyText(context, song.level);
-                      final diffColor = _getDifficultyColor(song.level);
+                      final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                          !unlockedLessons.contains(songIdStr);
 
                       return GestureDetector(
                         onTap: () async {
-                          await context.push('/lesson-play', extra: song);
-                          await SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.portraitUp,
-                          ]);
-                          _loadSongStars();
+                          final selectedLevel = await DifficultySelectionDialog.show(
+                            context,
+                            song: song,
+                          );
+                          if (selectedLevel != null && context.mounted) {
+                            final updatedSong = song.copyWith(level: selectedLevel);
+                            await context.push('/lesson-play', extra: updatedSong);
+                            await SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.portraitUp,
+                            ]);
+                            _loadSongStars();
+                          }
                         },
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 10),
@@ -256,15 +242,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                     height: 80.sp,
                                     borderRadius: 12,
                                   ),
-                                  Positioned(
-                                    top: 6.sp,
-                                    left: 6.sp,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/ic_reward.svg',
-                                      width: 24.sp,
-                                      height: 24.sp,
+                                  if (showRewardBadge)
+                                    Positioned(
+                                      top: 6.sp,
+                                      left: 6.sp,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/ic_reward.svg',
+                                        width: 24.sp,
+                                        height: 24.sp,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                               SizedBox(width: 10.w),
@@ -303,59 +290,37 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                 ),
                               ),
 
-                              // Difficulty Tag & Play Button
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: diffColor.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(color: diffColor.withValues(alpha: 0.2), width: 1),
-                                    ),
-                                    child: Text(
-                                      difficulty,
-                                      style: AppTextStyles.textWhite12.copyWith(
-                                        color: diffColor,
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                              // Play Button Pill
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD065F2),
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFF7745D3).withValues(alpha: 0.25),
+                                      const Color(0xFFCC69EE).withValues(alpha: 0.25),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
                                   ),
-                                  SizedBox(height: 8.h),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFD065F2),
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color(0xFF7745D3).withValues(alpha: 0.25),
-                                          const Color(0xFFCC69EE).withValues(alpha: 0.25),
-                                        ],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_play.svg',
+                                      width: 12.sp,
+                                      height: 12.sp,
+                                      color: AppColors.textPurple,
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/ic_play.svg',
-                                          width: 12.sp,
-                                          height: 12.sp,
-                                          color: AppColors.textPurple,
-                                        ),
-                                        SizedBox(width: 5.w),
-                                        Text(
-                                          context.tr('practice_now'),
-                                          style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
+                                    SizedBox(width: 5.w),
+                                    Text(
+                                      context.tr('practice_now'),
+                                      style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),

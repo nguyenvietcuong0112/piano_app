@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../ads/dimens/ad_dimen.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/audio_engine.dart';
 import '../../../core/services/audio_recorder_service.dart';
@@ -82,9 +83,12 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
           _totalDurationSeconds = _calculateTotalSongDuration();
         });
       }
-      ref
-          .read(lessonPlayControllerProvider.notifier)
-          .initSong(_noteList.length);
+      final controller = ref.read(lessonPlayControllerProvider.notifier);
+      controller.initSong(_noteList.length);
+      double speedMultiplier = 1.0;
+      if (widget.lesson.level == 1) speedMultiplier = 0.8;
+      if (widget.lesson.level == 3) speedMultiplier = 1.3;
+      controller.setSpeedMultiplier(speedMultiplier);
     }
   }
 
@@ -410,10 +414,6 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
     int startOctave =
         _lessonContainer?.startOctave ?? widget.lesson.startOctave;
-    int currentEffectiveOctave = (startOctave + lessonState.octaveShift).clamp(
-      1,
-      7,
-    );
 
     return PopScope(
       canPop: false,
@@ -451,14 +451,19 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       FirebaseRemoteConfigService.getBoolConfigByKey(
                         FirebaseRemoteConfigService.banner_all,
                       ))
-                    EasyBannerAd(
-                      adId: MyAdIdName.bannerAll.getId,
-                      adIdName: MyAdIdName.bannerAll,
+                    SizedBox(
+                      width: double.infinity,
+                      child: EasyNativeAd(
+                        factoryId: MyAdIdName.nativeBanner,
+                        adId: MyAdIdName.nativeBanner.getId,
+                        adIdName: MyAdIdName.nativeBanner,
+                        height: AdDimen.nativeBannerHeight,
+                      ),
                     ),
                   // Toolbar Header
                   Container(
                     width: double.infinity,
-                    height: 100.r, 
+                    height: 100.r,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     color: const Color(0xFF14141A),
                     child: SingleChildScrollView(
@@ -626,68 +631,6 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                           ),
                           const SizedBox(width: 12),
 
-                          // Octave Shift Control (- / +)
-                          GradientBorderCard(
-                            height: 36.h,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            backgroundGradient: const LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-                            ),
-                            borderRadius: 8,
-                            borderGradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
-                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                InkWell(
-                                  onTap: () => controller.setOctaveShift(
-                                    lessonState.octaveShift - 1,
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                    ),
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: Colors.white70,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  "C$currentEffectiveOctave",
-                                  style: AppTextStyles.textWhite12.copyWith(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => controller.setOctaveShift(
-                                    lessonState.octaveShift + 1,
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                    ),
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white70,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-
                           // Speed Multiplier (Triggers SpeedControllerDialog)
                           GestureDetector(
                             onTap: () {
@@ -703,6 +646,66 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                               'assets/icons/ic_speed.svg',
                               width: 48.h,
                               height: 36.h,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+
+                          // Temporary Auto Test Button for testing songs
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isAutoGuideMode = !_isAutoGuideMode;
+                              });
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  duration: const Duration(seconds: 1),
+                                  backgroundColor: _isAutoGuideMode
+                                      ? const Color(0xFF4CAF50)
+                                      : const Color(0xFFE53935),
+                                  content: Text(
+                                    _isAutoGuideMode
+                                        ? "🤖 Auto-Play Test: ON"
+                                        : "🤖 Auto-Play Test: OFF",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 36.h,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: _isAutoGuideMode
+                                    ? const Color(0xFF4CAF50).withValues(alpha: 0.8)
+                                    : const Color(0xFF2B2544),
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: _isAutoGuideMode
+                                      ? Colors.greenAccent
+                                      : Colors.white24,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _isAutoGuideMode
+                                        ? Icons.smart_toy_rounded
+                                        : Icons.smart_toy_outlined,
+                                    color: Colors.white,
+                                    size: 18.sp,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Auto Test",
+                                    style: AppTextStyles.textWhite12.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

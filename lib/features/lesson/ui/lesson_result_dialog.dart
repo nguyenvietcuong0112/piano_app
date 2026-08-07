@@ -32,7 +32,7 @@ class LessonResultDialog extends StatelessWidget {
         width: 150.w,
         borderRadius: 24,
         strokeWidth: 1.5,
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 16.w, 24.h),
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 8.w, 24.h),
         backgroundGradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -59,8 +59,8 @@ class LessonResultDialog extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => Navigator.of(context).pop(),
                 child: Container(
-                  width: 32.w,
-                  height: 32.h,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
@@ -80,8 +80,7 @@ class LessonResultDialog extends StatelessWidget {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 24.h),
-
+                SizedBox(height: 36.h),
                 // Star Rating Display (5 Stars)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

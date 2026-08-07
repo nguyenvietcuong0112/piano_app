@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -15,6 +16,7 @@ import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/song_thumbnail.dart';
 import '../domain/lesson_model.dart';
 import '../state/lesson_provider.dart';
+import 'difficulty_selection_dialog.dart';
 
 class SongsLandscapeScreen extends ConsumerStatefulWidget {
   const SongsLandscapeScreen({super.key});
@@ -65,35 +67,12 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
     }
   }
 
-  String _getDifficultyText(BuildContext context, int level) {
-    switch (level) {
-      case 1:
-        return context.tr('easy');
-      case 2:
-        return context.tr('medium');
-      case 3:
-        return context.tr('hard');
-      default:
-        return context.tr('easy');
-    }
-  }
 
-  Color _getDifficultyColor(int level) {
-    switch (level) {
-      case 1:
-        return AppColors.levelEasy;
-      case 2:
-        return AppColors.levelMedium;
-      case 3:
-        return AppColors.levelHard;
-      default:
-        return AppColors.levelEasy;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final lessonsAsync = ref.watch(lessonsProvider);
+    final unlockedLessons = ref.watch(unlockedLessonsProvider);
     final displayCategories = lessonsAsync.asData?.value?.categories ?? [];
 
     if (displayCategories.isNotEmpty) {
@@ -214,17 +193,24 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                       final song = allSongs[index];
                       final songIdStr = song.id.toString();
                       final starCount = _songStarsMap[songIdStr] ?? 0;
-                      final difficulty = _getDifficultyText(context, song.level);
-                      final diffColor = _getDifficultyColor(song.level);
+                      final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                          !unlockedLessons.contains(songIdStr);
 
                       return GestureDetector(
                         onTap: () async {
-                          await context.push('/lesson-play', extra: song);
-                          await SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.landscapeLeft,
-                            DeviceOrientation.landscapeRight,
-                          ]);
-                          _loadSongStars();
+                          final selectedLevel = await DifficultySelectionDialog.show(
+                            context,
+                            song: song,
+                          );
+                          if (selectedLevel != null && context.mounted) {
+                            final updatedSong = song.copyWith(level: selectedLevel);
+                            await context.push('/lesson-play', extra: updatedSong);
+                            await SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.landscapeLeft,
+                              DeviceOrientation.landscapeRight,
+                            ]);
+                            _loadSongStars();
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
@@ -252,17 +238,18 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                                     height: 50,
                                     borderRadius: 8,
                                   ),
-                                  Positioned(
-                                    top: 2,
-                                    left: 2,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/ic_reward.svg',
-                                      width: 16.r,
-                                      height: 16.r,
-                                      errorBuilder: (context, error, stack) =>
-                                          const SizedBox.shrink(),
+                                  if (showRewardBadge)
+                                    Positioned(
+                                      top: 2,
+                                      left: 2,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/ic_reward.svg',
+                                        width: 16.r,
+                                        height: 16.r,
+                                        errorBuilder: (context, error, stack) =>
+                                            const SizedBox.shrink(),
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                               const SizedBox(width: 8),
@@ -312,101 +299,59 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                               ),
                               const SizedBox(width: 6),
 
-                              // Right Section (Difficulty Chip & Play Button)
+                              // Right Section (Play Button)
                               FittedBox(
                                 fit: BoxFit.scaleDown,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Difficulty Tag Chip
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: diffColor.withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(6.r),
-                                        border: Border.all(
-                                          color: diffColor.withValues(alpha: 0.3),
-                                          width: 1,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFAD56E6),
+                                        Color(0xFF7B38D8),
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(12.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFAD56E6)
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/ic_play.svg',
+                                        width: 10.r,
+                                        height: 10.r,
+                                        colorFilter: const ColorFilter.mode(
+                                            Colors.white, BlendMode.srcIn),
+                                        errorBuilder:
+                                            (context, error, stack) =>
+                                                const Icon(
+                                          Icons.play_arrow_rounded,
+                                          color: Colors.white,
+                                          size: 10,
                                         ),
                                       ),
-                                      child: Text(
-                                        difficulty,
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        context.tr('practice_now'),
                                         style: AppTextStyles.textWhite12.copyWith(
-                                          color: diffColor,
-                                          fontSize: 9,
+                                          fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 6),
-
-                                    // Play Button Pill
-                                    GestureDetector(
-                                      onTap: () async {
-                                        await context.push('/lesson-play',
-                                            extra: song);
-                                        await SystemChrome.setPreferredOrientations([
-                                          DeviceOrientation.landscapeLeft,
-                                          DeviceOrientation.landscapeRight,
-                                        ]);
-                                        _loadSongStars();
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 5),
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFFAD56E6),
-                                              Color(0xFF7B38D8),
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(12.r),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: const Color(0xFFAD56E6)
-                                                  .withValues(alpha: 0.3),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            SvgPicture.asset(
-                                              'assets/icons/ic_play.svg',
-                                              width: 10.r,
-                                              height: 10.r,
-                                              colorFilter: const ColorFilter.mode(
-                                                  Colors.white, BlendMode.srcIn),
-                                              errorBuilder:
-                                                  (context, error, stack) =>
-                                                      const Icon(
-                                                Icons.play_arrow_rounded,
-                                                color: Colors.white,
-                                                size: 10,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 3),
-                                            Text(
-                                              context.tr('practice_now'),
-                                              style: AppTextStyles.textWhite12.copyWith(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -416,8 +361,8 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                     },
                   ),
           ),
-        ],
-      ),
+        ], 
+      ), 
     );
   }
 }
