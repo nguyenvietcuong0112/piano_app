@@ -180,7 +180,7 @@ class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
         // Success Notice Text
         Text(
           context.tr('applied'),
-          style: AppTextStyles.textWhite16.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w500),
+          style: AppTextStyles.textWhite16.copyWith(fontWeight: FontWeight.w500),
           textAlign: TextAlign.center,
         ),
 

@@ -88,7 +88,7 @@ const Map<String, String> vi = {
   'stop': 'Dừng',
 
   // Themes
-  'piano_keyboard_themes': 'Bộ Bàn Phím Piano',
+  'piano_keyboard_themes': 'Chủ đề',
   'apply': 'Áp dụng',
   'applied': 'Đã áp dụng',
   'preview': 'Dùng thử',

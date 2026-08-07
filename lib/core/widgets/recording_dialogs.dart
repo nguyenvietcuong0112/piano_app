@@ -39,7 +39,7 @@ class RecordSelectionDialog extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         context.tr('record'),
-                        style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r),
+                        style: AppTextStyles.textWhite16,
                       ),
                     ),
                     Align(
@@ -126,7 +126,7 @@ class RecordSelectionDialog extends StatelessWidget {
             SizedBox(width: 12.w),
             Text(
               label,
-              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
+              style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -193,7 +193,7 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                       alignment: Alignment.center,
                       child: Text(
                         context.tr('save_recording'),
-                        style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r),
+                        style: AppTextStyles.textWhite16,
                       ),
                     ),
                     Align(
@@ -242,7 +242,7 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                       Expanded(
                         child: TextField(
                           controller: _controller,
-                          style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.w600),
+                          style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.w600),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: context.tr('enter_rec_title'),
@@ -283,7 +283,7 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                           child: Center(
                             child: Text(
                               context.tr('cancel'),
-                              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
+                              style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -318,7 +318,7 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                           child: Center(
                             child: Text(
                               context.tr('save'),
-                              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
+                              style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),

@@ -88,7 +88,7 @@ const Map<String, String> en = {
   'stop': 'Stop',
 
   // Themes
-  'piano_keyboard_themes': 'Piano Keyboard Themes',
+  'piano_keyboard_themes': 'Themes',
   'apply': 'Apply',
   'applied': 'Applied',
   'preview': 'Preview',

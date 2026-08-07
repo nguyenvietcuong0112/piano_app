@@ -103,7 +103,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
                     children: [
                       Text(
                         category.categoryName,
-                        style: AppTextStyles.textWhite18.copyWith(fontSize: 17.sp),
+                        style: AppTextStyles.textWhite16.copyWith(fontWeight: FontWeight.w500),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/all-themes', extra: category),

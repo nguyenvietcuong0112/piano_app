@@ -182,7 +182,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     children: [
                       Text(
                         context.tr('lesson_list'),
-                        style: AppTextStyles.textWhite18.copyWith(fontSize: 17),
+                        style: AppTextStyles.textWhite18,
                       ),
                       GestureDetector(
                         onTap: () => context.push('/all-lessons'),

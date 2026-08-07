@@ -49,14 +49,14 @@ class NoDataWidget extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: AppTextStyles.textWhite18.copyWith(fontSize: 17.r),
+              style: AppTextStyles.textWhite18,
             ),
             if (subtitle != null && subtitle!.isNotEmpty) ...[
               SizedBox(height: 8.h),
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: AppTextStyles.textGrey14.copyWith(fontSize: 13.r, height: 1.4),
+                style: AppTextStyles.textGrey14.copyWith( height: 1.4),
               ),
             ],
             if (actionText != null && onActionPressed != null) ...[
@@ -75,7 +75,7 @@ class NoDataWidget extends StatelessWidget {
                 icon: Icon(actionIcon ?? Icons.explore_rounded, size: 18.r),
                 label: Text(
                   actionText!,
-                  style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.w600),
+                  style: AppTextStyles.textWhite14.copyWith( fontWeight: FontWeight.w600),
                 ),
               ),
             ],

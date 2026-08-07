@@ -262,14 +262,14 @@ class SettingsScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: AppTextStyles.textWhite16.copyWith(fontSize: 15.sp),
+                    style: AppTextStyles.textWhite16,
                   ),
                 ),
                 // Optional Trailing Text (e.g., Version)
                 if (trailingText != null)
                   Text(
                     trailingText,
-                    style: AppTextStyles.textGrey14.copyWith(fontSize: 14.sp),
+                    style: AppTextStyles.textGrey14,
                   ),
               ],
             ),

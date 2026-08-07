@@ -82,7 +82,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: Text(
               widget.category.categoryName,
-              style: AppTextStyles.textWhite18.copyWith(fontSize: 18.sp),
+              style: AppTextStyles.textWhite18,
             ),
           ),
 
@@ -143,7 +143,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
                 // Theme Title Name
                 Text(
                   theme.titleName,
-                  style: AppTextStyles.textWhite14.copyWith(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ],

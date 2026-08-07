@@ -227,7 +227,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           width: 24.w,
           child: Text(
             iconText,
-            style: AppTextStyles.textWhite14.copyWith(fontSize: 15.sp),
+            style: AppTextStyles.textWhite14,
           ),
         ),
         SizedBox(width: 8.w),

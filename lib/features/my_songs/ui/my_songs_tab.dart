@@ -140,7 +140,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                 children: [
                   Text(
                     context.tr('completed_list'),
-                    style: AppTextStyles.textWhite18.copyWith(fontSize: 17),
+                    style: AppTextStyles.textWhite18,
                   ),
                   IconButton(
                     onPressed: _loadCompletedSongs,
@@ -263,7 +263,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                         const SizedBox(width: 6), 
                                         Text(
                                           "$accuracy% ACC",
-                                          style: AppTextStyles.textGrey12.copyWith(fontSize: 10, fontWeight: FontWeight.bold),
+                                          style: AppTextStyles.textGrey12.copyWith(fontWeight: FontWeight.bold),
                                         ),
                                       ],
                                     ),
