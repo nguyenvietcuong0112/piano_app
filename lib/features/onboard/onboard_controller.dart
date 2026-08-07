@@ -9,13 +9,14 @@ import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_factory.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/services/shared_preference_service.dart';
 
 /// Data model representing a single onboarding page or full ad page.
 class OnboardStep {
-  final String title;
-  final String desc;
+  final String titleKey;
+  final String descKey;
   final String image;
   final String adId;
   final String? adIdName;
@@ -24,8 +25,8 @@ class OnboardStep {
   final BoxFit fit;
 
   const OnboardStep({
-    this.title = '',
-    this.desc = '',
+    this.titleKey = '',
+    this.descKey = '',
     this.image = '',
     this.adId = '',
     this.adIdName,
@@ -54,15 +55,16 @@ class OnboardController extends ChangeNotifier {
 
   bool isIntro1AdLoading = false;
   bool isIntro4AdLoading = false;
+  bool isIntro4AdReady = false;
   bool isFullAdNextButtonVisible = false;
 
   // --- Subscriptions & Timers ---
   StreamSubscription? _adEventSubscription;
   Timer? _fullAdTimer;
   Timer? _intro1TimeoutTimer;
-  Timer? _intro3TimeoutTimer;
+  Timer? _intro4TimeoutTimer;
   Timer? _intro1SuccessTimer;
-  Timer? _intro3SuccessTimer;
+  Timer? _intro4SuccessTimer;
 
   void init() {
     reloadAds();
@@ -86,9 +88,9 @@ class OnboardController extends ChangeNotifier {
   void _cancelTimers() {
     _fullAdTimer?.cancel();
     _intro1TimeoutTimer?.cancel();
-    _intro3TimeoutTimer?.cancel();
+    _intro4TimeoutTimer?.cancel();
     _intro1SuccessTimer?.cancel();
-    _intro3SuccessTimer?.cancel();
+    _intro4SuccessTimer?.cancel();
   }
 
   // --- Ad Management ---
@@ -96,10 +98,12 @@ class OnboardController extends ChangeNotifier {
     if (AppConstants.isPremiumUser.value) {
       isIntro1AdLoading = false;
       isIntro4AdLoading = false;
+      isIntro4AdReady = false;
       _notify();
       return;
     }
 
+    isIntro4AdReady = false;
     _initIntro1AdState();
     _initFullAds();
     _listenAdEvents();
@@ -194,10 +198,11 @@ class OnboardController extends ChangeNotifier {
         }
       } else if (event.adUnitId == MyAdIdName.nativeOnboard3Ad.getId) {
         if (event.type == AdEventType.adLoaded || event.type == AdEventType.adFailedToLoad) {
-          _intro3SuccessTimer?.cancel();
-          _intro3SuccessTimer = Timer(const Duration(milliseconds: 500), () {
+          isIntro4AdReady = true;
+          _intro4SuccessTimer?.cancel();
+          _intro4SuccessTimer = Timer(const Duration(milliseconds: 500), () {
             isIntro4AdLoading = false;
-            _intro3TimeoutTimer?.cancel();
+            _intro4TimeoutTimer?.cancel();
             _notify();
           });
         }
@@ -226,8 +231,8 @@ class OnboardController extends ChangeNotifier {
 
     final steps = <OnboardStep>[
       OnboardStep(
-        title: "Meet your AI Companion",
-        desc: "Find your perfect match and stay connected anytime",
+        titleKey: "onboard_title_1",
+        descKey: "onboard_desc_1",
         image: "assets/images/onboard1.png",
         adId: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad.getId : "",
         adIdName: showAdOnboard1 ? MyAdIdName.nativeOnboard1Ad : null,
@@ -240,14 +245,14 @@ class OnboardController extends ChangeNotifier {
     }
 
     steps.add(const OnboardStep(
-      title: "Dive into Deep Conversations",
-      desc: "Enjoy unlimited, private chats with someone who understands you",
+      titleKey: "onboard_title_2",
+      descKey: "onboard_desc_2",
       image: "assets/images/onboard2.png",
     ));
 
     steps.add(const OnboardStep(
-      title: "Create Personalized AI Friend",
-      desc: "Shape personality, style and vibe into a companion made for you",
+      titleKey: "onboard_title_3",
+      descKey: "onboard_desc_3",
       image: "assets/images/onboard3.png",
     ));
 
@@ -257,8 +262,8 @@ class OnboardController extends ChangeNotifier {
 
     // Page 4
     steps.add(OnboardStep(
-      title: "Your AI Companion Awaits",
-      desc: "Start now and feel the connection instantly",
+      titleKey: "onboard_title_4",
+      descKey: "onboard_desc_4",
       image: "assets/images/onboard4.png",
       adId: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad.getId : "",
       adIdName: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad : null,
@@ -287,8 +292,8 @@ class OnboardController extends ChangeNotifier {
         isFullAdNextButtonVisible = false;
       }
 
-      if (step.title == "Your AI Companion Awaits") {
-        _checkIntro3AdLoadingState();
+      if (step.titleKey == "onboard_title_4") {
+        _checkintro4AdLoadingState();
       }
     }
 
@@ -302,27 +307,27 @@ class OnboardController extends ChangeNotifier {
     _notify();
   }
 
-  void _checkIntro3AdLoadingState() {
+  void _checkintro4AdLoadingState() {
     final showAdOnboard4 = FirebaseRemoteConfigService.getBoolConfigByKey(
       FirebaseRemoteConfigService.native_onboarding_4,
     );
 
     if (showAdOnboard4 && !AppConstants.isPremiumUser.value) {
       final ad = EasyAds.instance.getCachedNativeAd(MyAdIdName.nativeOnboard3Ad);
-      final isLoaded = ad != null && ad.isAdLoaded;
+      final isLoaded = isIntro4AdReady || (ad != null && ad.isAdLoaded);
 
       if (isLoaded) {
         isIntro4AdLoading = true;
-        _intro3TimeoutTimer?.cancel();
-        _intro3SuccessTimer?.cancel();
-        _intro3SuccessTimer = Timer(const Duration(milliseconds: 500), () {
+        _intro4TimeoutTimer?.cancel();
+        _intro4SuccessTimer?.cancel();
+        _intro4SuccessTimer = Timer(const Duration(milliseconds: 500), () {
           isIntro4AdLoading = false;
           _notify();
         });
       } else {
         isIntro4AdLoading = true;
-        _intro3TimeoutTimer?.cancel();
-        _intro3TimeoutTimer = Timer(const Duration(seconds: 5), () {
+        _intro4TimeoutTimer?.cancel();
+        _intro4TimeoutTimer = Timer(const Duration(seconds: 4), () {
           if (isIntro4AdLoading) {
             isIntro4AdLoading = false;
             _notify();
@@ -368,8 +373,8 @@ class OnboardController extends ChangeNotifier {
     }
   }
 
-  String getTitleButton(int introIndex) {
-    return introIndex == 3 ? "Get started" : "Next";
+  String getTitleButton(int introIndex, BuildContext context) {
+    return introIndex == 3 ? context.tr('get_started') : context.tr('next');
   }
 }
 

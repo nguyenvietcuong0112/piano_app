@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import 'gradient_border_card.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -53,11 +54,7 @@ class PrimaryButton extends StatelessWidget {
                 ],
                 Text(
                   text,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.textWhite16.copyWith(fontSize: 16.sp, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

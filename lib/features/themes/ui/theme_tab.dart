@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_service.dart';
@@ -27,7 +28,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Applied Theme: ${theme.titleName}"),
+          content: Text("${context.tr('applied_theme')} ${theme.titleName}"),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -45,7 +46,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
         error: (err, stack) => Center(
           child: Text(
             'Error loading themes: $err',
-            style: const TextStyle(color: Colors.white70),
+            style: AppTextStyles.textGrey14,
           ),
         ),
         data: (themeResponse) {
@@ -102,18 +103,14 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
                     children: [
                       Text(
                         category.categoryName,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.textWhite18.copyWith(fontSize: 17.sp),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/all-themes', extra: category),
                         child: Row(
                           children: [
                             Text(
-                              "See All",
+                              context.tr('view_all'),
                               style: AppTextStyles.textPurple14,
                             ),
                             SizedBox(width: 2.w),
@@ -189,11 +186,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
                 // // Theme Title Name
                 // Text(
                 //   theme.titleName,
-                //   style: TextStyle(
-                //     color: Colors.white,
-                //     fontSize: 14.sp,
-                //     fontWeight: FontWeight.bold,
-                //   ),
+                //   style: AppTextStyles.textWhite14.copyWith(fontSize: 14.sp, fontWeight: FontWeight.bold),
                 //   textAlign: TextAlign.center,
                 // ),
               ],

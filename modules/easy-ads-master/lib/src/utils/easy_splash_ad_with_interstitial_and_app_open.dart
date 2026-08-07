@@ -69,7 +69,9 @@ class _EasySplashAdWithInterstitialAndAppOpenState
     WidgetsBinding.instance.addObserver(this);
     EasyAds.instance.setFullscreenAdShowing(true);
     _appOpenAd?.load();
-    _interstitialAd?.load();
+    if (EasyAds.instance.canShowInterstitialAd()) {
+      _interstitialAd?.load();
+    }
     _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (_ads != null) {
         _timer?.cancel();
@@ -80,7 +82,8 @@ class _EasySplashAdWithInterstitialAndAppOpenState
         _timer = null;
         _ads = _appOpenAd;
       } else if (_interstitialAd?.isAdLoaded == true &&
-          _appOpenAd?.isAdLoadedFailed == true) {
+          _appOpenAd?.isAdLoadedFailed == true &&
+          EasyAds.instance.canShowInterstitialAd()) {
         _timer?.cancel();
         _timer = null;
         _ads = _interstitialAd;

@@ -10,12 +10,12 @@ class FirebaseRemoteConfigService {
   static const String inter_splash_high = "inter_splash_high";
   static const String inter_splash = "inter_splash";
   static const String native_language = "native_language";
-  static const String native_language_alt = "native_language_alt";
+  static const String native_language_click = "native_language_click";
   static const String native_onboarding_1 = "native_onboarding_1";
-  static const String native_onboarding_full_2 = "native_onboarding_full_2";
   static const String native_onboarding_full_1 = "native_onboarding_full_1";
+  static const String native_onboarding_full_2 = "native_onboarding_full_2";
   static const String native_onboarding_4 = "native_onboarding_4";
-  static const String native_permission = "native_permission";
+
   static const String native_banner = "native_banner";
   static const String inter_all = "inter_all";
   static const String interval_inter_ad = "interval_inter_ad";
@@ -40,7 +40,7 @@ class FirebaseRemoteConfigService {
         "inter_splash_high": true,
         "inter_splash": true,
         "native_language": true,
-        "native_language_alt": true,
+        "native_language_click": true,
         "native_onboarding_1": true,
         "native_onboarding_full_1": true,
         "native_onboarding_full_2": true,

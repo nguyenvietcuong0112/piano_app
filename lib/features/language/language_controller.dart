@@ -59,7 +59,7 @@ class LanguageController extends ChangeNotifier {
     _notify();
 
     _loadingTimer?.cancel();
-    _loadingTimer = Timer(const Duration(seconds: 3), () {
+    _loadingTimer = Timer(const Duration(milliseconds: 1000), () {
       isLoading = false;
       _notify();
     });
@@ -98,14 +98,8 @@ class LanguageController extends ChangeNotifier {
   void onSelectItem(int index) {
     selectedIndex = index;
     isShowClickAds = true;
-    isShouldShowNext = false;
+    isShouldShowNext = true;
     _notify();
-
-    _nextDelayTimer?.cancel();
-    _nextDelayTimer = Timer(const Duration(milliseconds: 3500), () {
-      isShouldShowNext = true;
-      _notify();
-    });
   }
 
   void onSelectBack(BuildContext context) {

@@ -1,6 +1,7 @@
 const Map<String, String> bn = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'ভাষা',
+  'select_language_subtitle': 'এগিয়ে যেতে দয়া করে একটি ভাষা নির্বাচন করুন',
   'settings': 'সেটিংস',
   'rate_app': 'অ্যাপ রেট করুন',
   'share_app': 'অ্যাপ শেয়ার করুন',
@@ -12,10 +13,123 @@ const Map<String, String> bn = {
   'my_songs': 'আমার গান',
   'recordings': 'রেকর্ডিং',
   'rate_dialog_title': 'অ্যাপ রেট করুন',
-  'rate_dialog_desc': 'আপনি কি আমাদের অ্যাপটি পছন্দ করেন? দয়া করে আমাদের ৫ তারা দিন!',
+  'rate_dialog_desc': 'আপনি কি আমাদের অ্যাপ পছন্দ করেছেন? দয়া করে ৫ স্টার দিন!',
   'later': 'পরে',
   'submit': 'জমা দিন',
-  'sharing': 'শেয়ার করা হচ্ছে...',
-  'privacy_policy_desc': 'আমরা আপনার গোপনীয়তাকে মূল্যায়ন করি।',
+  'sharing': 'পিয়ানো অ্যাপ শেয়ার করা হচ্ছে...',
+  'privacy_policy_desc':
+      'আমরা আপনার গোপনীয়তাকে সম্মান করি। এই অ্যাপটি আপনার ব্যক্তিগত ডেটা সুরক্ষিত রাখে।',
   'close': 'বন্ধ করুন',
+
+  // Difficulty
+  'easy': 'সহজ',
+  'medium': 'মাঝারি',
+  'hard': 'কঠিন',
+
+  // Home Tab
+  'piano_lessons': 'পিয়ানো পাঠ',
+  'home_banner_sub': '৫০+ জনপ্রিয় গানের সাথে সহজে পিয়ানো শিখুন',
+  'start_now': 'এখনই শুরু করুন',
+  'lesson_list': 'পাঠের তালিকা',
+  'view_all': 'সব দেখুন',
+  'practice_now': 'চালান',
+  'learn_now': 'শিখুন',
+
+  // Lessons & Search
+  'all_lessons': 'সব পাঠ',
+  'search_song_hint': 'গান খুঁজুন...',
+  'all': 'সব',
+  'completed': 'সম্পন্ন',
+  'not_learned': 'শেখা হয়নি',
+  'no_songs_found': 'কোন গান পাওয়া যায়নি',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'পাঠ ছেড়ে দিন',
+  'quit_lesson_msg': 'আপনি যদি এখন ছেড়ে দেন, আপনার অগ্রগতি মুছে যাবে।\nআপনি কি নিশ্চিত যে ছেড়ে দিতে চান?',
+  'quit': 'ছাড়ুন',
+  'stay': 'থাকুন',
+  'auto_guide': 'অটো গাইড',
+  'speed': 'গতি',
+  'playback_speed': 'প্লেব্যাক গতি',
+  'slow': 'ধীর',
+  'normal': 'স্বাভাবিক',
+  'fast': 'দ্রুত',
+  'saved_recording': 'রেকর্ডিং সংরক্ষিত হয়েছে:',
+  'mic_permission_required': 'মাইক্রোফোন অনুমতি প্রয়োজন',
+
+  // Lesson Result
+  'lesson_completed': 'পাঠ সম্পন্ন হয়েছে!',
+  'accuracy': 'সঠিকতা',
+  'total_notes': 'মোট নোট',
+  'perfect_master': '৫ স্টার',
+  'replay': 'পুনরায় চালান',
+  'next_lesson': 'পরবর্তী পাঠ',
+
+  // My Songs Tab
+  'my_song_collection': 'আমার গানের সংগ্রহ',
+  'learned_count': 'শেখা হয়েছে:',
+  'stars_count': '৫ স্টার:',
+  'completed_list': 'সম্পন্ন গানের তালিকা',
+  'refresh': 'রিফ্রেশ',
+  'no_completed_songs': 'এখনও কোনো অনুশীলন করা গান নেই',
+  'no_completed_songs_sub': 'অনুশীলন শুরু করতে হোম থেকে যেকোনো পাঠ বেছে নিন!',
+  'explore_songs_now': 'এখনই গান খুঁজুন',
+  'acc': 'সঠিকতা',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'অ্যাকোস্টিক পিয়ানো',
+  'electric_organ': 'ইলেকট্রিক অর্গান',
+  'rhodes_piano': 'রোডস পিয়ানো',
+  'synth_keyboard': 'সিন্থ কীবোর্ড',
+  'free_play_title': 'ফ্রি প্লে কীবোর্ড খুলুন',
+  'key_labels': 'কি লেবেল',
+  'instrument': 'বাদ্যযন্ত্র',
+  'record': 'রেকর্ড',
+  'stop': 'থামুন',
+
+  // Themes
+  'piano_keyboard_themes': 'পিয়ানো কীবোর্ড থিম',
+  'apply': 'প্রয়োগ করুন',
+  'applied': 'প্রয়োগ করা হয়েছে',
+  'preview': 'পূর্বরূপ',
+  'explore_more_themes': 'আরও থিম দেখুন',
+  'applied_theme': 'প্রয়োগকৃত থিম:',
+  'play_piano': 'পিয়ানো বাজান',
+
+  // Recordings
+  'my_recordings': 'আমার রেকর্ডিং',
+  'rename_rec': 'রেকর্ডিংয়ের নাম পরিবর্তন করুন',
+  'delete_rec': 'রেকর্ডিং মুছুন',
+  'delete_rec_confirm': 'আপনি কি নিশ্চিত যে এই রেকর্ডিংটি মুছে ফেলতে চান?',
+  'no_recordings_yet': 'এখনও কোনো রেকর্ডিং নেই',
+  'no_recordings_sub': 'আপনার সৃষ্টি সংরক্ষণ করতে পিয়ানো বাজানোর সময় রেকর্ড চাপুন!',
+  'cancel': 'বাতিল',
+  'delete': 'মুছুন',
+  'save': 'সংরক্ষণ',
+  'enter_rec_title': 'শিরোনাম লিখুন...',
+
+  // Settings & Dialogs
+  'contact_support': 'সহায়তার জন্য যোগাযোগ করুন',
+  'restore_purchase': 'ক্রয় পুনরুদ্ধার করুন',
+  'rate_thank_you': 'আমাদের রেটিং দেওয়ার জন্য ধন্যবাদ!',
+  'quit_app': 'অ্যাপ থেকে বের হন',
+  'quit_app_msg': 'আপনি কি নিশ্চিত যে বের হতে চান?',
+  'discard': 'বাতিল',
+  'save_recording': 'রেকর্ডিং সংরক্ষণ করুন',
+
+  // Onboard & Premium
+  'next': 'পরবর্তী',
+  'get_started': 'শুরু করুন',
+  'onboard_title_1': 'আপনার AI পিয়ানো শিক্ষক',
+  'onboard_desc_1': 'ব্যক্তিগতকৃত পাঠ যা আপনার শেখার গতির সাথে খাপ খায়।',
+  'onboard_title_2': 'খেলে খেলে শিখুন',
+  'onboard_desc_2': 'প্রতিদিন ইন্টারেক্টিভ গান এবং মজাদার অনুশীলনের মাধ্যমে অনুশীলন করুন।',
+  'onboard_title_3': 'বিভিন্ন পিয়ানো থিম',
+  'onboard_desc_3': 'আপনার শৈলী চয়ন করুন। আপনার অনুপ্রেরণাদায়ী থিমে খেলুন।',
+  'onboard_title_4': 'আপনার সঙ্গীত যাত্রা আনলক করুন',
+  'onboard_desc_4': 'আজই আপনার প্রথম পাঠ শুরু করুন এবং আত্মবিশ্বাসের সাথে পিয়ানো বাজান।',
+  'unlock_all_features': 'সব ফিচার আনলক করুন',
+  'remove_ads': 'বিজ্ঞাপন সরান',
+  'subscribe_now': 'এখনই সাবস্ক্রাইব করুন',
+  'terms_of_use': 'ব্যবহারের শর্তাবলী',
 };

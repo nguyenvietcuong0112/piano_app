@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/shared_preference_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/no_data_widget.dart';
@@ -94,13 +95,9 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Bộ Sưu Tập Bài Hát Đã Đánh",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Text(
+                            context.tr('my_song_collection'),
+                            style: AppTextStyles.textWhite16,
                           ),
                           const SizedBox(height: 6),
                           Row(
@@ -112,8 +109,8 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  "🎵 Đã học: $totalCompleted",
-                                  style: const TextStyle(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                                  "🎵 ${context.tr('learned_count')} $totalCompleted",
+                                  style: AppTextStyles.textWhite12.copyWith(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold),
                                 ),
                               ),
                               const SizedBox(width: 8),
@@ -124,8 +121,8 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  "🌟 5 Sao: $perfectMastered",
-                                  style: const TextStyle(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                                  "🌟 ${context.tr('stars_count')} $perfectMastered",
+                                  style: AppTextStyles.textWhite12.copyWith(color: Colors.amberAccent, fontSize: 11, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
@@ -141,18 +138,14 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Danh Sách Đã Hoàn Thành",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Text(
+                    context.tr('completed_list'),
+                    style: AppTextStyles.textWhite18.copyWith(fontSize: 17),
                   ),
                   IconButton(
                     onPressed: _loadCompletedSongs,
                     icon: const Icon(Icons.refresh_rounded, color: Color(0xFFAD57E6), size: 20),
-                    tooltip: "Làm mới",
+                    tooltip: context.tr('refresh'),
                   ),
                 ],
               ),
@@ -165,9 +158,9 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                 )
               else if (_completedSongs.isEmpty)
                 NoDataWidget(
-                  title: "Chưa có bài hát luyện tập nào",
-                  subtitle: "Hãy chọn bài học bất kỳ ở màn Home và hoàn thành bài chơi để lưu lịch sử vào đây nhé!",
-                  actionText: "Khám Phá Bài Hát Ngay",
+                  title: context.tr('no_completed_songs'),
+                  subtitle: context.tr('no_completed_songs_sub'),
+                  actionText: context.tr('explore_songs_now'),
                   actionIcon: Icons.play_arrow_rounded,
                   onActionPressed: () => context.go('/home'),
                 )
@@ -270,7 +263,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                         const SizedBox(width: 6), 
                                         Text(
                                           "$accuracy% ACC",
-                                          style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold),
+                                          style: AppTextStyles.textGrey12.copyWith(fontSize: 10, fontWeight: FontWeight.bold),
                                         ),
                                       ],
                                     ),
@@ -304,7 +297,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                                       const Icon(Icons.replay_rounded, size: 14, color: Colors.white),
                                       SizedBox(width: 4.w),
                                       Text(
-                                        "Luyện lại",
+                                        context.tr('replay'),
                                         style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
                                       ),
                                     ],

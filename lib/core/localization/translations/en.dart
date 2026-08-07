@@ -1,6 +1,7 @@
 const Map<String, String> en = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Language',
+  'select_language_subtitle': 'Please select a language to continue',
   'settings': 'Settings',
   'rate_app': 'Rate app',
   'share_app': 'Share app',
@@ -19,4 +20,116 @@ const Map<String, String> en = {
   'privacy_policy_desc':
       'We value your privacy. This application respects and protects your personal data. No personal sensitive information is collected or shared with third parties without your consent.',
   'close': 'Close',
+
+  // Difficulty
+  'easy': 'Easy',
+  'medium': 'Medium',
+  'hard': 'Hard',
+
+  // Home Tab
+  'piano_lessons': 'PIANO LESSONS',
+  'home_banner_sub': 'Learn Piano Easily With 50+ Hot Songs',
+  'start_now': 'START NOW',
+  'lesson_list': 'Lesson List',
+  'view_all': 'View All',
+  'practice_now': 'Play',
+  'learn_now': 'Learn Now',
+
+  // Lessons & Search
+  'all_lessons': 'All Lessons',
+  'search_song_hint': 'Search song...',
+  'all': 'All',
+  'completed': 'Completed',
+  'not_learned': 'Not learned',
+  'no_songs_found': 'No songs found',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Quit Lesson',
+  'quit_lesson_msg': 'If you quit now, your current lesson progress will be lost.\nAre you sure you want to quit?',
+  'quit': 'Quit',
+  'stay': 'Stay',
+  'auto_guide': 'Auto Guide',
+  'speed': 'Speed',
+  'playback_speed': 'Playback Speed',
+  'slow': 'Slow',
+  'normal': 'Normal',
+  'fast': 'Fast',
+  'saved_recording': 'Saved recording:',
+  'mic_permission_required': 'Microphone permission required',
+
+  // Lesson Result
+  'lesson_completed': 'Lesson Completed!',
+  'accuracy': 'Accuracy',
+  'total_notes': 'Total Notes',
+  'perfect_master': '5 Stars',
+  'replay': 'Replay',
+  'next_lesson': 'Next Lesson',
+
+  // My Songs Tab
+  'my_song_collection': 'My Practiced Songs',
+  'learned_count': 'Learned:',
+  'stars_count': '5 Stars:',
+  'completed_list': 'Completed List',
+  'refresh': 'Refresh',
+  'no_completed_songs': 'No practiced songs yet',
+  'no_completed_songs_sub': 'Choose any lesson from Home and finish playing to save history here!',
+  'explore_songs_now': 'Explore Songs Now',
+  'acc': 'ACC',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Acoustic Piano',
+  'electric_organ': 'Electric Organ',
+  'rhodes_piano': 'Rhodes Piano',
+  'synth_keyboard': 'Synth Keyboard',
+  'free_play_title': 'Open Free Play Keyboard',
+  'key_labels': 'Key Labels',
+  'instrument': 'Instrument',
+  'record': 'Record',
+  'stop': 'Stop',
+
+  // Themes
+  'piano_keyboard_themes': 'Piano Keyboard Themes',
+  'apply': 'Apply',
+  'applied': 'Applied',
+  'preview': 'Preview',
+  'explore_more_themes': 'Explore More Themes',
+  'applied_theme': 'Applied Theme:',
+  'play_piano': 'Play Piano',
+
+  // Recordings
+  'my_recordings': 'My Recordings',
+  'rename_rec': 'Rename Recording',
+  'delete_rec': 'Delete Recording',
+  'delete_rec_confirm': 'Are you sure you want to delete this recording?',
+  'no_recordings_yet': 'No recordings yet',
+  'no_recordings_sub': 'Press Record while playing Piano to save your creations!',
+  'cancel': 'Cancel',
+  'delete': 'Delete',
+  'save': 'Save',
+  'enter_rec_title': 'Enter recording title...',
+
+  // Settings & Dialogs
+  'contact_support': 'Contact Support',
+  'restore_purchase': 'Restore Purchase',
+  'rate_thank_you': 'Thank you for rating us!',
+  'quit_app': 'Quit App',
+  'quit_app_msg': 'Are you sure you want to exit?',
+  'discard': 'Discard',
+  'save_recording': 'Save Recording',
+
+  // Onboard & Premium
+  'next': 'Next',
+  'get_started': 'Get Started',
+  'onboard_title_1': 'Your AI Piano Teacher',
+  'onboard_desc_1': 'Personalized lessons that adapt to your learning pace.',
+  'onboard_title_2': 'Learn by Playing',
+  'onboard_desc_2': 'Practice with interactive songs and fun exercises every day.',
+  'onboard_title_3': 'Many Piano Themes',
+  'onboard_desc_3': 'Choose your style. Play in the theme that inspires you.',
+  'onboard_title_4': 'Unlock Your Musical Journey',
+  'onboard_desc_4': 'Start your first lesson today and enjoy playing piano with confidence.',
+  'unlock_all_features': 'Unlock All Features',
+  'remove_ads': 'Remove Ads',
+  'subscribe_now': 'Subscribe Now',
+  'terms_of_use': 'Terms of Use',
 };

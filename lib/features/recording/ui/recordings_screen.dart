@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/services/recording_storage_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/primary_button.dart';
 
@@ -39,20 +41,20 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1C182F),
-        title: Text("Delete Recording", style: TextStyle(color: Colors.white, fontSize: 16.r)),
+        title: Text(context.tr('delete_rec'), style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r)),
         content: Text(
-          "Are you sure you want to delete this recording?",
-          style: TextStyle(color: Colors.white70, fontSize: 13.r),
+          context.tr('delete_rec_confirm'),
+          style: AppTextStyles.textGrey14.copyWith(fontSize: 13.r),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text("Cancel", style: TextStyle(color: Colors.white60, fontSize: 13.r)),
+            child: Text(context.tr('cancel'), style: AppTextStyles.textGrey14.copyWith(fontSize: 13.r)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: Text("Delete", style: TextStyle(color: Colors.white, fontSize: 13.r)),
+            child: Text(context.tr('delete'), style: AppTextStyles.textWhite14.copyWith(fontSize: 13.r)),
           ),
         ],
       ),
@@ -70,13 +72,13 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1C182F),
-        title: Text("Rename Recording", style: TextStyle(color: Colors.white, fontSize: 16.r)),
+        title: Text(context.tr('rename_rec'), style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r)),
         content: TextField(
           controller: controller,
-          style: TextStyle(color: Colors.white, fontSize: 14.r),
+          style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r),
           decoration: InputDecoration(
-            hintText: "Enter title",
-            hintStyle: TextStyle(color: Colors.white54, fontSize: 13.r),
+            hintText: context.tr('enter_rec_title'),
+            hintStyle: AppTextStyles.textGrey14.copyWith(fontSize: 13.r),
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Color(0xFFCF6BEE)),
             ),
@@ -88,14 +90,14 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel", style: TextStyle(color: Colors.white60, fontSize: 13.r)),
+            child: Text(context.tr('cancel'), style: AppTextStyles.textGrey14.copyWith(fontSize: 13.r)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, controller.text.trim()),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFCF6BEE),
             ),
-            child: Text("Save", style: TextStyle(color: Colors.white, fontSize: 13.r)),
+            child: Text(context.tr('save'), style: AppTextStyles.textWhite14.copyWith(fontSize: 13.r)),
           ),
         ],
       ),
@@ -167,12 +169,8 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
 
           // Title
           Text(
-            "Recording",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.r,
-              fontWeight: FontWeight.bold,
-            ),
+            context.tr('my_recordings'),
+            style: AppTextStyles.textWhite18.copyWith(fontSize: 18.r),
           ),
         ],
       ),
@@ -191,7 +189,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
           _buildSidebarTab(
             index: 0,
             icon: Icons.mic_rounded,
-            label: "My recording",
+            label: context.tr('my_recordings'),
           ),
           SizedBox(height: 12.h),
           // Piano Sheets Tab
@@ -251,11 +249,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.r,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -269,21 +263,21 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedTabIndex = index),
       child: Container(
-        height: 52.h,
+        height: 66.r,
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         decoration: BoxDecoration(
+          color: const Color(0xFF131024),
           borderRadius: BorderRadius.circular(16.r),
-          color: const Color(0xFF1B162C),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: Colors.white.withValues(alpha: 0.05),
             width: 1,
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 36.r,
-              height: 36.r,
+              width: 40.r,
+              height: 40.r,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.r),
                 color: const Color(0xFF282042),
@@ -298,11 +292,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.r,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: AppTextStyles.textGrey14.copyWith(fontSize: 14.r, color: Colors.white70),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -335,11 +325,11 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
   }
 
   Widget _buildEmptyRecordingsView() {
-    return const NoDataWidget(
-      imageAsset: 'assets/images/img_nodata.png',
+    return NoDataWidget(
+      imageAsset: 'assets/images/img_empty_recording.png',
       imageHeight: 110,
-      title: "No recordings yet",
-      subtitle: "Your recordings will appear here",
+      title: context.tr('no_recordings_yet'),
+      subtitle: context.tr('no_recordings_sub'),
     );
   }
 
@@ -384,21 +374,14 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
               children: [
                 Text(
                   item.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.r,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 3.h),
                 Text(
                   item.date,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.45),
-                    fontSize: 11.r,
-                  ),
+                  style: AppTextStyles.textGrey12.copyWith(fontSize: 11.r, color: Colors.white.withValues(alpha: 0.45)),
                 ),
               ],
             ),
@@ -407,11 +390,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
           // Duration
           Text(
             item.duration,
-            style: TextStyle(
-              color: const Color(0xFFB880FF),
-              fontSize: 12.r,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTextStyles.textPurple12.copyWith(color: const Color(0xFFB880FF), fontSize: 12.r, fontWeight: FontWeight.w500),
           ),
           SizedBox(width: 16.w),
 

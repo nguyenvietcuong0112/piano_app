@@ -1,79 +1,63 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../core/widgets/app_loading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/services/shared_preference_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_service.dart';
 import '../../../core/widgets/app_scaffold.dart';
-import '../../../core/widgets/gradient_border_card.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../domain/theme_model.dart';
 
-class ThemePreviewScreen extends StatefulWidget {
+class ThemePreviewScreen extends ConsumerStatefulWidget {
   final ThemeItem theme;
 
   const ThemePreviewScreen({super.key, required this.theme});
 
   @override
-  State<ThemePreviewScreen> createState() => _ThemePreviewScreenState();
+  ConsumerState<ThemePreviewScreen> createState() => _ThemePreviewScreenState();
 }
 
-class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
-  bool _isDownloaded = false;
+class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
+  bool _isDownloaded = true;
   bool _isDownloading = false;
   double _downloadProgress = 0.0;
-  Timer? _downloadTimer;
 
   @override
   void initState() {
     super.initState();
-    _checkStatus();
+    _checkDownloadState();
   }
 
-  @override
-  void dispose() {
-    _downloadTimer?.cancel();
-    super.dispose();
+  void _checkDownloadState() {
+    _isDownloaded = true;
   }
 
-  Future<void> _checkStatus() async {
-    final downloaded = await SharedPreferenceService.isThemeDownloaded(widget.theme.resName);
-    if (mounted) {
-      setState(() {
-        _isDownloaded = downloaded;
-      });
-    }
-  }
-
-  void _startDownload() {
+  void _startDownload() async {
     setState(() {
       _isDownloading = true;
       _downloadProgress = 0.0;
     });
 
-    _downloadTimer?.cancel();
-    _downloadTimer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
+    for (int i = 1; i <= 10; i++) {
+      await Future.delayed(const Duration(milliseconds: 150));
+      if (!mounted) return;
       setState(() {
-        _downloadProgress += 0.1;
-        if (_downloadProgress >= 1.0) {
-          _downloadProgress = 1.0;
-          _isDownloading = false;
-          _isDownloaded = true;
-          timer.cancel();
-          SharedPreferenceService.setThemeDownloaded(widget.theme.resName);
-        }
+        _downloadProgress = i / 10.0;
       });
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isDownloading = false;
+      _isDownloaded = true;
     });
+
+    _applyTheme();
   }
 
   Future<void> _applyTheme() async {
@@ -82,7 +66,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
       setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Applied Theme: ${widget.theme.titleName}"),
+          content: Text("${context.tr('applied_theme')} ${widget.theme.titleName}"),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -101,7 +85,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
           backgroundColor: AppColors.scaffoldBackground,
           body: Column(
             children: [
-              // Header Bar with Back Button & Title "Preview"
+              // Header Bar with Back Button & Title
               Padding(
                 padding: EdgeInsets.only(top: 8.h, bottom: 20.h),
                 child: Stack(
@@ -128,7 +112,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
                       ),
                     ),
                     Text(
-                      "Preview",
+                      context.tr('preview'),
                       style: AppTextStyles.textWhite22.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -137,7 +121,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
 
               SizedBox(height: 12.h),
 
-              // Theme Preview Card Frame
+              // Theme Preview Card Container
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(12.sp),
@@ -149,14 +133,15 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
                     end: Alignment.bottomCenter,
                   ),
                   border: Border.all(
-                    color: isCurrentlyActive ? AppColors.textGrey.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.10),
+                    color: isCurrentlyActive
+                        ? AppColors.textGrey.withValues(alpha: 0.5)
+                        : Colors.white.withValues(alpha: 0.10),
                     width: 1,
                   ),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Theme Image Area
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16.r),
                       child: SizedBox(
@@ -168,17 +153,6 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
                         ),
                       ),
                     ),
-                    // Theme Name
-                    // Text(
-                    //   widget.theme.titleName,
-                    //   style: TextStyle(
-                    //     color: Colors.white,
-                    //     fontSize: 16.sp,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    //   textAlign: TextAlign.center,
-                    // ),
-                    // SizedBox(height: 6.h),
                   ],
                 ),
               ),
@@ -205,12 +179,8 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
       children: [
         // Success Notice Text
         Text(
-          "You’re currently using this theme",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w500,
-          ),
+          context.tr('applied'),
+          style: AppTextStyles.textWhite16.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w500),
           textAlign: TextAlign.center,
         ),
 
@@ -218,7 +188,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
 
         // Primary Button: "Play Piano"
         PrimaryButton(
-          text: "Play Piano",
+          text: context.tr('play_piano'),
           onTap: () {
             context.go('/themes');
             context.push('/play');
@@ -229,7 +199,7 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
 
         // Secondary Button: "Explore More Themes"
         PrimaryButton(
-          text: "Explore More Themes",
+          text: context.tr('explore_more_themes'),
           backgroundGradient: AppColors.secondaryButtonGradient,
           borderGradient: AppColors.secondaryBorderGradient,
           onTap: () => context.pop(),
@@ -241,8 +211,8 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
   /// Single action button for Download or Apply
   Widget _buildDownloadOrApplyButton() {
     final String buttonText = _isDownloading
-        ? "Downloading ${(_downloadProgress * 100).toInt()}%"
-        : (!_isDownloaded ? "Download" : "Apply");
+        ? "${context.tr('downloading')} ${(_downloadProgress * 100).toInt()}%"
+        : (!_isDownloaded ? context.tr('download') : context.tr('apply'));
 
     return PrimaryButton(
       text: buttonText,
@@ -254,47 +224,6 @@ class _ThemePreviewScreenState extends State<ThemePreviewScreen> {
           _applyTheme();
         }
       },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (_isDownloading)
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: _downloadProgress,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryButtonGradient,
-                      borderRadius: BorderRadius.circular(26.r),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // if (_isDownloading) ...[
-              //   SizedBox(
-              //     width: 24.sp,
-              //     height: 24.sp,
-              //     child: const AppLoading(width: 24, height: 24),
-              //   ),
-              //   SizedBox(width: 10.w),
-              // ],
-              Text(
-                buttonText,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

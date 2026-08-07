@@ -6,9 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/audio_engine.dart';
 import '../../../core/services/audio_recorder_service.dart';
 import '../../../core/services/recording_storage_service.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_service.dart';
 import '../../../core/widgets/exit_confirmation_dialog.dart';
 import '../../../core/widgets/gradient_border_card.dart';
@@ -21,7 +23,12 @@ import '../controller/piano_play_controller.dart';
 import 'piano_view.dart';
 
 class PlayPianoScreen extends ConsumerStatefulWidget {
-  const PlayPianoScreen({super.key});
+  final String instrumentId;
+
+  const PlayPianoScreen({
+    super.key,
+    this.instrumentId = 'bright',
+  });
 
   @override
   ConsumerState<PlayPianoScreen> createState() => _PlayPianoScreenState();
@@ -31,8 +38,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
   @override
   void initState() {
     super.initState();
-    final preset = ref.read(pianoSettingsProvider).soundPreset;
-    AudioEngine().loadInstrument(preset);
+    AudioEngine().loadInstrument(widget.instrumentId);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -52,10 +58,10 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
   Future<void> _exitScreen() async {
     final shouldExit = await ExitConfirmationDialog.show(
       context,
-      title: "Exit Piano",
-      message: "Are you sure you want to leave the piano free play mode?",
-      confirmText: "Leave",
-      cancelText: "Continue",
+      title: context.tr('quit_lesson_title'),
+      message: context.tr('quit_lesson_msg'),
+      confirmText: context.tr('quit'),
+      cancelText: context.tr('stay'),
     );
     if (shouldExit && mounted) {
       await SystemChrome.setPreferredOrientations([
@@ -104,7 +110,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: const Color(0xFF7E48F0),
-              content: Text("✅ Saved recording: $savedTitle"),
+              content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
             ),
           );
         }
@@ -125,7 +131,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
           controller.toggleRecording();
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Microphone permission required")),
+            SnackBar(content: Text("⚠️ ${context.tr('mic_permission_required')}")),
           );
         }
       }
@@ -226,15 +232,13 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                                       width: 24.h,
                                       height: 24.h,
                                     ),
-                                    const SizedBox(width: 4),
-                                    const Text(
-                                      "Game",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
+                                     const SizedBox(width: 4),
+                                     Text(
+                                       "Game",
+                                       style: AppTextStyles.textWhite12.copyWith(
+                                         fontWeight: FontWeight.bold,
+                                       ),
+                                     ),
                                   ],
                                 ),
                               ),

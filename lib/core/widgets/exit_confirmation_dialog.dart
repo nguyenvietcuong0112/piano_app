@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../theme/app_text_styles.dart';
 import 'gradient_border_card.dart';
 
 class ExitConfirmationDialog extends StatelessWidget {
@@ -72,11 +73,7 @@ class ExitConfirmationDialog extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.textWhite18,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -106,11 +103,9 @@ class ExitConfirmationDialog extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTextStyles.textWhite14.copyWith(
                 color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 14,
                 height: 1.4,
-                fontWeight: FontWeight.w400,
               ),
             ),
 
@@ -144,9 +139,7 @@ class ExitConfirmationDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         cancelText,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                        style: AppTextStyles.textWhite14.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -181,9 +174,7 @@ class ExitConfirmationDialog extends StatelessWidget {
                     child: Center(
                       child: Text(
                         confirmText,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                        style: AppTextStyles.textWhite14.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),

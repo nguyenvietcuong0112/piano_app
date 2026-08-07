@@ -1,6 +1,7 @@
 const Map<String, String> tr = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Dil',
+  'select_language_subtitle': 'Lütfen devam etmek için bir dil seçin',
   'settings': 'Ayarlar',
   'rate_app': 'Uygulamayı değerlendir',
   'share_app': 'Uygulamayı paylaş',
@@ -12,10 +13,123 @@ const Map<String, String> tr = {
   'my_songs': 'Şarkılarım',
   'recordings': 'Kayıtlar',
   'rate_dialog_title': 'Uygulamayı Değerlendir',
-  'rate_dialog_desc': 'Uygulamamızı beğendiniz mi? Lütfen bize 5 yıldız verin!',
+  'rate_dialog_desc': 'Uygulamamızı beğendiniz mi? Bize 5 yıldız verin!',
   'later': 'Daha sonra',
   'submit': 'Gönder',
-  'sharing': 'Uygulama paylaşılıyor...',
-  'privacy_policy_desc': 'Gizliliğinize önem veriyoruz.',
+  'sharing': 'Piyano Uygulaması Paylaşılıyor...',
+  'privacy_policy_desc':
+      'Gizliliğinize önem veriyoruz. Bu uygulama kişisel verilerinizi korur.',
   'close': 'Kapat',
+
+  // Difficulty
+  'easy': 'Kolay',
+  'medium': 'Orta',
+  'hard': 'Zor',
+
+  // Home Tab
+  'piano_lessons': 'PİYANO DERSLERİ',
+  'home_banner_sub': '50+ popüler şarkı ile kolayca piyano öğrenin',
+  'start_now': 'ŞİMDİ BAŞLA',
+  'lesson_list': 'Ders Listesi',
+  'view_all': 'Tümünü Gör',
+  'practice_now': 'Oyna',
+  'learn_now': 'Öğren',
+
+  // Lessons & Search
+  'all_lessons': 'Tüm Dersler',
+  'search_song_hint': 'Şarkı ara...',
+  'all': 'Tümü',
+  'completed': 'Tamamlandı',
+  'not_learned': 'Öğrenilmedi',
+  'no_songs_found': 'Şarkı bulunamadı',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Dersten Çık',
+  'quit_lesson_msg': 'Şimdi çıkarsanız mevcut ilerlemeniz kaybolacak.\nÇıkmak istediğinizden emin misiniz?',
+  'quit': 'Çık',
+  'stay': 'Kal',
+  'auto_guide': 'Otomatik Rehber',
+  'speed': 'Hız',
+  'playback_speed': 'Oynatma Hızı',
+  'slow': 'Yavaş',
+  'normal': 'Normal',
+  'fast': 'Hızlı',
+  'saved_recording': 'Kayıt saklandı:',
+  'mic_permission_required': 'Mikrofon izni gerekli',
+
+  // Lesson Result
+  'lesson_completed': 'Ders Tamamlandı!',
+  'accuracy': 'Doğruluk',
+  'total_notes': 'Toplam Nota',
+  'perfect_master': '5 Yıldız',
+  'replay': 'Tekrar Oyna',
+  'next_lesson': 'Sonraki Ders',
+
+  // My Songs Tab
+  'my_song_collection': 'Şarkı Koleksiyonum',
+  'learned_count': 'Öğrenilen:',
+  'stars_count': '5 Yıldız:',
+  'completed_list': 'Tamamlananlar Listesi',
+  'refresh': 'Yenile',
+  'no_completed_songs': 'Henüz pratik yapılmış şarkı yok',
+  'no_completed_songs_sub': 'Pratik yapmak için Ana Sayfadan bir ders seçin!',
+  'explore_songs_now': 'Şarkıları Keşfet',
+  'acc': 'DOĞR',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Akustik Piyano',
+  'electric_organ': 'Elektro Organ',
+  'rhodes_piano': 'Rhodes Piyano',
+  'synth_keyboard': 'Sentetik Klavye',
+  'free_play_title': 'Serbest Klavyeyi Aç',
+  'key_labels': 'Tuş Etiketleri',
+  'instrument': 'Enstrüman',
+  'record': 'Kaydet',
+  'stop': 'Durdur',
+
+  // Themes
+  'piano_keyboard_themes': 'Piyano Klavye Temaları',
+  'apply': 'Uygula',
+  'applied': 'Uygulandı',
+  'preview': 'Önizleme',
+  'explore_more_themes': 'Daha Fazla Tema Keşfet',
+  'applied_theme': 'Uygulanan Tema:',
+  'play_piano': 'Piyano Çal',
+
+  // Recordings
+  'my_recordings': 'Kayıtlarım',
+  'rename_rec': 'Kaydı Yeniden Adlandır',
+  'delete_rec': 'Kaydı Sil',
+  'delete_rec_confirm': 'Bu kaydı silmek istediğinizden emin misiniz?',
+  'no_recordings_yet': 'Henüz kayıt yok',
+  'no_recordings_sub': 'Eserlerinizi kaydetmek için piyano çalarken Kaydet\'e basın!',
+  'cancel': 'İptal',
+  'delete': 'Sil',
+  'save': 'Kaydet',
+  'enter_rec_title': 'Başlık girin...',
+
+  // Settings & Dialogs
+  'contact_support': 'Destekle İletişime Geç',
+  'restore_purchase': 'Satın Almayı Geri Yükle',
+  'rate_thank_you': 'Değerlendirmeniz için teşekkür ederiz!',
+  'quit_app': 'Uygulamadan Çık',
+  'quit_app_msg': 'Çıkmak istediğinizden emin misiniz?',
+  'discard': 'Vazgeç',
+  'save_recording': 'Kaydı Sakla',
+
+  // Onboard & Premium
+  'next': 'İleri',
+  'get_started': 'Başla',
+  'onboard_title_1': 'Yapay Zeka Piyano Öğretmeniniz',
+  'onboard_desc_1': 'Öğrenme hızınıza uyum sağlayan kişiselleştirilmiş dersler.',
+  'onboard_title_2': 'Çalarak Öğrenin',
+  'onboard_desc_2': 'Her gün etkileşimli şarkılar ve eğlenceli alıştırmalarla pratik yapın.',
+  'onboard_title_3': 'Çeşitli Piyano Temaları',
+  'onboard_desc_3': 'Tarzınızı seçin. Sizi motive eden temada çalın.',
+  'onboard_title_4': 'Müzik Yolculuğunuza Başlayın',
+  'onboard_desc_4': 'İlk dersinize bugün başlayın ve güvenle piyano çalmanın tadını çıkarın.',
+  'unlock_all_features': 'Tüm Özellikleri Aç',
+  'remove_ads': 'Reklamları Kaldır',
+  'subscribe_now': 'Şimdi Abone Ol',
+  'terms_of_use': 'Kullanım Şartları',
 };

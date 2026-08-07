@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/audio_engine.dart';
 import '../../../core/services/audio_recorder_service.dart';
 import '../../../core/services/recording_storage_service.dart';
@@ -312,7 +313,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: const Color(0xFF7E48F0),
-            content: Text("✅ Saved recording: $savedTitle"),
+            content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
           ),
         );
       }
@@ -342,8 +343,8 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
           controller.toggleRecording();
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("⚠️ Microphone permission required"),
+            SnackBar(
+              content: Text("⚠️ ${context.tr('mic_permission_required')}"),
             ),
           );
         }
@@ -362,11 +363,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   Future<void> _exitScreen() async {
     final shouldExit = await ExitConfirmationDialog.show(
       context,
-      title: "Quit Lesson",
-      message:
-          "If you quit now, your current lesson progress will be lost.\nAre you sure you want to quit?",
-      confirmText: "Quit",
-      cancelText: "Stay",
+      title: context.tr('quit_lesson_title'),
+      message: context.tr('quit_lesson_msg'),
+      confirmText: context.tr('quit'),
+      cancelText: context.tr('stay'),
     );
     if (shouldExit && mounted) {
       context.pop();
@@ -470,8 +470,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                   Expanded(
                                     child: Text(
                                       widget.lesson.titleName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: AppTextStyles.textWhite12.copyWith(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -523,8 +522,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                   child: Text(
                                     elapsedStr,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: AppTextStyles.textWhite12.copyWith(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -565,8 +563,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                   child: Text(
                                     totalDurationStr,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: AppTextStyles.textWhite12.copyWith(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -713,7 +710,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                     child: Center(
                       child: Text(
                         "$_countdownValue",
-                        style: const TextStyle(
+                        style: AppTextStyles.textWhite22.copyWith(
                           color: Colors.amberAccent,
                           fontSize: 90,
                           fontWeight: FontWeight.bold,

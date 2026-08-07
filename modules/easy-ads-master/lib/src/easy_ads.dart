@@ -18,6 +18,7 @@ import 'package:easy_ads_flutter/src/utils/easy_interstitial_ad_splash_with_2_id
 import 'package:easy_ads_flutter/src/utils/easy_logger.dart';
 import 'package:easy_ads_flutter/src/utils/extensions.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +30,21 @@ import 'utils/easy_interstitial_ad_splash_with_3_id.dart';
 import 'utils/easy_splash_ad_with_interstitial_and_app_open.dart';
 
 class EasyAds {
-  EasyAds._easyAds();
+  static const String _keyIntervalInterAd = 'interval_inter_ad';
+  static const String _keyLastInterstitialShowTimePref =
+      'easy_ads_last_interstitial_show_time';
+
+  DateTime? _lastInterstitialAdShowTime;
+  int? _customInterstitialInterval;
+
+  EasyAds._easyAds() {
+    _eventController.onEvent.listen((event) {
+      if (event.adUnitType == AdUnitType.interstitial &&
+          event.type == AdEventType.adShowed) {
+        recordInterstitialAdShowTime();
+      }
+    });
+  }
 
   static final EasyAds instance = EasyAds._easyAds();
 
@@ -96,6 +111,68 @@ class EasyAds {
 
   /// Cache pool for preloaded Native Ads
   final Map<String, EasyAdBase> _nativeAdCache = {};
+
+  /// Cache pool for preloaded Interstitial Ads
+  final Map<String, EasyAdBase> _interstitialAdCache = {};
+
+  /// Cache pool for preloaded Rewarded Ads
+  final Map<String, EasyAdBase> _rewardAdCache = {};
+
+  /// Returns the required interval in seconds between interstitial ad shows.
+  /// First checks if a custom interval was set, otherwise fetches from [FirebaseRemoteConfig] key 'interval_inter_ad',
+  /// falling back to 30 seconds default.
+  int get interstitialInterval {
+    if (_customInterstitialInterval != null) {
+      return _customInterstitialInterval!;
+    }
+    try {
+      final value = FirebaseRemoteConfig.instance.getInt(_keyIntervalInterAd);
+      if (value > 0) return value;
+    } catch (e) {
+      // RemoteConfig not initialized or failed
+    }
+    return 30;
+  }
+
+  void setCustomInterstitialInterval(int seconds) {
+    _customInterstitialInterval = seconds;
+  }
+
+  DateTime? get lastInterstitialAdShowTime {
+    if (_lastInterstitialAdShowTime == null && _sharedPreferences != null) {
+      final ts = _sharedPreferences!.getInt(_keyLastInterstitialShowTimePref);
+      if (ts != null && ts > 0) {
+        _lastInterstitialAdShowTime = DateTime.fromMillisecondsSinceEpoch(ts);
+      }
+    }
+    return _lastInterstitialAdShowTime;
+  }
+
+  void recordInterstitialAdShowTime() {
+    _lastInterstitialAdShowTime = DateTime.now();
+    _sharedPreferences?.setInt(_keyLastInterstitialShowTimePref,
+        _lastInterstitialAdShowTime!.millisecondsSinceEpoch);
+    _logger.logInfo(
+        'EasyAds: Recorded interstitial ad show time at $_lastInterstitialAdShowTime');
+  }
+
+  /// Checks if minimum interval between interstitial ads has passed.
+  bool canShowInterstitialAd() {
+    if (_isPremiumUser) return false;
+    if (_isFullscreenAdShowing) return false;
+
+    final lastShow = lastInterstitialAdShowTime;
+    if (lastShow != null) {
+      final elapsedSeconds = DateTime.now().difference(lastShow).inSeconds;
+      final requiredInterval = interstitialInterval;
+      if (elapsedSeconds < requiredInterval) {
+        _logger.logInfo(
+            'EasyAds: Interstitial ad skipped. Elapsed: ${elapsedSeconds}s, Required: ${requiredInterval}s (Key: $_keyIntervalInterAd)');
+        return false;
+      }
+    }
+    return true;
+  }
 
   /// [_logger] is used to show Ad logs in the console
   final EasyLogger _logger = EasyLogger();
@@ -432,6 +509,180 @@ class EasyAds {
     _nativeAdCache.clear();
   }
 
+  /// Preloads an interstitial ad for a specific adId / adIdName and stores it in cache.
+  Future<void> preloadInterstitialAd({
+    required String adId,
+    String? adIdName,
+    AdNetwork adNetwork = AdNetwork.admob,
+    bool immersiveModeEnabled = true,
+  }) async {
+    if (_isPremiumUser || adId.isEmpty) return;
+    final key = adIdName ?? (adId.startsWith('ca-app-pub-') ? adId : adId);
+
+    if (_interstitialAdCache.containsKey(key)) {
+      final cachedAd = _interstitialAdCache[key]!;
+      if (cachedAd.isAdLoaded || cachedAd.isAdLoading) {
+        _logger.logInfo('Interstitial Ad with key $key is already loaded or loading.');
+        return;
+      }
+    }
+
+    _logger.logInfo('Preloading Interstitial Ad for key $key with adId $adId');
+    final ad = createInterstitial(
+      adNetwork: adNetwork,
+      adId: adId,
+      adIdName: adIdName,
+      immersiveModeEnabled: immersiveModeEnabled,
+    );
+
+    if (ad != null) {
+      _interstitialAdCache[key] = ad;
+      await ad.load();
+    }
+  }
+
+  /// Gets an existing cached interstitial ad or creates and caches a new one.
+  EasyAdBase? getOrCreateCachedInterstitialAd({
+    required String adId,
+    String? adIdName,
+    AdNetwork adNetwork = AdNetwork.admob,
+    bool immersiveModeEnabled = true,
+  }) {
+    if (adId.isEmpty) return null;
+    final key = adIdName ?? (adId.startsWith('ca-app-pub-') ? adId : adId);
+
+    if (_interstitialAdCache.containsKey(key)) {
+      final existingAd = _interstitialAdCache[key]!;
+      if (existingAd.isAdLoaded || existingAd.isAdLoading) {
+        return existingAd;
+      }
+      existingAd.dispose();
+      _interstitialAdCache.remove(key);
+    }
+
+    final ad = createInterstitial(
+      adNetwork: adNetwork,
+      adId: adId,
+      adIdName: adIdName,
+      immersiveModeEnabled: immersiveModeEnabled,
+    );
+
+    if (ad != null) {
+      _interstitialAdCache[key] = ad;
+    }
+    return ad;
+  }
+
+  /// Retrieves a cached interstitial ad by key.
+  EasyAdBase? getCachedInterstitialAd(String key) {
+    return _interstitialAdCache[key];
+  }
+
+  /// Disposes and removes a specific cached interstitial ad.
+  void disposeCachedInterstitialAd(String key) {
+    if (_interstitialAdCache.containsKey(key)) {
+      _logger.logInfo('Disposing cached Interstitial Ad for key: $key');
+      _interstitialAdCache[key]?.dispose();
+      _interstitialAdCache.remove(key);
+    }
+  }
+
+  /// Disposes and clears all cached interstitial ads.
+  void clearInterstitialAdCache() {
+    _logger.logInfo('Clearing all cached Interstitial Ads');
+    for (final ad in _interstitialAdCache.values) {
+      ad.dispose();
+    }
+    _interstitialAdCache.clear();
+  }
+
+  /// Preloads a Reward Ad and caches it.
+  Future<void> preloadRewardAd({
+    required String adId,
+    String? adIdName,
+    AdNetwork adNetwork = AdNetwork.admob,
+    bool immersiveModeEnabled = true,
+  }) async {
+    if (_isPremiumUser || adId.isEmpty) return;
+    final key = adIdName ?? (adId.startsWith('ca-app-pub-') ? adId : adId);
+
+    if (_rewardAdCache.containsKey(key)) {
+      final cachedAd = _rewardAdCache[key]!;
+      if (cachedAd.isAdLoaded || cachedAd.isAdLoading) {
+        _logger.logInfo('Reward Ad with key $key is already loaded or loading.');
+        return;
+      }
+    }
+
+    _logger.logInfo('Preloading Reward Ad for key $key with adId $adId');
+    final ad = createReward(
+      adNetwork: adNetwork,
+      adId: adId,
+      adIdName: adIdName,
+      immersiveModeEnabled: immersiveModeEnabled,
+    );
+
+    if (ad != null) {
+      _rewardAdCache[key] = ad;
+      await ad.load();
+    }
+  }
+
+  /// Gets an existing cached reward ad or creates and caches a new one.
+  EasyAdBase? getOrCreateCachedRewardAd({
+    required String adId,
+    String? adIdName,
+    AdNetwork adNetwork = AdNetwork.admob,
+    bool immersiveModeEnabled = true,
+  }) {
+    if (adId.isEmpty) return null;
+    final key = adIdName ?? (adId.startsWith('ca-app-pub-') ? adId : adId);
+
+    if (_rewardAdCache.containsKey(key)) {
+      final existingAd = _rewardAdCache[key]!;
+      if (existingAd.isAdLoaded || existingAd.isAdLoading) {
+        return existingAd;
+      }
+      existingAd.dispose();
+      _rewardAdCache.remove(key);
+    }
+
+    final ad = createReward(
+      adNetwork: adNetwork,
+      adId: adId,
+      adIdName: adIdName,
+      immersiveModeEnabled: immersiveModeEnabled,
+    );
+
+    if (ad != null) {
+      _rewardAdCache[key] = ad;
+    }
+    return ad;
+  }
+
+  /// Retrieves a cached reward ad by key.
+  EasyAdBase? getCachedRewardAd(String key) {
+    return _rewardAdCache[key];
+  }
+
+  /// Disposes and removes a specific cached reward ad.
+  void disposeCachedRewardAd(String key) {
+    if (_rewardAdCache.containsKey(key)) {
+      _logger.logInfo('Disposing cached Reward Ad for key: $key');
+      _rewardAdCache[key]?.dispose();
+      _rewardAdCache.remove(key);
+    }
+  }
+
+  /// Disposes and clears all cached reward ads.
+  void clearRewardAdCache() {
+    _logger.logInfo('Clearing all cached Reward Ads');
+    for (final ad in _rewardAdCache.values) {
+      ad.dispose();
+    }
+    _rewardAdCache.clear();
+  }
+
   Future<void> initAdmob({
     String? appOpenAdUnitId,
     String? appOpenAdIdName,
@@ -459,6 +710,9 @@ class EasyAds {
   /// [adUnitType] should be mentioned here, only interstitial or rewarded should be mentioned here
   bool showRandomAd(AdUnitType adUnitType) {
     if (_isPremiumUser) return false;
+    if (adUnitType == AdUnitType.interstitial && !canShowInterstitialAd()) {
+      return false;
+    }
     assert(
         adUnitType == AdUnitType.interstitial ||
             adUnitType == AdUnitType.rewarded,
@@ -601,6 +855,9 @@ class EasyAds {
   Future<bool> showAd(AdUnitType adUnitType,
       {AdNetwork adNetwork = AdNetwork.any}) async {
     if (_isPremiumUser) return false;
+    if (adUnitType == AdUnitType.interstitial && !canShowInterstitialAd()) {
+      return false;
+    }
     List<EasyAdBase> ads = [];
     if (adUnitType == AdUnitType.rewarded) {
       ads = _rewardedAds;
@@ -742,6 +999,10 @@ class EasyAds {
     if (_isFullscreenAdShowing) {
       return;
     }
+    if (!canShowInterstitialAd()) {
+      adDissmissed?.call();
+      return;
+    }
     Navigator.of(context).push(
       PageRouteBuilder(
         fullscreenDialog: true,
@@ -780,6 +1041,10 @@ class EasyAds {
     if (_isFullscreenAdShowing) {
       return;
     }
+    if (!canShowInterstitialAd()) {
+      adDissmissed?.call();
+      return;
+    }
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -810,6 +1075,10 @@ class EasyAds {
       return;
     }
     if (_isFullscreenAdShowing) {
+      return;
+    }
+    if (!canShowInterstitialAd()) {
+      adDissmissed?.call();
       return;
     }
     Navigator.push(
@@ -845,6 +1114,10 @@ class EasyAds {
       return;
     }
     if (_isFullscreenAdShowing) {
+      return;
+    }
+    if (!canShowInterstitialAd()) {
+      adDissmissed?.call();
       return;
     }
     Navigator.push(

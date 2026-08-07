@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/audio_engine.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
 import '../../../core/widgets/gradient_border_card.dart';
@@ -67,7 +68,7 @@ class PianoTab extends ConsumerWidget {
                           ),
                           SizedBox(height: 6.h),
                           Text(
-                            "Learn Piano anywhere,\nanytime. Real keys, real feel.",
+                            context.tr('home_banner_sub'),
                             style: AppTextStyles.textGrey12.copyWith(height: 1.3),
                           ),
                           SizedBox(height: 14.h),
@@ -92,7 +93,7 @@ class PianoTab extends ConsumerWidget {
                                 Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18.sp),
                                 SizedBox(width: 4.w),
                                 Text(
-                                  "Play Now",
+                                  context.tr('start_now'),
                                   style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -110,7 +111,7 @@ class PianoTab extends ConsumerWidget {
 
             // Section Title: "More Instruments"
             Text(
-              "More Instruments",
+              context.tr('instrument'),
               style: AppTextStyles.textWhite18,
             ),
             SizedBox(height: 8.h),
@@ -238,8 +239,7 @@ class PianoTab extends ConsumerWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: AppTextStyles.textWhite16.copyWith(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.5,
@@ -248,10 +248,9 @@ class PianoTab extends ConsumerWidget {
                       SizedBox(height: 2.h),
                       Text(
                         subtitle,
-                        style: TextStyle(
+                        style: AppTextStyles.textWhite12.copyWith(
                           color: Colors.white.withValues(alpha: 0.75),
                           fontSize: 11.sp,
-                          fontWeight: FontWeight.w400,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -1,6 +1,7 @@
 const Map<String, String> ru = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Язык',
+  'select_language_subtitle': 'Пожалуйста, выберите язык для продолжения',
   'settings': 'Настройки',
   'rate_app': 'Оценить приложение',
   'share_app': 'Поделиться приложением',
@@ -15,7 +16,120 @@ const Map<String, String> ru = {
   'rate_dialog_desc': 'Вам нравится наше приложение? Поставьте нам 5 звезд!',
   'later': 'Позже',
   'submit': 'Отправить',
-  'sharing': 'Поделиться приложением...',
-  'privacy_policy_desc': 'Мы ценим вашу конфиденциальность.',
+  'sharing': 'Делимся приложением Пианино...',
+  'privacy_policy_desc':
+      'Мы ценим вашу конфиденциальность. Это приложение защищает ваши личные данные.',
   'close': 'Закрыть',
+
+  // Difficulty
+  'easy': 'Легко',
+  'medium': 'Средне',
+  'hard': 'Сложно',
+
+  // Home Tab
+  'piano_lessons': 'УРОКИ ПИАНИНО',
+  'home_banner_sub': 'Обучайтесь игре на пианино легко с 50+ популярными песнями',
+  'start_now': 'НАЧАТЬ СЕЙЧАС',
+  'lesson_list': 'Список уроков',
+  'view_all': 'Смотреть все',
+  'practice_now': 'Играть',
+  'learn_now': 'Учить',
+
+  // Lessons & Search
+  'all_lessons': 'Все уроки',
+  'search_song_hint': 'Поиск песни...',
+  'all': 'Все',
+  'completed': 'Завершено',
+  'not_learned': 'Не выучено',
+  'no_songs_found': 'Песни не найдены',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Выйти из урока',
+  'quit_lesson_msg': 'Если вы выйдете сейчас, ваш прогресс будет утерян.\nВы уверены, что хотите выйти?',
+  'quit': 'Выйти',
+  'stay': 'Остаться',
+  'auto_guide': 'Авто-гид',
+  'speed': 'Скорость',
+  'playback_speed': 'Скорость воспроизведения',
+  'slow': 'Медленно',
+  'normal': 'Обычно',
+  'fast': 'Быстро',
+  'saved_recording': 'Запись сохранена:',
+  'mic_permission_required': 'Требуется разрешение на микрофон',
+
+  // Lesson Result
+  'lesson_completed': 'Урок завершен!',
+  'accuracy': 'Точность',
+  'total_notes': 'Всего нот',
+  'perfect_master': '5 Звезд',
+  'replay': 'Повторить',
+  'next_lesson': 'Следующий урок',
+
+  // My Songs Tab
+  'my_song_collection': 'Коллекция песен',
+  'learned_count': 'Изучено:',
+  'stars_count': '5 Звезд:',
+  'completed_list': 'Завершенные песни',
+  'refresh': 'Обновить',
+  'no_completed_songs': 'Пока нет пройденных песен',
+  'no_completed_songs_sub': 'Выберите любой урок на Главной для практики!',
+  'explore_songs_now': 'Искать песни',
+  'acc': 'ТОЧН',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Акустическое пианино',
+  'electric_organ': 'Электроорган',
+  'rhodes_piano': 'Пианино Родес',
+  'synth_keyboard': 'Синтезатор',
+  'free_play_title': 'Свободная игра',
+  'key_labels': 'Метки клавиш',
+  'instrument': 'Инструмент',
+  'record': 'Запись',
+  'stop': 'Стоп',
+
+  // Themes
+  'piano_keyboard_themes': 'Темы клавиатуры пианино',
+  'apply': 'Применить',
+  'applied': 'Применено',
+  'preview': 'Предпросмотр',
+  'explore_more_themes': 'Больше тем',
+  'applied_theme': 'Применена тема:',
+  'play_piano': 'Играть на пианино',
+
+  // Recordings
+  'my_recordings': 'Мои записи',
+  'rename_rec': 'Переименовать запись',
+  'delete_rec': 'Удалить запись',
+  'delete_rec_confirm': 'Вы уверены, что хотите удалить эту запись?',
+  'no_recordings_yet': 'Записей пока нет',
+  'no_recordings_sub': 'Нажмите «Запись» во время игры, чтобы сохранить свое произведение!',
+  'cancel': 'Отмена',
+  'delete': 'Удалить',
+  'save': 'Сохранить',
+  'enter_rec_title': 'Введите название...',
+
+  // Settings & Dialogs
+  'contact_support': 'Связаться с поддержкой',
+  'restore_purchase': 'Восстановить покупки',
+  'rate_thank_you': 'Спасибо за оценку!',
+  'quit_app': 'Выйти из приложения',
+  'quit_app_msg': 'Вы уверены, что хотите выйти?',
+  'discard': 'Отменить',
+  'save_recording': 'Сохранить запись',
+
+  // Onboard & Premium
+  'next': 'Далее',
+  'get_started': 'Начать',
+  'onboard_title_1': 'Ваш ИИ-учитель пианино',
+  'onboard_desc_1': 'Персонализированные уроки, адаптирующиеся к вашему темпу.',
+  'onboard_title_2': 'Учитесь играя',
+  'onboard_desc_2': 'Практикуйтесь с интерактивными песнями и интересными упражнениями каждый день.',
+  'onboard_title_3': 'Разнообразные темы пианино',
+  'onboard_desc_3': 'Выберите свой стиль. Играйте в теме, которая вас вдохновляет.',
+  'onboard_title_4': 'Откройте свое музыкальное путешествие',
+  'onboard_desc_4': 'Начните свой первый урок сегодня и играйте на пианино с уверенностью.',
+  'unlock_all_features': 'Разблокировать все функции',
+  'remove_ads': 'Убрать рекламу',
+  'subscribe_now': 'Подписаться',
+  'terms_of_use': 'Условия использования',
 };

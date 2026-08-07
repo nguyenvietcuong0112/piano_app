@@ -10,7 +10,9 @@ import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import 'language_controller.dart';
 
 class LanguagePage extends ConsumerStatefulWidget {
@@ -76,10 +78,26 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
     );
   }
 
-  Widget _buildNativeAd(LanguageController controller) {
+  bool _shouldShowLanguageAd(LanguageController controller) {
     if (AppConstants.isPremiumUser.value ||
         !controller.isFirstLaunch ||
         !controller.isShouldShowAds) {
+      return false;
+    }
+    final isClick = controller.isShowClickAds;
+    if (isClick) {
+      return FirebaseRemoteConfigService.getBoolConfigByKey(
+        FirebaseRemoteConfigService.native_language_click,
+      );
+    } else {
+      return FirebaseRemoteConfigService.getBoolConfigByKey(
+        FirebaseRemoteConfigService.native_language,
+      );
+    }
+  }
+
+  Widget _buildNativeAd(LanguageController controller) {
+    if (!_shouldShowLanguageAd(controller)) {
       return const SizedBox.shrink();
     }
 
@@ -106,85 +124,103 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
   }
 
   Widget _buildContent(LanguageController controller) {
-    final bool hideAd = AppConstants.isPremiumUser.value || !controller.isFirstLaunch;
-    return ListView.builder(
-      itemCount: controller.itemsList.length,
-      scrollDirection: Axis.vertical,
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 10,
-        bottom: hideAd ? 20 : AdDimen.mediumNativeHeight + 10,
-      ),
-      itemBuilder: (context, index) {
-        final isSelected = controller.selectedIndex == index;
-        return GestureDetector(
-          onTap: () => controller.onSelectItem(index),
-          child: Container(
-            height: 44,
-            width: double.infinity,
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: isSelected ? AppColors.primary : AppColors.surface,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      controller.itemsList[index].pngAsset,
-                      width: 40,
-                      height: 30,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.flag, color: Colors.white),
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      controller.itemsList[index].title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textWhite,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-                isSelected
-                    ? Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(width: 1, color: Colors.white),
-                        ),
-                        child: Center(
-                          child: Container(
-                            width: 15,
-                            height: 15,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(width: 1, color: Colors.grey),
-                        ),
-                      ),
-              ],
+    final bool hideAd = !_shouldShowLanguageAd(controller);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 12),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              context.tr('select_language_subtitle'),
+              style: AppTextStyles.textGrey14,
+              textAlign: TextAlign.left,
             ),
           ),
-        );
-      },
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: controller.itemsList.length,
+            scrollDirection: Axis.vertical,
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 0,
+              bottom: hideAd ? 20 : AdDimen.mediumNativeHeight + 10,
+            ),
+            itemBuilder: (context, index) {
+              final isSelected = controller.selectedIndex == index;
+              return GestureDetector(
+                onTap: () => controller.onSelectItem(index),
+                child: Container(
+                  height: 44,
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: isSelected ? AppColors.primary : AppColors.surface,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.asset(
+                              controller.itemsList[index].pngAsset,
+                              width: 38,
+                              height: 26,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.flag, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Text(
+                            controller.itemsList[index].title,
+                            style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                      isSelected
+                          ? Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(width: 1, color: Colors.white),
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 15,
+                                  height: 15,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(width: 1, color: Colors.grey),
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -198,11 +234,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             child: Center(
               child: Text(
                 context.tr('language'),
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textWhite,
-                ),
+                style: AppTextStyles.textWhite20,
               ),
             ),
           ),

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/theme/theme_service.dart';
@@ -27,7 +28,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Applied Theme: ${theme.titleName}"),
+          content: Text("${context.tr('applied_theme')} ${theme.titleName}"),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
@@ -81,11 +82,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
             padding: EdgeInsets.symmetric(vertical: 8.h),
             child: Text(
               widget.category.categoryName,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.textWhite18.copyWith(fontSize: 18.sp),
             ),
           ),
 
@@ -146,11 +143,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
                 // Theme Title Name
                 Text(
                   theme.titleName,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.textWhite14.copyWith(fontSize: 14.sp, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ],

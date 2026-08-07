@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -64,16 +65,16 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
     }
   }
 
-  String _getDifficultyText(int level) {
+  String _getDifficultyText(BuildContext context, int level) {
     switch (level) {
       case 1:
-        return "Easy";
+        return context.tr('easy');
       case 2:
-        return "Medium";
+        return context.tr('medium');
       case 3:
-        return "Hard";
+        return context.tr('hard');
       default:
-        return "Easy";
+        return context.tr('easy');
     }
   }
 
@@ -146,7 +147,7 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                   ),
                 ),
                 Text(
-                  "Songs",
+                  context.tr('all_lessons'),
                   style: AppTextStyles.textWhite20.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -166,7 +167,7 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
               children: [
                 // "All song" Pill
                 GradientTabPill(
-                  label: "All song",
+                  label: context.tr('all'),
                   isSelected: _selectedCategoryId == -1,
                   onTap: () {
                     setState(() {
@@ -196,9 +197,8 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
           // Songs 3-Column Grid in Landscape
           Expanded(
             child: allSongs.isEmpty
-                ? const NoDataWidget(
-                    title: "No songs found",
-                    subtitle: "No songs match the selected category.",
+                ? NoDataWidget(
+                    title: context.tr('no_songs_found'),
                   )
                 : GridView.builder(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -214,7 +214,7 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                       final song = allSongs[index];
                       final songIdStr = song.id.toString();
                       final starCount = _songStarsMap[songIdStr] ?? 0;
-                      final difficulty = _getDifficultyText(song.level);
+                      final difficulty = _getDifficultyText(context, song.level);
                       final diffColor = _getDifficultyColor(song.level);
 
                       return GestureDetector(
@@ -273,26 +273,23 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      song.titleName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      song.authorName,
-                                      style: const TextStyle(
-                                        color: Colors.white54,
-                                        fontSize: 10,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                     Text(
+                                       song.titleName,
+                                       style: AppTextStyles.textWhite12.copyWith(
+                                         fontWeight: FontWeight.bold,
+                                       ),
+                                       maxLines: 1,
+                                       overflow: TextOverflow.ellipsis,
+                                     ),
+                                     const SizedBox(height: 2),
+                                     Text(
+                                       song.authorName,
+                                       style: AppTextStyles.textGrey12.copyWith(
+                                         fontSize: 10,
+                                       ),
+                                       maxLines: 1,
+                                       overflow: TextOverflow.ellipsis,
+                                     ),
                                     const SizedBox(height: 3),
 
                                     // 5 Stars Rating Row
@@ -337,7 +334,7 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                                       ),
                                       child: Text(
                                         difficulty,
-                                        style: TextStyle(
+                                        style: AppTextStyles.textWhite12.copyWith(
                                           color: diffColor,
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
@@ -398,10 +395,9 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 3),
-                                            const Text(
-                                              "Play",
-                                              style: TextStyle(
-                                                color: Colors.white,
+                                            Text(
+                                              context.tr('practice_now'),
+                                              style: AppTextStyles.textWhite12.copyWith(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                               ),

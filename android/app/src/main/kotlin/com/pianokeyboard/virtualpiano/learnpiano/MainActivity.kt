@@ -30,6 +30,11 @@ class MainActivity: FlutterActivity() {
         )
         GoogleMobileAdsPlugin.registerNativeAdFactory(
             flutterEngine,
+            "nativeBanner",
+            NativeBannerFactory(layoutInflater)
+        )
+        GoogleMobileAdsPlugin.registerNativeAdFactory(
+            flutterEngine,
             "nativeMediaSmall",
             NativeMediaSmallFactory(layoutInflater)
         )
@@ -39,6 +44,7 @@ class MainActivity: FlutterActivity() {
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeMedia")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeMedia2")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeNoMedia")
+        GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeBanner")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeFull")
         GoogleMobileAdsPlugin.unregisterNativeAdFactory(flutterEngine, "nativeMediaSmall")
     }

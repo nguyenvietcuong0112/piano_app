@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../theme/app_text_styles.dart';
 import '../services/audio_recorder_service.dart';
+import '../localization/app_localizations.dart';
 import 'gradient_border_card.dart';
 
 class RecordSelectionDialog extends StatelessWidget {
@@ -36,12 +38,8 @@ class RecordSelectionDialog extends StatelessWidget {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        "Record",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.r,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        context.tr('record'),
+                        style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r),
                       ),
                     ),
                     Align(
@@ -71,7 +69,7 @@ class RecordSelectionDialog extends StatelessWidget {
                 _buildOptionTile(
                   context: context,
                   icon: Icons.mic_rounded,
-                  label: "My recording",
+                  label: context.tr('my_recordings'),
                   onTap: () => Navigator.pop(context, RecordingMode.mic),
                 ),
                 SizedBox(height: 10.h),
@@ -128,11 +126,7 @@ class RecordSelectionDialog extends StatelessWidget {
             SizedBox(width: 12.w),
             Text(
               label,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14.r,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -198,12 +192,8 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        "Save",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.r,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        context.tr('save_recording'),
+                        style: AppTextStyles.textWhite16.copyWith(fontSize: 16.r),
                       ),
                     ),
                     Align(
@@ -248,19 +238,15 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                         color: Colors.white70,
                         size: 18.r,
                       ),
-                      SizedBox(width: 10.w),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: TextField(
                           controller: _controller,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13.r,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          decoration: const InputDecoration(
+                          style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.w600),
+                          decoration: InputDecoration(
                             border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                            hintText: context.tr('enter_rec_title'),
+                            hintStyle: AppTextStyles.textGrey14.copyWith(color: Colors.white38, fontSize: 14.r),
                           ),
                         ),
                       ),
@@ -296,12 +282,8 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                           ),
                           child: Center(
                             child: Text(
-                              "Cancel",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.r,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              context.tr('cancel'),
+                              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -335,12 +317,8 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                           ),
                           child: Center(
                             child: Text(
-                              "Save",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.r,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              context.tr('save'),
+                              style: AppTextStyles.textWhite14.copyWith(fontSize: 14.r, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),

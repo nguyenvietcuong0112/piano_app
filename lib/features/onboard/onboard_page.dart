@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import 'onboard_controller.dart';
 
 class OnboardPage extends ConsumerStatefulWidget {
@@ -31,13 +33,13 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
     final steps = controller.getSteps();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.scaffoldBackground,
       body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: PageView.builder(
           controller: controller.pageController,
-          physics: const NeverScrollableScrollPhysics(),
+          // physics: const NeverScrollableScrollPhysics(),
           itemCount: steps.length,
           onPageChanged: controller.onChangePage,
           itemBuilder: (context, index) {
@@ -95,97 +97,76 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
       OnboardController controller, OnboardStep step, List<OnboardStep> steps) {
     final bool hasAd = step.adId.isNotEmpty && !AppConstants.isPremiumUser.value;
 
-    return Stack(
+    return Column(
       children: [
-        // Top Header Image
-        Positioned.fill(
-          child: Column(
-            children: [
-              Expanded(
-                child: Image.asset(
-                  step.image,
-                  fit: step.fit,
-                  width: double.infinity,
-                ),
-              ),
-              SizedBox(height: hasAd ? 340 : 180),
-            ],
+        // Top Header Image (Fills all available remaining space)
+        Expanded(
+          child: Image.asset(
+            step.image,
+            fit: step.fit,
+            width: double.infinity,
           ),
         ),
 
         // Bottom Section (Text + Indicators + Next Button + Native Ad)
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title & Description
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  step.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: AppColors.textWhite,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 10),
+            // Title & Description
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                context.tr(step.titleKey),
+                style: AppTextStyles.textWhite20,
+                textAlign: TextAlign.center,
+                maxLines: 1,
               ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  step.desc,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textGrey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                context.tr(step.descKey),
+                style: AppTextStyles.textGrey14,
+                textAlign: TextAlign.center,
+                maxLines: 2,
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 20),
 
-              // Bottom Layout Conditional on Ad
-              if (hasAd) ...[
-                // Pages 1 & 4 (With Ads)
-                Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 100),
-                      _buildDotsIndicator(controller),
-                      _buildTextNextButton(controller, steps),
-                    ],
-                  ),
+            // Bottom Layout Conditional on Ad
+            if (hasAd) ...[
+              // Pages 1 & 4 (With Ads)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildDotsIndicator(controller),
+                    _buildTextNextButton(controller, steps),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                EasyNativeAd(
-                  key: ValueKey(step.adId),
-                  factoryId: step.factoryId,
-                  adId: step.adId,
-                  adIdName: step.adIdName,
-                  height: AdDimen.mediumNativeHeight,
-                ),
-              ] else ...[
-                // Pages 2 & 3 (Without Ads)
-                SizedBox(
-                  height: 20,
-                  child: Center(child: _buildDotsIndicator(controller)),
-                ),
-                const SizedBox(height: 15),
-                _buildBigNextButton(controller, steps),
-                const SizedBox(height: 15),
-              ],
+              ),
+              const SizedBox(height: 10),
+              EasyNativeAd(
+                key: ValueKey(step.adId),
+                factoryId: step.factoryId,
+                adId: step.adId,
+                adIdName: step.adIdName,
+                height: AdDimen.mediumNativeHeight,
+              ),
+            ] else ...[
+              // Pages 2 & 3 (Without Ads)
+              SizedBox(
+                height: 20,
+                child: Center(child: _buildDotsIndicator(controller)),
+              ),
+              const SizedBox(height: 15),
+              _buildBigNextButton(controller, steps),
+              const SizedBox(height: 15),
             ],
-          ),
+          ],
         ),
       ],
     );
@@ -197,10 +178,10 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
       dotsCount: controller.totalPage,
       position: controller.currentTabOnboard,
       decorator: DotsDecorator(
-        color: Colors.grey,
-        activeColor: AppColors.primary,
-        size: const Size(12, 8),
-        activeSize: const Size(22, 8),
+        color: Color(0XFF141126),
+        activeColor: AppColors.textPurple,
+        size: const Size(30, 8),
+        activeSize: const Size(30, 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         activeShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         spacing: const EdgeInsets.only(right: 8),
@@ -236,16 +217,18 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
     return GestureDetector(
       onTap: () => controller.onSelectNext(context, steps),
       child: Container(
-        width: 100,
         color: Colors.transparent,
         alignment: Alignment.centerRight,
-        height: 40,
-        child: Text(
-          controller.getTitleButton(introIndex),
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primary,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(color: AppColors.textPurple,width: 1),
+            borderRadius: BorderRadius.circular(32)
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+          child: Text(
+            controller.getTitleButton(introIndex, context),
+            style: AppTextStyles.textPurple14,
           ),
         ),
       ),
@@ -269,12 +252,8 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
         height: 50,
         child: Center(
           child: Text(
-            controller.getTitleButton(introIndex).toUpperCase(),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            controller.getTitleButton(introIndex, context).toUpperCase(),
+            style: AppTextStyles.textWhite16,
           ),
         ),
       ),

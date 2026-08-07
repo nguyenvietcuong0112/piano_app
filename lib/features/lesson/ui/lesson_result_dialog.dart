@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/gradient_border_card.dart';
 import '../controller/lesson_play_controller.dart';
 
@@ -118,13 +120,12 @@ class LessonResultDialog extends StatelessWidget {
 
                 SizedBox(height: 16.h),
 
-                // Score Display (NO .sp used for fontSize!)
+                // Score Display
                 Text(
                   "${state.score}",
-                  style: const TextStyle(
+                  style: AppTextStyles.textWhite22.copyWith(
                     fontSize: 38,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                     height: 1.0,
                   ),
                   textAlign: TextAlign.center,
@@ -132,13 +133,10 @@ class LessonResultDialog extends StatelessWidget {
 
                 SizedBox(height: 12.h),
 
-                // Congratulations Subtitle (NO .sp used for fontSize!)
+                // Congratulations Subtitle
                 Text(
-                  "Congratulations! You completed your lesson",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white.withValues(alpha: 0.85),
+                  context.tr('lesson_completed'),
+                  style: AppTextStyles.textWhite14.copyWith(
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
@@ -149,7 +147,7 @@ class LessonResultDialog extends StatelessWidget {
                 // Action Buttons Row
                 Row(
                   children: [
-                    // Learn Again Button (Matching Exit Dialog Cancel style)
+                    // Replay Button
                     Expanded(
                       child: GradientBorderCard(
                         height: 44.h,
@@ -175,12 +173,10 @@ class LessonResultDialog extends StatelessWidget {
                             const Color(0xFF7B1FA2).withValues(alpha: 0.3),
                           ],
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            "Learn again",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
+                            context.tr('replay'),
+                            style: AppTextStyles.textWhite14.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -190,7 +186,7 @@ class LessonResultDialog extends StatelessWidget {
 
                     SizedBox(width: 12.w),
 
-                    // Next Lesson Button (Matching Exit Dialog Confirm style)
+                    // Next Lesson Button
                     Expanded(
                       child: GradientBorderCard(
                         height: 44.h,
@@ -220,12 +216,10 @@ class LessonResultDialog extends StatelessWidget {
                             const Color(0xFFCF6BEE).withValues(alpha: 0.6),
                           ],
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            "Next lesson",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
+                            context.tr('next_lesson'),
+                            style: AppTextStyles.textWhite14.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),

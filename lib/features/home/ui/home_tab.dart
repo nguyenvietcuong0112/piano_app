@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/shared_preference_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -56,16 +57,16 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     }
   }
 
-  String _getDifficultyText(int level) {
+  String _getDifficultyText(BuildContext context, int level) {
     switch (level) {
       case 1:
-        return "Easy";
+        return context.tr('easy');
       case 2:
-        return "Medium";
+        return context.tr('medium');
       case 3:
-        return "Hard";
+        return context.tr('hard');
       default:
-        return "Easy";
+        return context.tr('easy');
     }
   }
 
@@ -92,7 +93,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           error: (err, stack) => Center(
             child: Text(
               "Error: $err",
-              style: const TextStyle(color: Colors.white70),
+              style: AppTextStyles.textGrey14,
             ),
           ),
           data: (lessonsResponse) {
@@ -103,51 +104,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 }
               });
             }
-            List<LessonsCategory> categories = lessonsResponse?.categories ?? [];
-            List<LessonsItem> popularSongs = [];
-            for (var c in categories) {
-              popularSongs.addAll(c.items);
-            }
-            if (popularSongs.isEmpty) {
-              popularSongs = [
-                LessonsItem(
-                  id: 1,
-                  titleName: "A Thousand Years",
-                  authorName: "Christina Perri",
-                  duration: "03:45",
-                  lessonsData: "a_thousand_years.json",
-                  thumbnail: "",
-                  level: 1, // 1 = Easy
-                  startOctave: 4,
-                  startKeyPosition: 0,
-                  visibleWhiteKeysCount: 14,
-                ),
-                LessonsItem(
-                  id: 2,
-                  titleName: "A Thousand Years",
-                  authorName: "Christina Perri",
-                  duration: "03:45",
-                  lessonsData: "a_thousand_years.json",
-                  thumbnail: "",
-                  level: 3, // 3 = Hard
-                  startOctave: 4,
-                  startKeyPosition: 0,
-                  visibleWhiteKeysCount: 14,
-                ),
-                LessonsItem(
-                  id: 3,
-                  titleName: "A Thousand Years",
-                  authorName: "Christina Perri",
-                  duration: "03:45",
-                  lessonsData: "a_thousand_years.json",
-                  thumbnail: "",
-                  level: 2, // 2 = Medium
-                  startOctave: 4,
-                  startKeyPosition: 0,
-                  visibleWhiteKeysCount: 14,
-                ),
-              ];
-            }
+            final popularCategory = (lessonsResponse != null && lessonsResponse.categories.isNotEmpty)
+                ? lessonsResponse.categories.firstWhere(
+                    (c) => c.categoryID == 1,
+                    orElse: () => lessonsResponse.categories.first,
+                  )
+                : null;
+            final popularSongs = popularCategory?.items ?? [];
+
             return SingleChildScrollView(
               padding: EdgeInsets.only(top: 12.h, bottom: 90.h),
               child: Column(
@@ -181,7 +145,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                 ),
                                 SizedBox(height: 6.h),
                                 Text(
-                                  "Learn Piano anywhere,\nanytime. Real keys, real feel.",
+                                  context.tr('home_banner_sub'),
                                   style: AppTextStyles.textWhite12,
                                 ),
                                 SizedBox(height: 12.h),
@@ -199,7 +163,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                       Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18.sp),
                                       SizedBox(width: 4.w),
                                       Text(
-                                        "Play Now",
+                                        context.tr('start_now'),
                                         style: AppTextStyles.textWhite12.copyWith(fontWeight: FontWeight.bold),
                                       ),
                                     ],
@@ -216,24 +180,20 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Popular Songs",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Text(
+                        context.tr('lesson_list'),
+                        style: AppTextStyles.textWhite18.copyWith(fontSize: 17),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/all-lessons'),
                         child:  Row(
                           children: [
                             Text(
-                              "See All",
+                              context.tr('view_all'),
                               style: AppTextStyles.textPurple14,
                             ),
-                            SizedBox(width: 2),
-                            Icon(Icons.chevron_right_rounded, color: AppColors.textPurple, size: 18),
+                            const SizedBox(width: 2),
+                            const Icon(Icons.chevron_right_rounded, color: AppColors.textPurple, size: 18),
                           ],
                         ),
                       ),
@@ -248,7 +208,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       final song = popularSongs[index];
                       final songIdStr = song.id.toString();
                       final starCount = _songStarsMap[songIdStr] ?? 0;
-                      final difficulty = _getDifficultyText(song.level);
+                      final difficulty = _getDifficultyText(context, song.level);
                       final diffColor = _getDifficultyColor(song.level);
 
                       return GestureDetector(
@@ -345,7 +305,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                     ),
                                     child: Text(
                                       difficulty,
-                                      style: TextStyle(
+                                      style: AppTextStyles.textWhite12.copyWith(
                                         color: diffColor,
                                         fontSize: 10.sp,
                                         fontWeight: FontWeight.bold,
@@ -378,7 +338,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                         ),
                                         SizedBox(width: 5.w),
                                         Text(
-                                          "Play",
+                                          context.tr('practice_now'),
                                           style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
                                         ),
                                       ],

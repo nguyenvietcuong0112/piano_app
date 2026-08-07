@@ -6,7 +6,9 @@ import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/const/ad_id_extension.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/services/firebase_remote_config_service.dart';
 import 'splash_controller.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -58,20 +60,14 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.asset(
-                        "assets/png/splash_thumb.png",
-                        width: 121,
-                        height: 121,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.piano, size: 80, color: Colors.amber),
+                        "assets/images/splash_thumb.png",
+                        width: 180,
+                        height: 180,
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        "Real Piano",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textWhite,
-                        ),
+                      Text(
+                        "Piano Lession",
+                        style: AppTextStyles.textWhite20,
                       ),
                       const SizedBox(height: 200),
                     ],
@@ -90,19 +86,19 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                     bottom: true,
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           "This action can contain advertising",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textGrey),
+                          style: AppTextStyles.textGrey14,
                         ),
                         const SizedBox(height: 10),
                         Container(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           child: const AppLoading(width: 80, height: 80),
                         ),
-                        if (!AppConstants.isPremiumUser.value) ...[
+                        if (!AppConstants.isPremiumUser.value &&
+                            FirebaseRemoteConfigService.getBoolConfigByKey(
+                              FirebaseRemoteConfigService.banner_splash,
+                            )) ...[
                           const SizedBox(height: 10),
                           EasyBannerAd(
                             adId: MyAdIdName.bannerSplash.getId,

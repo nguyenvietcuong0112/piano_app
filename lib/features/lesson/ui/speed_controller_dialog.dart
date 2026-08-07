@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/gradient_border_card.dart';
 import '../../../core/widgets/gradient_slider_track_shape.dart';
 
@@ -79,13 +81,9 @@ class _SpeedControllerDialogState extends State<SpeedControllerDialog> {
             Stack(
               alignment: Alignment.center,
               children: [
-                const Text(
-                  "Speed Controller",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Text(
+                  context.tr('playback_speed'),
+                  style: AppTextStyles.textWhite16,
                 ),
                 Align(
                   alignment: Alignment.centerRight,
@@ -134,8 +132,7 @@ class _SpeedControllerDialogState extends State<SpeedControllerDialog> {
                               ),
                               child: Text(
                                 _currentSpeed.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: AppTextStyles.textWhite12.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -149,13 +146,9 @@ class _SpeedControllerDialogState extends State<SpeedControllerDialog> {
                     // Slider Row: "0.0" | ----- Thumb ----- | "2.0"
                     Row(
                       children: [
-                        const Text(
+                        Text(
                           "0.0",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: AppTextStyles.textGrey12,
                         ),
                         Expanded(
                           child: SliderTheme(
@@ -188,13 +181,9 @@ class _SpeedControllerDialogState extends State<SpeedControllerDialog> {
                             ),
                           ),
                         ),
-                        const Text(
+                        Text(
                           "2.0",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: AppTextStyles.textGrey12,
                         ),
                       ],
                     ),

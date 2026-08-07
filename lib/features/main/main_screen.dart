@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/exit_confirmation_dialog.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
@@ -31,13 +32,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     });
   }
 
-  static const List<String> _titles = [
-    "Piano Lesssion",
-    "Piano Theme",
-    "Piano Instrument",
-    "My Song",
-  ];
-
   void _onTap(int index) {
     widget.navigationShell.goBranch(
       index,
@@ -49,9 +43,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget build(BuildContext context) {
     final currentIndex = widget.navigationShell.currentIndex;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final currentTitle = (currentIndex >= 0 && currentIndex < _titles.length)
-        ? _titles[currentIndex]
-        : "Piano Lesssion";
+    final titles = [
+      context.tr('piano_lessons'),
+      context.tr('piano_keyboard_themes'),
+      context.tr('piano'),
+      context.tr('my_song_collection'),
+    ];
+    final currentTitle = (currentIndex >= 0 && currentIndex < titles.length)
+        ? titles[currentIndex]
+        : context.tr('piano_lessons');
 
     return PopScope(
       canPop: false,
@@ -67,10 +67,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         // Show reusable ExitConfirmationDialog when backing out of main screen
         final shouldExit = await ExitConfirmationDialog.show(
           context,
-          title: "Exit App",
-          message: "Are you sure you want to exit the app?",
-          confirmText: "Exit",
-          cancelText: "Cancel",
+          title: context.tr('quit_app'),
+          message: context.tr('quit_app_msg'),
+          confirmText: context.tr('quit'),
+          cancelText: context.tr('cancel'),
         );
 
         if (shouldExit) {

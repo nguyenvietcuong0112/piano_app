@@ -30,7 +30,8 @@ class EasyInterstitialAd extends StatefulWidget {
 
 class _EasyInterstitialAdState extends State<EasyInterstitialAd>
     with WidgetsBindingObserver {
-  late final EasyAdBase? _interstitialAd = EasyAds.instance.createInterstitial(
+  late final String _adKey = widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? widget.adId : widget.adId);
+  late final EasyAdBase? _interstitialAd = EasyAds.instance.getOrCreateCachedInterstitialAd(
     adNetwork: widget.adNetwork,
     adId: widget.adId,
     adIdName: widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? null : widget.adId),
@@ -41,7 +42,9 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
   Timer? _timeoutTimer;
 
   Future<void> _showAd() => Future.delayed(
-        const Duration(seconds: 1),
+        _interstitialAd?.isAdLoaded == true
+            ? const Duration(milliseconds: 100)
+            : const Duration(seconds: 1),
         () {
           if (_appLifecycleState == AppLifecycleState.resumed) {
             if (mounted) {
@@ -58,6 +61,11 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
     if (mounted) {
       EasyAds.instance.setFullscreenAdShowing(false);
       _streamSubscription?.cancel();
+      // If ad failed to load completely, dispose it.
+      // If it is still loading in background, keep it in cache so it finishes loading for the next click.
+      if (_interstitialAd?.isAdLoaded != true && _interstitialAd?.isAdLoading != true) {
+        EasyAds.instance.disposeCachedInterstitialAd(_adKey);
+      }
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
@@ -95,6 +103,7 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
             _timeoutTimer?.cancel();
             EasyAds.instance.setFullscreenAdShowing(false);
             _streamSubscription?.cancel();
+            EasyAds.instance.disposeCachedInterstitialAd(_adKey);
             if (mounted && Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
             }
@@ -104,6 +113,7 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
             _timeoutTimer?.cancel();
             EasyAds.instance.setFullscreenAdShowing(false);
             _streamSubscription?.cancel();
+            EasyAds.instance.disposeCachedInterstitialAd(_adKey);
             if (mounted && Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
             }
@@ -116,6 +126,7 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
               _timeoutTimer?.cancel();
               EasyAds.instance.setFullscreenAdShowing(false);
               _streamSubscription?.cancel();
+              EasyAds.instance.disposeCachedInterstitialAd(_adKey);
               if (mounted && Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
               }
@@ -134,7 +145,7 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
       } else {
         _adFailedToShow = true;
       }
-    } else {
+    } else if (_interstitialAd?.isAdLoading != true) {
       _interstitialAd?.load();
     }
 
@@ -158,7 +169,6 @@ class _EasyInterstitialAdState extends State<EasyInterstitialAd>
     WidgetsBinding.instance.removeObserver(this);
     _streamSubscription?.cancel();
     _timeoutTimer?.cancel();
-    _interstitialAd?.dispose();
     super.dispose();
   }
 

@@ -1,6 +1,7 @@
 const Map<String, String> vi = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Ngôn ngữ',
+  'select_language_subtitle': 'Vui lòng chọn ngôn ngữ để tiếp tục',
   'settings': 'Cài đặt',
   'rate_app': 'Đánh giá ứng dụng',
   'share_app': 'Chia sẻ ứng dụng',
@@ -19,4 +20,116 @@ const Map<String, String> vi = {
   'privacy_policy_desc':
       'Chúng tôi tôn trọng quyền riêng tư của bạn. Ứng dụng này tôn trọng và bảo vệ dữ liệu cá nhân của bạn.',
   'close': 'Đóng',
+
+  // Difficulty
+  'easy': 'Dễ',
+  'medium': 'Trung bình',
+  'hard': 'Khó',
+
+  // Home Tab
+  'piano_lessons': 'BÀI HỌC PIANO',
+  'home_banner_sub': 'Học Đàn Piano Dễ Dàng Với 50+ Bài Hát Hot',
+  'start_now': 'BẮT ĐẦU NGAY',
+  'lesson_list': 'Danh Sách Bài Học',
+  'view_all': 'Xem tất cả',
+  'practice_now': 'Chơi',
+  'learn_now': 'Học ngay',
+
+  // Lessons & Search
+  'all_lessons': 'Tất Cả Bài Học',
+  'search_song_hint': 'Tìm kiếm bài hát...',
+  'all': 'Tất cả',
+  'completed': 'Đã hoàn thành',
+  'not_learned': 'Chưa học',
+  'no_songs_found': 'Không tìm thấy bài hát',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Thoát Bài Học',
+  'quit_lesson_msg': 'Nếu thoát bây giờ, tiến trình bài học của bạn sẽ bị mất.\nBạn có chắc muốn thoát không?',
+  'quit': 'Thoát',
+  'stay': 'Ở lại',
+  'auto_guide': 'Tự động hướng dẫn',
+  'speed': 'Tốc độ',
+  'playback_speed': 'Tốc độ phát',
+  'slow': 'Chậm',
+  'normal': 'Bình thường',
+  'fast': 'Nhanh',
+  'saved_recording': 'Đã lưu bản thu:',
+  'mic_permission_required': 'Cần cấp quyền Micro',
+
+  // Lesson Result
+  'lesson_completed': 'Hoàn Thành Bài Học!',
+  'accuracy': 'Độ chính xác',
+  'total_notes': 'Tổng số nốt',
+  'perfect_master': '5 Sao',
+  'replay': 'Chơi lại',
+  'next_lesson': 'Bài tiếp theo',
+
+  // My Songs Tab
+  'my_song_collection': 'Bộ Sưu Tập Bài Hát Đã Đánh',
+  'learned_count': 'Đã học:',
+  'stars_count': '5 Sao:',
+  'completed_list': 'Danh Sách Đã Hoàn Thành',
+  'refresh': 'Làm mới',
+  'no_completed_songs': 'Chưa có bài hát luyện tập nào',
+  'no_completed_songs_sub': 'Hãy chọn bài học bất kỳ ở màn Home và hoàn thành bài chơi để lưu lịch sử vào đây nhé!',
+  'explore_songs_now': 'Khám Phá Bài Hát Ngay',
+  'acc': 'ACC',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Piano Cổ Điển',
+  'electric_organ': 'Đàn Organ Điện',
+  'rhodes_piano': 'Piano Rhodes',
+  'synth_keyboard': 'Bàn Phím Synth',
+  'free_play_title': 'Mở Bàn Phím Free Play',
+  'key_labels': 'Nhãn phím',
+  'instrument': 'Nhạc cụ',
+  'record': 'Thu âm',
+  'stop': 'Dừng',
+
+  // Themes
+  'piano_keyboard_themes': 'Bộ Bàn Phím Piano',
+  'apply': 'Áp dụng',
+  'applied': 'Đã áp dụng',
+  'preview': 'Dùng thử',
+  'explore_more_themes': 'Khám phá thêm chủ đề',
+  'applied_theme': 'Đã áp dụng chủ đề:',
+  'play_piano': 'Chơi Piano',
+
+  // Recordings
+  'my_recordings': 'Bản Thu Của Tôi',
+  'rename_rec': 'Đổi tên bản thu',
+  'delete_rec': 'Xóa bản thu',
+  'delete_rec_confirm': 'Bạn có chắc chắn muốn xóa bản thu này?',
+  'no_recordings_yet': 'Chưa có bản thu nào',
+  'no_recordings_sub': 'Hãy nhấn nút Thu âm khi chơi Piano để lưu lại tác phẩm của bạn!',
+  'cancel': 'Hủy',
+  'delete': 'Xóa',
+  'save': 'Lưu',
+  'enter_rec_title': 'Nhập tên bản thu...',
+
+  // Settings & Dialogs
+  'contact_support': 'Liên hệ hỗ trợ',
+  'restore_purchase': 'Khôi phục mua hàng',
+  'rate_thank_you': 'Cảm ơn bạn đã đánh giá!',
+  'quit_app': 'Thoát Ứng Dụng',
+  'quit_app_msg': 'Bạn có chắc muốn thoát không?',
+  'discard': 'Hủy bỏ',
+  'save_recording': 'Lưu Bản Thu',
+
+  // Onboard & Premium
+  'next': 'Tiếp theo',
+  'get_started': 'Bắt đầu',
+  'onboard_title_1': 'Giáo viên Piano AI của bạn',
+  'onboard_desc_1': 'Lộ trình học cá nhân hóa phù hợp với tốc độ của bạn.',
+  'onboard_title_2': 'Học qua trải nghiệm thực tế',
+  'onboard_desc_2': 'Luyện tập cùng hàng trăm bài hát tương tác và bài tập thú vị mỗi ngày.',
+  'onboard_title_3': 'Chủ đề bàn phím đa dạng',
+  'onboard_desc_3': 'Tự do lựa chọn phong cách cá nhân với các giao diện truyền cảm hứng.',
+  'onboard_title_4': 'Khai phá hành trình âm nhạc',
+  'onboard_desc_4': 'Bắt đầu bài học đầu tiên ngay hôm nay và tự tin làm chủ cây đàn piano.',
+  'unlock_all_features': 'Mở khóa tất cả tính năng',
+  'remove_ads': 'Xóa quảng cáo',
+  'subscribe_now': 'Đăng ký ngay',
+  'terms_of_use': 'Điều khoản sử dụng',
 };

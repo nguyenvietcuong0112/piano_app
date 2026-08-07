@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
+import 'easy_loading_ad.dart';
 
 class EasyNativeAd extends StatefulWidget {
   final AdNetwork adNetwork;
@@ -29,30 +30,48 @@ class EasyNativeAd extends StatefulWidget {
 }
 
 class _EasyNativeAdState extends State<EasyNativeAd> {
-  late final EasyAdBase? _nativeAd = EasyAds.instance.createNative(
-    adNetwork: widget.adNetwork,
-    factoryId: widget.factoryId,
-    adId: widget.adId,
-    adIdName: widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? null : widget.adId),
-    height: widget.height,
-  );
+  late final String _cacheKey =
+      widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? widget.adId : widget.adId);
+  EasyAdBase? _nativeAd;
   StreamSubscription? _streamSubscription;
 
   @override
-  Widget build(BuildContext context) => _nativeAd?.show() ?? const SizedBox();
-
-  @override
   void initState() {
-    _nativeAd?.load();
+    super.initState();
+    _nativeAd = EasyAds.instance.getCachedNativeAd(_cacheKey);
+
+    if (_nativeAd == null || _nativeAd!.isAdLoadedFailed) {
+      EasyAds.instance.preloadNativeAd(
+        adId: widget.adId,
+        adIdName: widget.adIdName,
+        factoryId: widget.factoryId,
+        height: widget.height,
+        cacheKey: _cacheKey,
+        adNetwork: widget.adNetwork,
+      );
+      _nativeAd = EasyAds.instance.getCachedNativeAd(_cacheKey);
+    }
+
     _streamSubscription = EasyAds.instance.onEvent.listen((event) {
-      if (event.adUnitType == AdUnitType.native) {
-        // Fire callbacks for native ad lifecycle
+      final resolvedId = EasyAds.instance.resolveAdUnitId(widget.adId);
+      if (event.adUnitType == AdUnitType.native &&
+          (event.adUnitId == widget.adId || event.adUnitId == resolvedId)) {
         switch (event.type) {
           case AdEventType.adLoaded:
             widget.onLoaded?.call();
+            if (mounted) {
+              setState(() {
+                _nativeAd = EasyAds.instance.getCachedNativeAd(_cacheKey);
+              });
+            }
             break;
           case AdEventType.adFailedToLoad:
             widget.onFailedToLoad?.call();
+            if (mounted) {
+              setState(() {
+                _nativeAd = EasyAds.instance.getCachedNativeAd(_cacheKey);
+              });
+            }
             break;
           case AdEventType.onAdImpression:
             widget.onImpression?.call();
@@ -60,15 +79,24 @@ class _EasyNativeAdState extends State<EasyNativeAd> {
           default:
             break;
         }
-        if (mounted) setState(() {});
       }
     });
-    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ad = _nativeAd ?? EasyAds.instance.getCachedNativeAd(_cacheKey);
+    if (ad == null || ad.isAdLoading) {
+      return EasyLoadingAd(height: widget.height);
+    }
+    if (ad.isAdLoadedFailed) {
+      return const SizedBox();
+    }
+    return ad.show() ?? const SizedBox();
   }
 
   @override
   void dispose() {
-    _nativeAd?.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }

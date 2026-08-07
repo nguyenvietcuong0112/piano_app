@@ -1,6 +1,7 @@
 const Map<String, String> es = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Idioma',
+  'select_language_subtitle': 'Por favor, selecciona un idioma para continuar',
   'settings': 'Ajustes',
   'rate_app': 'Calificar aplicación',
   'share_app': 'Compartir aplicación',
@@ -16,6 +17,119 @@ const Map<String, String> es = {
   'later': 'Más tarde',
   'submit': 'Enviar',
   'sharing': 'Compartiendo app de piano...',
-  'privacy_policy_desc': 'Respetamos su privacidad.',
+  'privacy_policy_desc':
+      'Valoramos tu privacidad. Esta aplicación respeta y protege tus datos personales.',
   'close': 'Cerrar',
+
+  // Difficulty
+  'easy': 'Fácil',
+  'medium': 'Medio',
+  'hard': 'Difícil',
+
+  // Home Tab
+  'piano_lessons': 'LECCIONES DE PIANO',
+  'home_banner_sub': 'Aprende piano fácilmente con más de 50 canciones populares',
+  'start_now': 'EMPEZAR AHORA',
+  'lesson_list': 'Lista de lecciones',
+  'view_all': 'Ver todo',
+  'practice_now': 'Jugar',
+  'learn_now': 'Aprender',
+
+  // Lessons & Search
+  'all_lessons': 'Todas las lecciones',
+  'search_song_hint': 'Buscar canción...',
+  'all': 'Todo',
+  'completed': 'Completado',
+  'not_learned': 'No aprendido',
+  'no_songs_found': 'No se encontraron canciones',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Salir de la lección',
+  'quit_lesson_msg': 'Si sales ahora, perderás tu progreso actual.\n¿Estás seguro de que deseas salir?',
+  'quit': 'Salir',
+  'stay': 'Permanecer',
+  'auto_guide': 'Guía automática',
+  'speed': 'Velocidad',
+  'playback_speed': 'Velocidad de reproducción',
+  'slow': 'Lento',
+  'normal': 'Normal',
+  'fast': 'Rápido',
+  'saved_recording': 'Grabación guardada:',
+  'mic_permission_required': 'Se requiere permiso de micrófono',
+
+  // Lesson Result
+  'lesson_completed': '¡Lección completada!',
+  'accuracy': 'Precisión',
+  'total_notes': 'Notas totales',
+  'perfect_master': '5 Estrellas',
+  'replay': 'Repetir',
+  'next_lesson': 'Siguiente lección',
+
+  // My Songs Tab
+  'my_song_collection': 'Colección de canciones',
+  'learned_count': 'Aprendidas:',
+  'stars_count': '5 Estrellas:',
+  'completed_list': 'Lista de completadas',
+  'refresh': 'Actualizar',
+  'no_completed_songs': 'Aún no hay canciones practicadas',
+  'no_completed_songs_sub': '¡Elige cualquier lección en Inicio para practicar!',
+  'explore_songs_now': 'Explorar canciones',
+  'acc': 'PREC',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Piano acústico',
+  'electric_organ': 'Órgano eléctrico',
+  'rhodes_piano': 'Piano Rhodes',
+  'synth_keyboard': 'Teclado sintético',
+  'free_play_title': 'Abrir teclado libre',
+  'key_labels': 'Etiquetas de teclas',
+  'instrument': 'Instrumento',
+  'record': 'Grabar',
+  'stop': 'Detener',
+
+  // Themes
+  'piano_keyboard_themes': 'Temas de teclado de piano',
+  'apply': 'Aplicar',
+  'applied': 'Aplicado',
+  'preview': 'Vista previa',
+  'explore_more_themes': 'Explorar más temas',
+  'applied_theme': 'Tema aplicado:',
+  'play_piano': 'Tocar piano',
+
+  // Recordings
+  'my_recordings': 'Mis grabaciones',
+  'rename_rec': 'Renombrar grabación',
+  'delete_rec': 'Eliminar grabación',
+  'delete_rec_confirm': '¿Estás seguro de que deseas eliminar esta grabación?',
+  'no_recordings_yet': 'Aún no hay grabaciones',
+  'no_recordings_sub': '¡Presiona Grabar mientras tocas el piano para guardar tus creaciones!',
+  'cancel': 'Cancelar',
+  'delete': 'Eliminar',
+  'save': 'Guardar',
+  'enter_rec_title': 'Introduce un título...',
+
+  // Settings & Dialogs
+  'contact_support': 'Soporte de contacto',
+  'restore_purchase': 'Restaurar compra',
+  'rate_thank_you': '¡Gracias por calificarnos!',
+  'quit_app': 'Salir de la aplicación',
+  'quit_app_msg': '¿Estás seguro de que deseas salir?',
+  'discard': 'Descartar',
+  'save_recording': 'Guardar grabación',
+
+  // Onboard & Premium
+  'next': 'Siguiente',
+  'get_started': 'Empezar',
+  'onboard_title_1': 'Tu Profesor de Piano con IA',
+  'onboard_desc_1': 'Lecciones personalizadas que se adaptan a tu ritmo de aprendizaje.',
+  'onboard_title_2': 'Aprende Jugando',
+  'onboard_desc_2': 'Practica con canciones interactivas y divertidos ejercicios todos los días.',
+  'onboard_title_3': 'Variados Temas de Piano',
+  'onboard_desc_3': 'Elige tu estilo. Toca con el tema que más te inspire.',
+  'onboard_title_4': 'Desbloquea tu Viaje Musical',
+  'onboard_desc_4': 'Comienza tu primera lección hoy y disfruta tocando el piano con confianza.',
+  'unlock_all_features': 'Desbloquear todas las funciones',
+  'remove_ads': 'Eliminar anuncios',
+  'subscribe_now': 'Suscribirse ahora',
+  'terms_of_use': 'Términos de uso',
 };

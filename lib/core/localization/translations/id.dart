@@ -1,6 +1,7 @@
 const Map<String, String> id = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Bahasa',
+  'select_language_subtitle': 'Silakan pilih bahasa untuk melanjutkan',
   'settings': 'Pengaturan',
   'rate_app': 'Beri nilai aplikasi',
   'share_app': 'Bagikan aplikasi',
@@ -12,10 +13,123 @@ const Map<String, String> id = {
   'my_songs': 'Lagu Saya',
   'recordings': 'Rekaman',
   'rate_dialog_title': 'Beri Nilai Aplikasi',
-  'rate_dialog_desc': 'Apakah Anda menyukai aplikasi kami? Beri kami 5 bintang!',
+  'rate_dialog_desc': 'Apakah Anda menyukai aplikasi kami? Beri kami bintang 5!',
   'later': 'Nanti',
   'submit': 'Kirim',
-  'sharing': 'Membagikan aplikasi...',
-  'privacy_policy_desc': 'Kami menghargai privasi Anda.',
+  'sharing': 'Membagikan Aplikasi Piano...',
+  'privacy_policy_desc':
+      'Kami menghargai privasi Anda. Aplikasi ini melindungi data pribadi Anda.',
   'close': 'Tutup',
+
+  // Difficulty
+  'easy': 'Mudah',
+  'medium': 'Sedang',
+  'hard': 'Sulit',
+
+  // Home Tab
+  'piano_lessons': 'PELAJARAN PIANO',
+  'home_banner_sub': 'Belajar piano dengan mudah dengan 50+ lagu populer',
+  'start_now': 'MULAI SEKARANG',
+  'lesson_list': 'Daftar Pelajaran',
+  'view_all': 'Lihat Semua',
+  'practice_now': 'Mainkan',
+  'learn_now': 'Belajar',
+
+  // Lessons & Search
+  'all_lessons': 'Semua Pelajaran',
+  'search_song_hint': 'Cari lagu...',
+  'all': 'Semua',
+  'completed': 'Selesai',
+  'not_learned': 'Belum dipelajari',
+  'no_songs_found': 'Lagu tidak ditemukan',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Keluar dari Pelajaran',
+  'quit_lesson_msg': 'Jika keluar sekarang, kemajuan pelajaran Anda akan hilang.\nYakin ingin keluar?',
+  'quit': 'Keluar',
+  'stay': 'Batal',
+  'auto_guide': 'Panduan Otomatis',
+  'speed': 'Kecepatan',
+  'playback_speed': 'Kecepatan Putar',
+  'slow': 'Lambat',
+  'normal': 'Normal',
+  'fast': 'Cepat',
+  'saved_recording': 'Rekaman tersimpan:',
+  'mic_permission_required': 'Izin mikrofon diperlukan',
+
+  // Lesson Result
+  'lesson_completed': 'Pelajaran Selesai!',
+  'accuracy': 'Akurasi',
+  'total_notes': 'Total Nada',
+  'perfect_master': '5 Bintang',
+  'replay': 'Main Lagi',
+  'next_lesson': 'Pelajaran Berikutnya',
+
+  // My Songs Tab
+  'my_song_collection': 'Koleksi Lagu Saya',
+  'learned_count': 'Dipelajari:',
+  'stars_count': '5 Bintang:',
+  'completed_list': 'Daftar Selesai',
+  'refresh': 'Segarkan',
+  'no_completed_songs': 'Belum ada lagu yang dilatih',
+  'no_completed_songs_sub': 'Pilih pelajaran di Beranda untuk mulai berlatih!',
+  'explore_songs_now': 'Jelajahi Lagu Sekarang',
+  'acc': 'AKU',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Piano Akustik',
+  'electric_organ': 'Organ Listrik',
+  'rhodes_piano': 'Piano Rhodes',
+  'synth_keyboard': 'Keyboard Synth',
+  'free_play_title': 'Buka Keyboard Bebas',
+  'key_labels': 'Label Tombol',
+  'instrument': 'Instrumen',
+  'record': 'Rekam',
+  'stop': 'Berhenti',
+
+  // Themes
+  'piano_keyboard_themes': 'Tema Keyboard Piano',
+  'apply': 'Terapkan',
+  'applied': 'Diterapkan',
+  'preview': 'Pratinjau',
+  'explore_more_themes': 'Jelajahi Lebih Banyak Tema',
+  'applied_theme': 'Tema Diterapkan:',
+  'play_piano': 'Main Piano',
+
+  // Recordings
+  'my_recordings': 'Rekaman Saya',
+  'rename_rec': 'Ubah Nama Rekaman',
+  'delete_rec': 'Hapus Rekaman',
+  'delete_rec_confirm': 'Apakah Anda yakin ingin menghapus rekaman ini?',
+  'no_recordings_yet': 'Belum ada rekaman',
+  'no_recordings_sub': 'Tekan Rekam saat bermain piano untuk menyimpan karya Anda!',
+  'cancel': 'Batal',
+  'delete': 'Hapus',
+  'save': 'Simpan',
+  'enter_rec_title': 'Masukkan judul...',
+
+  // Settings & Dialogs
+  'contact_support': 'Hubungi Dukungan',
+  'restore_purchase': 'Pulihkan Pembelian',
+  'rate_thank_you': 'Terima kasih telah memberi kami penilaian!',
+  'quit_app': 'Keluar dari Aplikasi',
+  'quit_app_msg': 'Apakah Anda yakin ingin keluar?',
+  'discard': 'Buang',
+  'save_recording': 'Simpan Rekaman',
+
+  // Onboard & Premium
+  'next': 'Lanjut',
+  'get_started': 'Mulai',
+  'onboard_title_1': 'Guru Piano AI Anda',
+  'onboard_desc_1': 'Pelajaran tersuai yang menyesuaikan dengan kecepatan belajar Anda.',
+  'onboard_title_2': 'Belajar Sambil Bermain',
+  'onboard_desc_2': 'Berlatih dengan lagu-lagu interaktif dan latihan seru setiap hari.',
+  'onboard_title_3': 'Banyak Tema Piano',
+  'onboard_desc_3': 'Pilih gaya Anda. Mainkan dengan tema yang menginspirasi Anda.',
+  'onboard_title_4': 'Buka Perjalanan Musik Anda',
+  'onboard_desc_4': 'Mulai pelajaran pertama Anda hari ini dan nikmati bermain piano dengan percaya diri.',
+  'unlock_all_features': 'Buka Semua Fitur',
+  'remove_ads': 'Hapus Iklan',
+  'subscribe_now': 'Berlangganan Sekarang',
+  'terms_of_use': 'Syarat Penggunaan',
 };

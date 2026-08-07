@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:background="#FAFAFA"
+        android:background="#06060E"
         android:scrollbars="none">
 
         <!-- Ad Badge/Attribution -->
@@ -99,7 +99,7 @@
         <com.pianokeyboard.virtualpiano.learnpiano.ShimmerButton
             android:id="@+id/ad_call_to_action"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="45dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/bg_button_ads"

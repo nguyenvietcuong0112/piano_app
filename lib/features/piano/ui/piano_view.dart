@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/audio_engine.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 class PianoKey {
   final String keyName;
@@ -642,8 +643,7 @@ class PianoPainter extends CustomPainter {
         TextPainter tp = TextPainter(
           text: TextSpan(
             text: displayText,
-            style: const TextStyle(
-              color: Colors.white,
+            style: AppTextStyles.textWhite12.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w800,
             ),
@@ -755,8 +755,7 @@ class PianoPainter extends CustomPainter {
         TextPainter tp = TextPainter(
           text: TextSpan(
             text: cleanLabel,
-            style: const TextStyle(
-              color: Colors.white,
+            style: AppTextStyles.textWhite12.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w900,
             ),

@@ -1,6 +1,7 @@
 const Map<String, String> fr = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'Langue',
+  'select_language_subtitle': 'Veuillez sélectionner une langue pour continuer',
   'settings': 'Paramètres',
   'rate_app': 'Évaluer l\'application',
   'share_app': 'Partager l\'application',
@@ -14,8 +15,121 @@ const Map<String, String> fr = {
   'rate_dialog_title': 'Évaluer l\'application',
   'rate_dialog_desc': 'Aimez-vous notre application ? Notez-nous 5 étoiles !',
   'later': 'Plus tard',
-  'submit': 'Soumettre',
-  'sharing': 'Partage de l\'application...',
-  'privacy_policy_desc': 'Nous respectons votre vie privée.',
+  'submit': 'Envoyer',
+  'sharing': 'Partage de l\'application Piano...',
+  'privacy_policy_desc':
+      'Nous respectons votre vie privée. Cette application protège vos données personnelles.',
   'close': 'Fermer',
+
+  // Difficulty
+  'easy': 'Facile',
+  'medium': 'Moyen',
+  'hard': 'Difficile',
+
+  // Home Tab
+  'piano_lessons': 'COURS DE PIANO',
+  'home_banner_sub': 'Apprenez le piano facilement avec plus de 50 chansons populaires',
+  'start_now': 'COMMENCER',
+  'lesson_list': 'Liste des cours',
+  'view_all': 'Tout voir',
+  'practice_now': 'Jouer',
+  'learn_now': 'Apprendre',
+
+  // Lessons & Search
+  'all_lessons': 'Tous les cours',
+  'search_song_hint': 'Rechercher une chanson...',
+  'all': 'Tout',
+  'completed': 'Terminé',
+  'not_learned': 'Non appris',
+  'no_songs_found': 'Aucune chanson trouvée',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'Quitter la leçon',
+  'quit_lesson_msg': 'Si vous quittez maintenant, votre progression sera perdue.\nÊtes-vous sûr de vouloir quitter ?',
+  'quit': 'Quitter',
+  'stay': 'Rester',
+  'auto_guide': 'Guide automatique',
+  'speed': 'Vitesse',
+  'playback_speed': 'Vitesse de lecture',
+  'slow': 'Lent',
+  'normal': 'Normal',
+  'fast': 'Rapide',
+  'saved_recording': 'Enregistrement sauvegardé :',
+  'mic_permission_required': 'Autorisation du microphone requise',
+
+  // Lesson Result
+  'lesson_completed': 'Leçon terminée !',
+  'accuracy': 'Précision',
+  'total_notes': 'Notes totales',
+  'perfect_master': '5 Étoiles',
+  'replay': 'Rejouer',
+  'next_lesson': 'Leçon suivante',
+
+  // My Songs Tab
+  'my_song_collection': 'Ma collection de chansons',
+  'learned_count': 'Apprises :',
+  'stars_count': '5 Étoiles :',
+  'completed_list': 'Liste des morceaux terminés',
+  'refresh': 'Actualiser',
+  'no_completed_songs': 'Aucune chanson pratiquée pour le moment',
+  'no_completed_songs_sub': 'Choisissez une leçon dans l\'accueil pour pratiquer !',
+  'explore_songs_now': 'Explorer les chansons',
+  'acc': 'PRÉC',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'Piano acoustique',
+  'electric_organ': 'Orgue électrique',
+  'rhodes_piano': 'Piano Rhodes',
+  'synth_keyboard': 'Clavier synthétiseur',
+  'free_play_title': 'Ouvrir le clavier libre',
+  'key_labels': 'Étiquettes des touches',
+  'instrument': 'Instrument',
+  'record': 'Enregistrer',
+  'stop': 'Arrêter',
+
+  // Themes
+  'piano_keyboard_themes': 'Thèmes de clavier de piano',
+  'apply': 'Appliquer',
+  'applied': 'Appliqué',
+  'preview': 'Aperçu',
+  'explore_more_themes': 'Explorer plus de thèmes',
+  'applied_theme': 'Thème appliqué :',
+  'play_piano': 'Jouer du piano',
+
+  // Recordings
+  'my_recordings': 'Mes enregistrements',
+  'rename_rec': 'Renommer l\'enregistrement',
+  'delete_rec': 'Supprimer l\'enregistrement',
+  'delete_rec_confirm': 'Êtes-vous sûr de vouloir supprimer cet enregistrement ?',
+  'no_recordings_yet': 'Aucun enregistrement pour le moment',
+  'no_recordings_sub': 'Appuyez sur Enregistrer pendant que vous jouez du piano pour sauvegarder vos créations !',
+  'cancel': 'Annuler',
+  'delete': 'Supprimer',
+  'save': 'Sauvegarder',
+  'enter_rec_title': 'Entrez un titre...',
+
+  // Settings & Dialogs
+  'contact_support': 'Contacter le support',
+  'restore_purchase': 'Restaurer l\'achat',
+  'rate_thank_you': 'Merci de nous avoir notés !',
+  'quit_app': 'Quitter l\'application',
+  'quit_app_msg': 'Êtes-vous sûr de vouloir quitter ?',
+  'discard': 'Abandonner',
+  'save_recording': 'Sauvegarder l\'enregistrement',
+
+  // Onboard & Premium
+  'next': 'Suivant',
+  'get_started': 'Commencer',
+  'onboard_title_1': 'Votre Professeur de Piano IA',
+  'onboard_desc_1': 'Des leçons personnalisées qui s\'adaptent à votre rythme d\'apprentissage.',
+  'onboard_title_2': 'Apprenez en Jouant',
+  'onboard_desc_2': 'Entraînez-vous avec des chansons interactives et des exercices amusants chaque jour.',
+  'onboard_title_3': 'Nombreux Thèmes de Piano',
+  'onboard_desc_3': 'Choisissez votre style. Jouez avec le thème qui vous inspire.',
+  'onboard_title_4': 'Libérez Votre Parcours Musical',
+  'onboard_desc_4': 'Commencez votre première leçon aujourd\'hui et jouez du piano en toute confiance.',
+  'unlock_all_features': 'Débloquer toutes les fonctionnalités',
+  'remove_ads': 'Supprimer les publicités',
+  'subscribe_now': 'S\'abonner maintenant',
+  'terms_of_use': 'Conditions d\'utilisation',
 };

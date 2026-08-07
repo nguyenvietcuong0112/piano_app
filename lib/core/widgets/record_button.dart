@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import '../theme/app_text_styles.dart';
 import 'gradient_border_card.dart';
 
 class RecordButton extends StatefulWidget {
@@ -157,9 +158,8 @@ class _RecordButtonState extends State<RecordButton>
             // Label Text (Shows active timer when recording, 'REC' when standby)
             Text(
               widget.isRecording ? _formattedTime : "REC",
-              style: TextStyle(
+              style: AppTextStyles.textWhite12.copyWith(
                 color: widget.isRecording ? Colors.white : Colors.white70,
-                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),

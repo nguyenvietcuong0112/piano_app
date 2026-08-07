@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -50,15 +51,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         ),
                         child: Image.asset(
                           'assets/images/img_acoustic_piano.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: const Color(0xFF231138),
-                            child: Icon(
-                              Icons.piano_rounded,
-                              size: 100.sp,
-                              color: AppColors.brandPurple,
-                            ),
-                          ),
+                          fit: BoxFit.contain,
                         ),
                       ),
 
@@ -66,7 +59,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       Positioned(
                         bottom: 10.h,
                         child: Text(
-                          "Learn Piano",
+                          context.tr('app_title'),
                           style: AppTextStyles.textWhite22.copyWith(
                             fontSize: 28.sp,
                             fontWeight: FontWeight.w900,
@@ -85,17 +78,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildFeatureItem("🚫", "No Ads"),
+                        _buildFeatureItem("🚫", context.tr('remove_ads')),
                         SizedBox(height: 10.h),
-                        _buildFeatureItem("🎵", "Unlock all Songs"),
+                        _buildFeatureItem("🎵", context.tr('my_song_collection')),
                         SizedBox(height: 10.h),
-                        _buildFeatureItem("🎨", "Unlock all Piano Themes"),
+                        _buildFeatureItem("🎨", context.tr('piano_keyboard_themes')),
                         SizedBox(height: 10.h),
-                        _buildFeatureItem("🎹", "Unlock Premium Instruments"),
+                        _buildFeatureItem("🎹", context.tr('piano')),
                         SizedBox(height: 10.h),
-                        _buildFeatureItem("🎙️", "Keyboard Recording"),
+                        _buildFeatureItem("🎙️", context.tr('recordings')),
                         SizedBox(height: 10.h),
-                        _buildFeatureItem("⭐", "Premium Features"),
+                        _buildFeatureItem("⭐", context.tr('unlock_all_features')),
                       ],
                     ),
                   ),
@@ -139,32 +132,24 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 18.h),
+                  SizedBox(height: 24.h),
 
-                  // 4. Continue CTA Button
+                  // 4. CTA Subscribe Button
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: GestureDetector(
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: const Color(0xFF7E26D4),
-                            content: Text(
-                              "🎉 Bạn đã đăng ký thành công gói ${_selectedPackage.toUpperCase()} PRO!",
-                              style: AppTextStyles.textWhite14,
-                            ),
-                          ),
-                        );
                         context.pop();
                       },
                       child: Container(
-                        width: double.infinity,
                         height: 52.h,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30.r),
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFB158F0), Color(0xFF7E26D4)],
+                            colors: [Color(0xFFCF6BEE), Color(0xFF9C27B0)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
+                          borderRadius: BorderRadius.circular(26.r),
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0xFFB158F0).withValues(alpha: 0.4),
@@ -175,7 +160,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         ),
                         child: Center(
                           child: Text(
-                            "Continue",
+                            context.tr('subscribe_now'),
                             style: AppTextStyles.textWhite16.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -193,11 +178,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildFooterLink("Restore Purchase"),
+                        _buildFooterLink(context.tr('restore_purchase')),
                         Text("|", style: AppTextStyles.textGrey12),
-                        _buildFooterLink("Privacy Policy"),
+                        _buildFooterLink(context.tr('policy')),
                         Text("|", style: AppTextStyles.textGrey12),
-                        _buildFooterLink("Terms of Use"),
+                        _buildFooterLink(context.tr('terms_of_use')),
                       ],
                     ),
                   ),
@@ -242,7 +227,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           width: 24.w,
           child: Text(
             iconText,
-            style: TextStyle(fontSize: 15.sp),
+            style: AppTextStyles.textWhite14.copyWith(fontSize: 15.sp),
           ),
         ),
         SizedBox(width: 8.w),

@@ -53,8 +53,7 @@ class SettingsScreen extends StatelessWidget {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
             title: Text(
               context.tr('rate_dialog_title'),
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+              style: AppTextStyles.textWhite18,
               textAlign: TextAlign.center,
             ),
             content: Column(
@@ -62,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(
                   context.tr('rate_dialog_desc'),
-                  style: const TextStyle(color: Colors.white70),
+                  style: AppTextStyles.textGrey14,
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16.h),
@@ -96,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
                 child: Text(context.tr('later'),
-                    style: const TextStyle(color: Colors.white54)),
+                    style: AppTextStyles.textGrey14),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -113,14 +112,14 @@ class SettingsScreen extends StatelessWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Thank you for rating us $selectedRating stars!'),
+                        content: Text(context.tr('rate_thank_you')),
                         duration: const Duration(seconds: 2),
                       ),
                     );
                   }
                 },
                 child: Text(context.tr('submit'),
-                    style: const TextStyle(color: Colors.white)),
+                    style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -263,22 +262,14 @@ class SettingsScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.textWhite16.copyWith(fontSize: 15.sp),
                   ),
                 ),
                 // Optional Trailing Text (e.g., Version)
                 if (trailingText != null)
                   Text(
                     trailingText,
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: AppTextStyles.textGrey14.copyWith(fontSize: 14.sp),
                   ),
               ],
             ),

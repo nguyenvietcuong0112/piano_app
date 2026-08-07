@@ -1,6 +1,7 @@
 const Map<String, String> hi = {
-  'app_title': 'Real Piano',
+  'app_title': 'Learn Piano',
   'language': 'भाषा',
+  'select_language_subtitle': 'जारी रखने के लिए कृपया एक भाषा चुनें',
   'settings': 'सेटिंग्स',
   'rate_app': 'ऐप को रेट करें',
   'share_app': 'ऐप शेयर करें',
@@ -12,10 +13,123 @@ const Map<String, String> hi = {
   'my_songs': 'मेरे गाने',
   'recordings': 'रिकॉर्डिंग',
   'rate_dialog_title': 'ऐप को रेट करें',
-  'rate_dialog_desc': 'क्या आपको हमारा ऐप पसंद आया? कृपया हमें 5 सितारे दें!',
+  'rate_dialog_desc': 'क्या आपको हमारा ऐप पसंद आया? कृपया हमें 5 स्टार दें!',
   'later': 'बाद में',
-  'submit': 'सबमिट करें',
-  'sharing': 'ऐप शेयर किया जा रहा है...',
-  'privacy_policy_desc': 'हम आपकी गोपनीयता का सम्मान करते हैं।',
+  'submit': 'जमा करें',
+  'sharing': 'पियानो ऐप शेयर किया जा रहा है...',
+  'privacy_policy_desc':
+      'हम आपकी गोपनीयता का सम्मान करते हैं। यह ऐप आपके व्यक्तिगत डेटा की सुरक्षा करता है।',
   'close': 'बंद करें',
+
+  // Difficulty
+  'easy': 'आसान',
+  'medium': 'मध्यम',
+  'hard': 'कठिन',
+
+  // Home Tab
+  'piano_lessons': 'पियानो पाठ',
+  'home_banner_sub': '50+ लोकप्रिय गानों के साथ आसानी से पियानो सीखें',
+  'start_now': 'अभी शुरू करें',
+  'lesson_list': 'पाठों की सूची',
+  'view_all': 'सभी देखें',
+  'practice_now': 'बजाएं',
+  'learn_now': 'सीखें',
+
+  // Lessons & Search
+  'all_lessons': 'सभी पाठ',
+  'search_song_hint': 'गाना खोजें...',
+  'all': 'सभी',
+  'completed': 'पूरा हुआ',
+  'not_learned': 'नहीं सीखा',
+  'no_songs_found': 'कोई गाना नहीं मिला',
+
+  // Lesson Play & Dialogs
+  'quit_lesson_title': 'पाठ छोड़ें',
+  'quit_lesson_msg': 'यदि आप अभी छोड़ते हैं, तो आपकी प्रगति खो जाएगी।\nक्या आप वाकई छोड़ना चाहते हैं?',
+  'quit': 'छोड़ें',
+  'stay': 'रहें',
+  'auto_guide': 'ऑटो गाइड',
+  'speed': 'गति',
+  'playback_speed': 'प्लेबैक गति',
+  'slow': 'धीमा',
+  'normal': 'सामान्य',
+  'fast': 'तेज़',
+  'saved_recording': 'रिकॉर्डिंग सहेजी गई:',
+  'mic_permission_required': 'माइक्रोफ़ोन अनुमति आवश्यक है',
+
+  // Lesson Result
+  'lesson_completed': 'पाठ पूरा हुआ!',
+  'accuracy': 'सटीकता',
+  'total_notes': 'कुल नोट्स',
+  'perfect_master': '5 स्टार',
+  'replay': 'पुनः चलाएं',
+  'next_lesson': 'अगला पाठ',
+
+  // My Songs Tab
+  'my_song_collection': 'गानों का संग्रह',
+  'learned_count': 'सीखे गए:',
+  'stars_count': '5 स्टार:',
+  'completed_list': 'पूरे किए गए गानों की सूची',
+  'refresh': 'रिफ्रेश करें',
+  'no_completed_songs': 'अभी तक कोई अभ्यास किया गया गाना नहीं है',
+  'no_completed_songs_sub': 'अभ्यास शुरू करने के लिए होम से कोई भी पाठ चुनें!',
+  'explore_songs_now': 'गाने खोजें',
+  'acc': 'सटीक',
+
+  // Piano Tab & Free Play
+  'acoustic_piano': 'ध्वनिक पियानो',
+  'electric_organ': 'इलेक्ट्रिक ऑर्गन',
+  'rhodes_piano': 'रोड्स पियानो',
+  'synth_keyboard': 'सिंथ कीबोर्ड',
+  'free_play_title': 'फ्री प्ले कीबोर्ड खोलें',
+  'key_labels': 'कुंजी लेबल',
+  'instrument': 'वाद्य यंत्र',
+  'record': 'रिकॉर्ड',
+  'stop': 'रोकें',
+
+  // Themes
+  'piano_keyboard_themes': 'पियानो कीबोर्ड थीम्स',
+  'apply': 'लागू करें',
+  'applied': 'लागू किया गया',
+  'preview': 'पूर्वावलोकन',
+  'explore_more_themes': 'और थीम्स खोजें',
+  'applied_theme': 'लागू की गई थीम:',
+  'play_piano': 'पियानो बजाएं',
+
+  // Recordings
+  'my_recordings': 'मेरी रिकॉर्डिंग',
+  'rename_rec': 'रिकॉर्डिंग का नाम बदलें',
+  'delete_rec': 'रिकॉर्डिंग हटाएं',
+  'delete_rec_confirm': 'क्या आप वाकई इस रिकॉर्डिंग को हटाना चाहते हैं?',
+  'no_recordings_yet': 'अभी कोई रिकॉर्डिंग नहीं है',
+  'no_recordings_sub': 'अपनी कृतियों को सहेजने के लिए पियानो बजाते समय रिकॉर्ड दबाएं!',
+  'cancel': 'रद्द करें',
+  'delete': 'हटाएं',
+  'save': 'सहेजें',
+  'enter_rec_title': 'शीर्षक दर्ज करें...',
+
+  // Settings & Dialogs
+  'contact_support': 'सहायता से संपर्क करें',
+  'restore_purchase': 'खरीद पुनर्स्थापित करें',
+  'rate_thank_you': 'हमें रेटिंग देने के लिए धन्यवाद!',
+  'quit_app': 'ऐप से बाहर निकलें',
+  'quit_app_msg': 'क्या आप वाकई बाहर निकलना चाहते हैं?',
+  'discard': 'अस्वीकार करें',
+  'save_recording': 'रिकॉर्डिंग सहेजें',
+
+  // Onboard & Premium
+  'next': 'आगे',
+  'get_started': 'शुरू करें',
+  'onboard_title_1': 'आपका AI पियानो शिक्षक',
+  'onboard_desc_1': 'व्यक्तिगत पाठ जो आपकी सीखने की गति के अनुकूल होते हैं।',
+  'onboard_title_2': 'खेलते-खेलते सीखें',
+  'onboard_desc_2': 'हर दिन इंटरैक्टिव गानों और मजेदार अभ्यासों के साथ अभ्यास करें।',
+  'onboard_title_3': 'विभिन्न पियानो थीम्स',
+  'onboard_desc_3': 'अपनी शैली चुनें। उस थीम में बजाएं जो आपको प्रेरित करती है।',
+  'onboard_title_4': 'अपनी संगीतमय यात्रा शुरू करें',
+  'onboard_desc_4': 'आज ही अपना पहला पाठ शुरू करें और आत्मविश्वास से पियानो बजाएं।',
+  'unlock_all_features': 'सभी सुविधाएं अनलॉक करें',
+  'remove_ads': 'विज्ञापन हटाएं',
+  'subscribe_now': 'अभी सदस्यता लें',
+  'terms_of_use': 'उपयोग की शर्तें',
 };

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/shared_preference_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -56,16 +57,16 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
     }
   }
 
-  String _getDifficultyText(int level) {
+  String _getDifficultyText(BuildContext context, int level) {
     switch (level) {
       case 1:
-        return "Easy";
+        return context.tr('easy');
       case 2:
-        return "Medium";
+        return context.tr('medium');
       case 3:
-        return "Hard";
+        return context.tr('hard');
       default:
-        return "Easy";
+        return context.tr('easy');
     }
   }
 
@@ -130,7 +131,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                 ),
                 SizedBox(width: 14.w),
                 Text(
-                  "Songs",
+                  context.tr('all_lessons'),
                   style: AppTextStyles.textWhite22,
                 ),
               ],
@@ -145,7 +146,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
               children: [
                 // "All song" Pill
                 GradientTabPill(
-                  label: "All song",
+                  label: context.tr('all'),
                   isSelected: _selectedCategoryId == -1,
                   onTap: () {
                     setState(() {
@@ -195,7 +196,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                           ...category.items.map((song) {
                             final songIdStr = song.id.toString();
                             final starCount = _songStarsMap[songIdStr] ?? 0;
-                            final difficulty = _getDifficultyText(song.level);
+                            final difficulty = _getDifficultyText(context, song.level);
                             final diffColor = _getDifficultyColor(song.level);
 
                             return GestureDetector(
@@ -251,21 +252,14 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                         children: [
                                           Text(
                                             song.titleName,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           SizedBox(height: 3.h),
                                           Text(
                                             "${song.authorName} • ${song.duration}",
-                                            style: const TextStyle(
-                                              color: Colors.white54,
-                                              fontSize: 12,
-                                            ),
+                                            style: AppTextStyles.textGrey12,
                                           ),
                                           SizedBox(height: 3.h),
 
@@ -298,7 +292,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                           ),
                                           child: Text(
                                             difficulty,
-                                            style: TextStyle(
+                                            style: AppTextStyles.textWhite12.copyWith(
                                               color: diffColor,
                                               fontSize: 10.sp,
                                               fontWeight: FontWeight.bold,
@@ -330,7 +324,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                               ),
                                               SizedBox(width: 5.w),
                                               Text(
-                                                "Play",
+                                                context.tr('practice_now'),
                                                 style: AppTextStyles.textPurple12,
                                               ),
                                             ],
