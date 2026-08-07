@@ -6,7 +6,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="project_flutter"
+        android:label="Learn Piano: Play Songs"
         android:usesCleartextTraffic="true">
 
         <!-- Sample AdMob App ID for testing -->

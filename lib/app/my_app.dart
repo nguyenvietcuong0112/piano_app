@@ -48,7 +48,7 @@ class _MyAppState extends ConsumerState<MyApp> {
             splitScreenMode: true,
             builder: (context, child) {
               return MaterialApp.router(
-                title: 'Real Piano',
+                title: 'Learn Piano: Play Songs',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.darkTheme,
                 locale: locale,

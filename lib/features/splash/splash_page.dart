@@ -66,7 +66,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        "Piano Lession",
+                        "Learn Piano: Play Songs",
                         style: AppTextStyles.textWhite20,
                       ),
                       const SizedBox(height: 200),
