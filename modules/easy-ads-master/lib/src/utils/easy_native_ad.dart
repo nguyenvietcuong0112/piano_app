@@ -31,7 +31,7 @@ class EasyNativeAd extends StatefulWidget {
 
 class _EasyNativeAdState extends State<EasyNativeAd> {
   late final String _cacheKey =
-      widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? widget.adId : widget.adId);
+      '${widget.adIdName ?? (widget.adId.startsWith('ca-app-pub-') ? widget.adId : widget.adId)}_${identityHashCode(this)}';
   EasyAdBase? _nativeAd;
   StreamSubscription? _streamSubscription;
 
@@ -98,6 +98,7 @@ class _EasyNativeAdState extends State<EasyNativeAd> {
   @override
   void dispose() {
     _streamSubscription?.cancel();
+    EasyAds.instance.disposeCachedNativeAd(_cacheKey);
     super.dispose();
   }
 }

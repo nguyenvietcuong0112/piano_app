@@ -186,7 +186,7 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                 children: [
                   if (!AppConstants.isPremiumUser.value &&
                       FirebaseRemoteConfigService.getBoolConfigByKey(
-                        FirebaseRemoteConfigService.banner_all,
+                        FirebaseRemoteConfigService.native_banner,
                       ))
                     SizedBox(
                       width: double.infinity,

@@ -449,7 +449,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                 children: [
                   if (!AppConstants.isPremiumUser.value &&
                       FirebaseRemoteConfigService.getBoolConfigByKey(
-                        FirebaseRemoteConfigService.banner_all,
+                        FirebaseRemoteConfigService.native_banner,
                       ))
                     SizedBox(
                       width: double.infinity,

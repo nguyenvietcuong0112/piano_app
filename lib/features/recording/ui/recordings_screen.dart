@@ -152,7 +152,7 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
             // Bottom Banner Ad
             if (!AppConstants.isPremiumUser.value &&
                 FirebaseRemoteConfigService.getBoolConfigByKey(
-                  FirebaseRemoteConfigService.banner_all,
+                  FirebaseRemoteConfigService.native_banner,
                 ))
               SizedBox(
                 width: double.infinity,
@@ -243,6 +243,16 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
             Color(0xFF8B56ED),
             Color(0xFF5333A5),
           ],
+        ),
+        borderGradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Color(0xFFCE64F0).withValues(alpha: 0.5),
+            Color(0xFF999999).withValues(alpha: 0.5),
+            Color(0xFFFFFFFF).withValues(alpha: 0.5),
+          ],
+          stops: [0.0, 0.5, 1.0],
         ),
         onTap: () => setState(() => _selectedTabIndex = index),
         child: Padding(

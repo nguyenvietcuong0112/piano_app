@@ -7,7 +7,7 @@ class FirebaseRemoteConfigService {
 
   //ads
   static const String banner_splash = "banner_splash";
-  static const String banner_all = "banner_all";
+  static const String native_banner = "native_banner";
   static const String inter_splash_high = "inter_splash_high";
   static const String inter_splash = "inter_splash";
   static const String native_language = "native_language";
@@ -17,7 +17,6 @@ class FirebaseRemoteConfigService {
   static const String native_onboarding_full_2 = "native_onboarding_full_2";
   static const String native_onboarding_4 = "native_onboarding_4";
 
-  static const String native_banner = "native_banner";
   static const String inter_all = "inter_all";
   static const String interval_inter_ad = "interval_inter_ad";
   static const String native_all = "native_all";
@@ -38,7 +37,7 @@ class FirebaseRemoteConfigService {
       await remoteConfig.setDefaults({
         "show_activity_iap": true,
         "banner_splash": true,
-        "banner_all": true,
+        "native_banner": true,
         "inter_splash_high": true,
         "inter_splash": true,
         "native_language": true,

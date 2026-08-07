@@ -228,7 +228,7 @@ class _DifficultySelectionDialogState
                 },
                 child: Container(
                   width: double.infinity,
-                  height: isLandscape ? 36.h : 44.h,
+                  height: isLandscape ? 50.h : 44.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14.r),
                     gradient: const LinearGradient(
