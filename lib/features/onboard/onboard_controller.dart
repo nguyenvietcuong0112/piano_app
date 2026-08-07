@@ -196,7 +196,7 @@ class OnboardController extends ChangeNotifier {
             _notify();
           });
         }
-      } else if (event.adUnitId == MyAdIdName.nativeOnboard3Ad.getId) {
+      } else if (event.adUnitId == MyAdIdName.nativeOnboard4Ad.getId) {
         if (event.type == AdEventType.adLoaded || event.type == AdEventType.adFailedToLoad) {
           isIntro4AdReady = true;
           _intro4SuccessTimer?.cancel();
@@ -264,8 +264,8 @@ class OnboardController extends ChangeNotifier {
       titleKey: "onboard_title_4",
       descKey: "onboard_desc_4",
       image: "assets/images/onboard4.png",
-      adId: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad.getId : "",
-      adIdName: showAdOnboard4 ? MyAdIdName.nativeOnboard3Ad : null,
+      adId: showAdOnboard4 ? MyAdIdName.nativeOnboard4Ad.getId : "",
+      adIdName: showAdOnboard4 ? MyAdIdName.nativeOnboard4Ad : null,
       factoryId: showAdOnboard4 ? NativeFactoryId.nativeMedia : "",
     ));
 
@@ -312,7 +312,7 @@ class OnboardController extends ChangeNotifier {
     );
 
     if (showAdOnboard4 && !AppConstants.isPremiumUser.value) {
-      final ad = EasyAds.instance.getCachedNativeAd(MyAdIdName.nativeOnboard3Ad);
+      final ad = EasyAds.instance.getCachedNativeAd(MyAdIdName.nativeOnboard4Ad);
       final isLoaded = isIntro4AdReady || (ad != null && ad.isAdLoaded);
 
       if (isLoaded) {

@@ -18,7 +18,11 @@ import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/mini_piano_overview.dart';
 import '../../../core/widgets/record_button.dart';
 import '../../../core/widgets/recording_dialogs.dart';
-import '../state/piano_provider.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../controller/piano_play_controller.dart';
 import 'piano_view.dart';
 
@@ -35,6 +39,8 @@ class PlayPianoScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
+  bool _isExiting = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +62,9 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
   }
 
   Future<void> _exitScreen() async {
+    if (_isExiting) return;
+    _isExiting = true;
+
     final shouldExit = await ExitConfirmationDialog.show(
       context,
       title: context.tr('quit_lesson_title'),
@@ -63,6 +72,9 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
       confirmText: context.tr('quit'),
       cancelText: context.tr('stay'),
     );
+
+    _isExiting = false;
+
     if (shouldExit && mounted) {
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
@@ -147,7 +159,10 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        _exitScreen();
+        final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+        if (isCurrentRoute && !_isExiting) {
+          _exitScreen();
+        }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF101014),
@@ -168,6 +183,14 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
 
               Column(
                 children: [
+                  if (!AppConstants.isPremiumUser.value &&
+                      FirebaseRemoteConfigService.getBoolConfigByKey(
+                        FirebaseRemoteConfigService.banner_all,
+                      ))
+                    EasyBannerAd(
+                      adId: MyAdIdName.bannerAll.getId,
+                      adIdName: MyAdIdName.bannerAll,
+                    ),
                   Container(
                     width: double.infinity,
                     height: 100.r,

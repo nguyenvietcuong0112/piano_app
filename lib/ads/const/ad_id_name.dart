@@ -16,13 +16,14 @@ class MyAdIdName {
   static const nativeOnboard1Ad = "nativeOnboard1Ad";
   static const nativeOnboardFull1Ad = "nativeOnboardFull1Ad";
   static const nativeOnboardFull2Ad = "nativeOnboardFull2Ad";
-  static const nativeOnboard3Ad = "nativeOnboard3Ad";
-  static const interClick = "interClick";
+  static const nativeOnboard4Ad = "nativeOnboard4Ad";
+  static const interAll = "interAll";
   static const nativeFull = "nativeFull";
   static const rewardedAd = "rewardedAd";
   static const bannerAll = "bannerAll";
   static const interstitialOnboard = "interstitialOnboard";
   static const nativeHome = "nativeHome";
+  static const nativeAll = "nativeAll";
 }
 
 enum AdType { nativeExpand, nativeCollapse }

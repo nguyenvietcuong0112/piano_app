@@ -7,6 +7,7 @@ class FirebaseRemoteConfigService {
 
   //ads
   static const String banner_splash = "banner_splash";
+  static const String banner_all = "banner_all";
   static const String inter_splash_high = "inter_splash_high";
   static const String inter_splash = "inter_splash";
   static const String native_language = "native_language";
@@ -37,6 +38,7 @@ class FirebaseRemoteConfigService {
       await remoteConfig.setDefaults({
         "show_activity_iap": true,
         "banner_splash": true,
+        "banner_all": true,
         "inter_splash_high": true,
         "inter_splash": true,
         "native_language": true,

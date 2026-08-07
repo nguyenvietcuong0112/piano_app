@@ -85,11 +85,19 @@ class SettingsScreen extends StatelessWidget {
                   title: context.tr('policy'),
                   onTap: _openPolicyUrl,
                 ),
-                _buildSettingTile(
-                  svgPath: 'assets/icons/ic_settings_version.svg',
-                  title: context.tr('version'),
-                  trailingText: "0.0.1",
-                  onTap: () {},
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    final versionText = snapshot.hasData
+                        ? snapshot.data!.version
+                        : '1.0.0';
+                    return _buildSettingTile(
+                      svgPath: 'assets/icons/ic_settings_version.svg',
+                      title: context.tr('version'),
+                      trailingText: versionText,
+                      onTap: () {},
+                    );
+                  },
                 ),
               ],
             ),
@@ -230,9 +238,9 @@ class SettingsScreen extends StatelessWidget {
         border: GradientBoxBorder(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFFFFF).withOpacity(0.5), // opacity 0.5
-              Color(0xFFFFFF), // opacity 0.5
-              Color(0xAD57E6).withOpacity(0.5),
+              const Color(0xFFFFFFFF).withValues(alpha: 0.5),
+              const Color(0x80FFFFFF),
+              const Color(0x80AD57E6),
             ],
           ),
           width: 1,

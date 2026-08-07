@@ -8,6 +8,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/primary_button.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
 class RecordingsScreen extends StatefulWidget {
   const RecordingsScreen({super.key});
@@ -142,6 +147,16 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
                 ],
               ),
             ),
+
+            // Bottom Banner Ad
+            if (!AppConstants.isPremiumUser.value &&
+                FirebaseRemoteConfigService.getBoolConfigByKey(
+                  FirebaseRemoteConfigService.banner_all,
+                ))
+              EasyBannerAd(
+                adId: MyAdIdName.bannerAll.getId,
+                adIdName: MyAdIdName.bannerAll,
+              ),
           ],
         ),
       ),

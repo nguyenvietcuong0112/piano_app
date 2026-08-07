@@ -20,6 +20,11 @@ import '../../../core/widgets/gradient_slider_track_shape.dart';
 import '../../../core/widgets/theme_image.dart';
 import '../../../core/widgets/record_button.dart';
 import '../../../core/widgets/recording_dialogs.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import '../../piano/ui/piano_view.dart';
 import '../data/lesson_datasource.dart';
 import '../domain/lesson_model.dart';
@@ -46,6 +51,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   double _totalDurationSeconds = 180.0;
   bool _isAutoGuideMode = false;
   int _countdownValue = 0;
+  bool _isExiting = false;
 
   @override
   void initState() {
@@ -361,6 +367,15 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   }
 
   Future<void> _exitScreen() async {
+    if (_isExiting) return;
+    _isExiting = true;
+
+    final state = ref.read(lessonPlayControllerProvider);
+    final bool wasPlaying = state.isPlaying && !state.isPaused;
+    if (wasPlaying) {
+      _pauseGame();
+    }
+
     final shouldExit = await ExitConfirmationDialog.show(
       context,
       title: context.tr('quit_lesson_title'),
@@ -368,8 +383,13 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       confirmText: context.tr('quit'),
       cancelText: context.tr('stay'),
     );
+
+    _isExiting = false;
+
     if (shouldExit && mounted) {
       context.pop();
+    } else if (wasPlaying && mounted) {
+      _togglePlayback();
     }
   }
 
@@ -399,7 +419,15 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        _exitScreen();
+        final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+        if (!isCurrentRoute || _isExiting) return;
+
+        final state = ref.read(lessonPlayControllerProvider);
+        if (state.isPlaying && !state.isPaused) {
+          _pauseGame();
+        } else {
+          _exitScreen();
+        }
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF121212),
@@ -419,6 +447,14 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
               ),
               Column(
                 children: [
+                  if (!AppConstants.isPremiumUser.value &&
+                      FirebaseRemoteConfigService.getBoolConfigByKey(
+                        FirebaseRemoteConfigService.banner_all,
+                      ))
+                    EasyBannerAd(
+                      adId: MyAdIdName.bannerAll.getId,
+                      adIdName: MyAdIdName.bannerAll,
+                    ),
                   // Toolbar Header
                   Container(
                     width: double.infinity,

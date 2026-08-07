@@ -107,7 +107,7 @@ class FirebaseHelper {
           return "inter_splash_view";
         case MyAdIdName.interSplash:
           return "inter_splash_view";
-        case MyAdIdName.interClick:
+        case MyAdIdName.interAll:
           return "inters_ad_view";
         case MyAdIdName.nativeLanguage:
           return "native_language_view";
@@ -123,7 +123,7 @@ class FirebaseHelper {
           return "native_onboarding_full_1_view";
         case MyAdIdName.nativeOnboardFull2Ad:
           return "native_onboarding_full_2_view";
-        case MyAdIdName.nativeOnboard3Ad:
+        case MyAdIdName.nativeOnboard4Ad:
           return "native_onboarding_4_view";
         case MyAdIdName.bannerAll:
           return "banner_all_view";
