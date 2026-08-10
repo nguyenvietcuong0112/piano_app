@@ -237,7 +237,24 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                           const SizedBox(width: 16),
 
                           GestureDetector(
-                            onTap: controller.toggleNoteNames,
+                            onTap: () async {
+                              final newIsDual = await context.push<bool>(
+                                '/player-mode',
+                                extra: playState.isDualMode,
+                              );
+                              if (mounted) {
+                                SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.landscapeLeft,
+                                  DeviceOrientation.landscapeRight,
+                                ]);
+                                SystemChrome.setEnabledSystemUIMode(
+                                  SystemUiMode.immersiveSticky,
+                                );
+                              }
+                              if (newIsDual != null) {
+                                controller.setDualMode(newIsDual);
+                              }
+                            },
                             child: SvgPicture.asset(
                               'assets/icons/ic_setting_piano.svg',
                               width: 48.w,
@@ -346,13 +363,154 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
                   ),
 
                   Expanded(
-                    child: PianoView(
-                      startOctave: playState.currentOctave,
-                      visibleWhiteKeysCount: playState.visibleWhiteKeysCount,
-                      showNoteNames: playState.showNoteNames,
-                      isLessonMode: false,
-                      onNotePressed: controller.setPlayedKeyStatus,
-                    ),
+                    child: !playState.isDualMode
+                        ? PianoView(
+                            startOctave: playState.currentOctave,
+                            visibleWhiteKeysCount:
+                                playState.visibleWhiteKeysCount,
+                            showNoteNames: playState.showNoteNames,
+                            isLessonMode: false,
+                            onNotePressed: controller.setPlayedKeyStatus,
+                          )
+                        : Column(
+                            children: [
+                              // Top Keyboard Row (Row 1)
+                              Expanded(
+                                child: PianoView(
+                                  startOctave: playState.currentOctave,
+                                  visibleWhiteKeysCount:
+                                      playState.visibleWhiteKeysCount,
+                                  showNoteNames: playState.showNoteNames,
+                                  isLessonMode: false,
+                                  onNotePressed: controller.setPlayedKeyStatus,
+                                ),
+                              ),
+
+                              // Middle Control Divider for Bottom Keyboard Row
+                              Container(
+                                height: 32.h,
+                                width: double.infinity,
+                                color: const Color(0xFF14141A),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // Shift -2 (Fast Left)
+                                    GestureDetector(
+                                      onTap: () =>
+                                          controller.shiftBottomOctave(-2),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: const Icon(
+                                            Icons
+                                                .keyboard_double_arrow_left_rounded,
+                                            color: Colors.white,
+                                            size: 18),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // Shift -1 (Left)
+                                    GestureDetector(
+                                      onTap: () =>
+                                          controller.shiftBottomOctave(-1),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: const Icon(
+                                            Icons.keyboard_arrow_left_rounded,
+                                            color: Colors.white,
+                                            size: 18),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+
+                                    // Mini Overview for Row 2
+                                    SizedBox(
+                                      width: 160.w,
+                                      child: MiniPianoOverview(
+                                        currentStartOctave:
+                                            playState.bottomOctave,
+                                        visibleWhiteKeysCount:
+                                            playState.visibleWhiteKeysCount,
+                                        onScrollOctave:
+                                            controller.setBottomOctave,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+
+                                    // Shift +1 (Right)
+                                    GestureDetector(
+                                      onTap: () =>
+                                          controller.shiftBottomOctave(1),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: const Icon(
+                                            Icons.keyboard_arrow_right_rounded,
+                                            color: Colors.white,
+                                            size: 18),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // Shift +2 (Fast Right)
+                                    GestureDetector(
+                                      onTap: () =>
+                                          controller.shiftBottomOctave(2),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                        child: const Icon(
+                                            Icons
+                                                .keyboard_double_arrow_right_rounded,
+                                            color: Colors.white,
+                                            size: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Bottom Keyboard Row (Row 2)
+                              Expanded(
+                                child: PianoView(
+                                  startOctave: playState.bottomOctave,
+                                  visibleWhiteKeysCount:
+                                      playState.visibleWhiteKeysCount,
+                                  showNoteNames: playState.showNoteNames,
+                                  isLessonMode: false,
+                                  onNotePressed: controller.setPlayedKeyStatus,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ],
               ),

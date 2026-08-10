@@ -79,7 +79,7 @@ class AppColors {
   static const Color keyWhite = Color(0xFFF9F9FB);
   static const Color keyWhiteBorder = Color(0xFFD0D0D5);
   static const Color keyBlack = Color(0xFF1E1E24);
-  static const Color keyPressed = Color(0xFF4CAF50);
+  static const Color keyPressed = Color(0xFFCF6BEE);
 
   // Key Label Octave Pill Colors
   static const Color octave3Pill = Color(0xFFA8E063);

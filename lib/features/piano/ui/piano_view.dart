@@ -249,10 +249,10 @@ class PianoViewState extends ConsumerState<PianoView>
 
   void _spawnHitParticles(double x, double y) {
     final List<Color> sparkColors = [
-      const Color(0xFFFFD54F), // Amber bright
-      const Color(0xFFFFA726), // Golden orange
+      const Color(0xFFCF6BEE), // Theme purple spark
+      const Color(0xFFE599FF), // Bright lavender spark
       const Color(0xFFFFFFFF), // Pure white spark
-      const Color(0xFFFFE082), // Soft gold
+      const Color(0xFFFFD54F), // Amber gold spark
     ];
 
     for (int i = 0; i < 22; i++) {
@@ -573,14 +573,26 @@ class PianoPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
-    final Paint blackKeyPaint = Paint()..color = const Color(0xEC121218);
-    final Paint pressedWhiteKeyPaint = Paint()..color = const Color(0x994CAF50);
-    final Paint pressedBlackKeyPaint = Paint()..color = const Color(0xD02E7D32);
+    final Paint blackKeyPaint = Paint()..color = const Color(0xEC121218);   
 
     // Draw White Piano Keys
     for (var key in keys.where((k) => !k.isBlack)) {
       final isPressed = activeKeyNames.contains(key.keyName);
-      final paint = isPressed ? pressedWhiteKeyPaint : whiteKeyPaint;
+      final Paint paint;
+      if (isPressed) {
+        paint = Paint()
+          ..shader =  LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xDD7E26D4), // Deep purple bottom
+              Color(0xDDCF6BEE).withOpacity(0.5), // Vibrant purple center
+              Color(0xDDE599FF).withOpacity(0.1), // Bright lavender top
+            ],
+          ).createShader(key.rect);
+      } else {
+        paint = whiteKeyPaint;
+      }
 
       final RRect rrect = RRect.fromRectAndCorners(
         key.rect,
@@ -589,6 +601,14 @@ class PianoPainter extends CustomPainter {
       );
       canvas.drawRRect(rrect, paint);
       canvas.drawRRect(rrect, whiteBorderPaint);
+
+      if (isPressed) {
+        final Paint pressedGlowBorder = Paint()
+          ..color = const Color(0xFFE599FF).withValues(alpha: 0.5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+        canvas.drawRRect(rrect, pressedGlowBorder);
+      }
 
       if (showNoteNames && noteLabelMode != 'off') {
         int oct = int.tryParse(key.label.substring(key.label.length - 1)) ?? 4;
@@ -669,7 +689,21 @@ class PianoPainter extends CustomPainter {
       }
 
       final isPressed = activeKeyNames.contains(key.keyName);
-      final paint = isPressed ? pressedBlackKeyPaint : blackKeyPaint;
+      final Paint paint;
+      if (isPressed) {
+        paint = Paint()
+          ..shader =  LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xDD7E26D4), // Deep purple bottom
+              Color(0xDDCF6BEE).withOpacity(0.5), // Vibrant purple center
+              Color(0xDDE599FF).withOpacity(0.1), // Bright lavender top
+            ],
+          ).createShader(key.rect);
+      } else {
+        paint = blackKeyPaint;
+      }
 
       final RRect rrect = RRect.fromRectAndCorners(
         key.rect,
@@ -677,6 +711,14 @@ class PianoPainter extends CustomPainter {
         bottomRight: const Radius.circular(5),
       );
       canvas.drawRRect(rrect, paint);
+
+      if (isPressed) {
+        final Paint pressedGlowBorder = Paint()
+          ..color = const Color(0xFFE599FF).withValues(alpha: 0.5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5;
+        canvas.drawRRect(rrect, pressedGlowBorder);
+      }
 
       if (!isPressed) {
         final Path highlightPath = Path()

@@ -6,33 +6,41 @@ import '../../../core/services/audio_engine.dart';
 
 class PianoPlayState {
   final int currentOctave;
+  final int bottomOctave;
   final int visibleWhiteKeysCount;
   final bool showNoteNames;
   final String statusMessage;
   final bool isRecording;
+  final bool isDualMode;
 
   const PianoPlayState({
     this.currentOctave = 3,
+    this.bottomOctave = 5,
     this.visibleWhiteKeysCount = 14,
     this.showNoteNames = true,
     this.statusMessage = "",
     this.isRecording = false,
+    this.isDualMode = false,
   });
 
   PianoPlayState copyWith({
     int? currentOctave,
+    int? bottomOctave,
     int? visibleWhiteKeysCount,
     bool? showNoteNames,
     String? statusMessage,
     bool? isRecording,
+    bool? isDualMode,
   }) {
     return PianoPlayState(
       currentOctave: currentOctave ?? this.currentOctave,
+      bottomOctave: bottomOctave ?? this.bottomOctave,
       visibleWhiteKeysCount:
           visibleWhiteKeysCount ?? this.visibleWhiteKeysCount,
       showNoteNames: showNoteNames ?? this.showNoteNames,
       statusMessage: statusMessage ?? this.statusMessage,
       isRecording: isRecording ?? this.isRecording,
+      isDualMode: isDualMode ?? this.isDualMode,
     );
   }
 }
@@ -42,8 +50,21 @@ class PianoPlayController extends StateNotifier<PianoPlayState> {
 
   PianoPlayController() : super(const PianoPlayState());
 
+  void setDualMode(bool isDual) {
+    state = state.copyWith(isDualMode: isDual);
+  }
+
   void setOctave(int octave) {
     state = state.copyWith(currentOctave: octave);
+  }
+
+  void setBottomOctave(int octave) {
+    state = state.copyWith(bottomOctave: octave.clamp(1, 7));
+  }
+
+  void shiftBottomOctave(int delta) {
+    int newOctave = (state.bottomOctave + delta).clamp(1, 7);
+    state = state.copyWith(bottomOctave: newOctave);
   }
 
   void zoomIn() {

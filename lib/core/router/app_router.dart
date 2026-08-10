@@ -12,6 +12,7 @@ import '../../features/lesson/ui/songs_landscape_screen.dart';
 import '../../features/lesson/ui/lesson_play_screen.dart';
 import '../../features/piano/ui/piano_tab.dart';
 import '../../features/piano/ui/play_piano_screen.dart';
+import '../../features/piano/ui/player_mode_screen.dart';
 import '../../features/themes/domain/theme_model.dart';
 import '../../features/themes/ui/theme_tab.dart';
 import '../../features/themes/ui/all_themes_screen.dart';
@@ -105,6 +106,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           },
           transitionDuration: const Duration(milliseconds: 200),
         ),
+      ),
+      GoRoute(
+        path: '/player-mode',
+        name: 'player-mode',
+        pageBuilder: (context, state) {
+          final initialIsDual = (state.extra as bool?) ?? false;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: PlayerModeScreen(initialIsDualMode: initialIsDual),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 200),
+          );
+        },
       ),
       GoRoute(
         path: '/all-lessons',
