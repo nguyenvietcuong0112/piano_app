@@ -73,6 +73,14 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
   }
 
   Future<void> _togglePlayRecording(RecordingItemModel item) async {
+    if (item.mode == 'internal' || (item.noteEvents != null && item.noteEvents!.isNotEmpty)) {
+      await _audioPlayer.stop();
+      if (mounted) {
+        context.push('/sheet-playback', extra: item);
+      }
+      return;
+    }
+
     if (_playingId == item.id) {
       if (_isPlaying) {
         await _audioPlayer.pause();

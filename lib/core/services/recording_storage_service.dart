@@ -2,6 +2,35 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'shared_preference_service.dart';
 
+class RecordedNoteEvent {
+  final String keyName;
+  final String label;
+  final int timestampMs;
+  final int durationMs;
+
+  RecordedNoteEvent({
+    required this.keyName,
+    required this.label,
+    required this.timestampMs,
+    this.durationMs = 400,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'keyName': keyName,
+        'label': label,
+        'timestampMs': timestampMs,
+        'durationMs': durationMs,
+      };
+
+  factory RecordedNoteEvent.fromJson(Map<String, dynamic> json) =>
+      RecordedNoteEvent(
+        keyName: json['keyName'] ?? '',
+        label: json['label'] ?? '',
+        timestampMs: json['timestampMs'] ?? 0,
+        durationMs: json['durationMs'] ?? 400,
+      );
+}
+
 class RecordingItemModel {
   final String id;
   final String title;
@@ -9,6 +38,7 @@ class RecordingItemModel {
   final String duration;
   final String filePath;
   final String mode; // 'mic' or 'internal'
+  final List<RecordedNoteEvent>? noteEvents;
 
   RecordingItemModel({
     required this.id,
@@ -17,6 +47,7 @@ class RecordingItemModel {
     required this.duration,
     required this.filePath,
     this.mode = 'mic',
+    this.noteEvents,
   });
 
   String get formattedDuration {
@@ -38,6 +69,7 @@ class RecordingItemModel {
     String? duration,
     String? filePath,
     String? mode,
+    List<RecordedNoteEvent>? noteEvents,
   }) {
     return RecordingItemModel(
       id: id ?? this.id,
@@ -46,6 +78,7 @@ class RecordingItemModel {
       duration: duration ?? this.duration,
       filePath: filePath ?? this.filePath,
       mode: mode ?? this.mode,
+      noteEvents: noteEvents ?? this.noteEvents,
     );
   }
 
@@ -56,6 +89,8 @@ class RecordingItemModel {
         'duration': duration,
         'filePath': filePath,
         'mode': mode,
+        if (noteEvents != null)
+          'noteEvents': noteEvents!.map((e) => e.toJson()).toList(),
       };
 
   factory RecordingItemModel.fromJson(Map<String, dynamic> json) =>
@@ -66,6 +101,11 @@ class RecordingItemModel {
         duration: json['duration'] ?? '',
         filePath: json['filePath'] ?? '',
         mode: json['mode'] ?? 'mic',
+        noteEvents: json['noteEvents'] != null
+            ? (json['noteEvents'] as List<dynamic>)
+                .map((e) => RecordedNoteEvent.fromJson(e as Map<String, dynamic>))
+                .toList()
+            : null,
       );
 }
 

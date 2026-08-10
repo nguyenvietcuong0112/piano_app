@@ -102,10 +102,13 @@ class PianoView extends ConsumerStatefulWidget {
     this.isLessonMode = false,
     this.isAutoGuideMode = false,
     this.noteSpeed = 7.5,
+    this.externalActiveKeys,
     this.onNotePressed,
     this.onNoteHit,
     this.onNoteMissed,
   });
+
+  final Set<String>? externalActiveKeys;
 
   @override
   ConsumerState<PianoView> createState() => PianoViewState();
@@ -530,6 +533,7 @@ class PianoViewState extends ConsumerState<PianoView>
               painter: PianoPainter(
                 keys: _keys,
                 activeKeyNames: _activeKeyNames,
+                externalActiveKeys: widget.externalActiveKeys,
                 fallingNotes: _fallingNotes,
                 particles: _particles,
                 showNoteNames: widget.showNoteNames,
@@ -547,6 +551,7 @@ class PianoViewState extends ConsumerState<PianoView>
 class PianoPainter extends CustomPainter {
   final List<PianoKey> keys;
   final Set<String> activeKeyNames;
+  final Set<String>? externalActiveKeys;
   final List<FallingNote> fallingNotes;
   final List<HitParticle> particles;
   final bool showNoteNames;
@@ -556,11 +561,12 @@ class PianoPainter extends CustomPainter {
   PianoPainter({
     required this.keys,
     required this.activeKeyNames,
+    this.externalActiveKeys,
     required this.fallingNotes,
     required this.particles,
     required this.showNoteNames,
     required this.noteLabelMode,
-    this.scrollX = 0.0,
+    required this.scrollX,
   });
 
   @override
@@ -577,7 +583,8 @@ class PianoPainter extends CustomPainter {
 
     // Draw White Piano Keys
     for (var key in keys.where((k) => !k.isBlack)) {
-      final isPressed = activeKeyNames.contains(key.keyName);
+      final isPressed = (externalActiveKeys?.contains(key.keyName) ?? false) ||
+          activeKeyNames.contains(key.keyName);
       final Paint paint;
       if (isPressed) {
         paint = Paint()
@@ -585,9 +592,9 @@ class PianoPainter extends CustomPainter {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xDD7E26D4), // Deep purple bottom
-              Color(0xDDCF6BEE).withOpacity(0.5), // Vibrant purple center
-              Color(0xDDE599FF).withOpacity(0.1), // Bright lavender top
+              const Color(0xDDE599FF),
+              const Color(0xDDCF6BEE),
+              const Color(0xDD7E26D4),
             ],
           ).createShader(key.rect);
       } else {
@@ -688,7 +695,8 @@ class PianoPainter extends CustomPainter {
         continue;
       }
 
-      final isPressed = activeKeyNames.contains(key.keyName);
+      final isPressed = (externalActiveKeys?.contains(key.keyName) ?? false) ||
+          activeKeyNames.contains(key.keyName);
       final Paint paint;
       if (isPressed) {
         paint = Paint()
@@ -696,9 +704,9 @@ class PianoPainter extends CustomPainter {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xDD7E26D4), // Deep purple bottom
-              Color(0xDDCF6BEE).withOpacity(0.5), // Vibrant purple center
-              Color(0xDDE599FF).withOpacity(0.1), // Bright lavender top
+              const Color(0xDDE599FF),
+              const Color(0xDDCF6BEE),
+              const Color(0xDD7E26D4),
             ],
           ).createShader(key.rect);
       } else {

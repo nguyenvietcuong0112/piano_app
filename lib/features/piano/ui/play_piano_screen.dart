@@ -111,7 +111,8 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
     final recorder = AudioRecorderService();
 
     if (playState.isRecording) {
-      final savedPath = await controller.toggleRecording();
+      final recordResult = await controller.toggleRecording();
+      final savedPath = recordResult?.filePath;
       await recorder.stopRecording(title: "Free Play");
 
       if (!mounted) return;
@@ -127,26 +128,19 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
         defaultTitle: defaultTitle,
       );
 
-      if (savedTitle != null && savedTitle.isNotEmpty && savedPath != null) {
+      if (savedTitle != null && savedTitle.isNotEmpty) {
+        final isInternalMode = recorder.currentMode == RecordingMode.internal;
         final newItem = RecordingItemModel(
           id: now.millisecondsSinceEpoch.toString(),
           title: savedTitle,
           date: dateStr,
           duration: "00:07",
-          filePath: savedPath,
-          mode: recorder.currentMode == RecordingMode.internal ? 'internal' : 'mic',
+          filePath: savedPath ?? '',
+          mode: isInternalMode ? 'internal' : 'mic',
+          noteEvents: isInternalMode ? recordResult?.noteEvents : null,
         );
 
         await RecordingStorageService.addRecording(newItem);
-
-        // if (mounted) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     backgroundColor: const Color(0xFF7E48F0),
-          //     content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
-          //   ),
-          // );
-        // }
       } else {
         if (savedPath != null) {
           final f = File(savedPath);

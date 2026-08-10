@@ -3,6 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import '../../../core/services/audio_engine.dart';
+import '../../../core/services/recording_storage_service.dart';
+
+class PianoRecordingResult {
+  final String? filePath;
+  final List<RecordedNoteEvent> noteEvents;
+
+  PianoRecordingResult({
+    this.filePath,
+    required this.noteEvents,
+  });
+}
 
 class PianoPlayState {
   final int currentOctave;
@@ -47,6 +58,8 @@ class PianoPlayState {
 
 class PianoPlayController extends StateNotifier<PianoPlayState> {
   final AudioRecorder _audioRecorder = AudioRecorder();
+  final List<RecordedNoteEvent> _recordedNoteEvents = [];
+  DateTime? _recordingStartTime;
 
   PianoPlayController() : super(const PianoPlayState());
 
@@ -86,6 +99,15 @@ class PianoPlayController extends StateNotifier<PianoPlayState> {
   }
 
   void setPlayedKeyStatus(String keyName, String label) {
+    if (state.isRecording && _recordingStartTime != null) {
+      final elapsedMs =
+          DateTime.now().difference(_recordingStartTime!).inMilliseconds;
+      _recordedNoteEvents.add(RecordedNoteEvent(
+        keyName: keyName,
+        label: label,
+        timestampMs: elapsedMs,
+      ));
+    }
     state = state.copyWith(statusMessage: "Played: $label ($keyName)");
   }
 
@@ -101,15 +123,22 @@ class PianoPlayController extends StateNotifier<PianoPlayState> {
     state = state.copyWith(statusMessage: "🔉 Volume: $percent%");
   }
 
-  Future<String?> toggleRecording() async {
+  Future<PianoRecordingResult?> toggleRecording() async {
     try {
       if (state.isRecording) {
         final path = await _audioRecorder.stop();
+        final resultEvents = List<RecordedNoteEvent>.from(_recordedNoteEvents);
+        _recordedNoteEvents.clear();
+        _recordingStartTime = null;
+
         state = state.copyWith(
           isRecording: false,
           statusMessage: "Saved: ${path?.split('/').last ?? 'Record'}",
         );
-        return path;
+        return PianoRecordingResult(
+          filePath: path,
+          noteEvents: resultEvents,
+        );
       } else {
         if (await _audioRecorder.hasPermission()) {
           final dir = await getApplicationDocumentsDirectory();
@@ -120,6 +149,9 @@ class PianoPlayController extends StateNotifier<PianoPlayState> {
             const RecordConfig(encoder: AudioEncoder.aacLc),
             path: path,
           );
+
+          _recordedNoteEvents.clear();
+          _recordingStartTime = DateTime.now();
 
           state = state.copyWith(
             isRecording: true,

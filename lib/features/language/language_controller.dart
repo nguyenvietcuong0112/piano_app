@@ -7,13 +7,11 @@ import '../../core/localization/locale_provider.dart';
 import '../../core/services/shared_preference_service.dart';
 
 class LanguageModel {
-  final String pngAsset;
   final String title;
   final String languageCode;
   final String countryCode;
 
   const LanguageModel({
-    this.pngAsset = '',
     required this.title,
     required this.languageCode,
     required this.countryCode,
@@ -39,18 +37,18 @@ class LanguageController extends ChangeNotifier {
     isFirstLaunch = firstLaunch;
     itemsList.clear();
     itemsList.addAll(const [
-      LanguageModel(pngAsset: 'assets/flag/flag_hindi.png', title: 'Hindi', languageCode: 'hi', countryCode: 'in'),
-      LanguageModel(pngAsset: 'assets/flag/flag_bengali.png', title: 'Bengali', languageCode: 'bn', countryCode: 'bd'),
-      LanguageModel(pngAsset: 'assets/flag/flag_indonesia.png', title: 'Indonesian', languageCode: 'id', countryCode: 'id'),
-      LanguageModel(pngAsset: 'assets/flag/flag_english.png', title: 'English', languageCode: 'en', countryCode: 'us'),
-      LanguageModel(pngAsset: 'assets/flag/flag_philippine.png', title: 'Filipino', languageCode: 'fil', countryCode: 'ph'),
-      LanguageModel(pngAsset: 'assets/flag/flag_spain.png', title: 'Spanish', languageCode: 'es', countryCode: 'es'),
-      LanguageModel(pngAsset: 'assets/flag/flag_turkish.png', title: 'Turkish', languageCode: 'tr', countryCode: 'tr'),
-      LanguageModel(pngAsset: 'assets/flag/flag_portuguese.png', title: 'Portuguese', languageCode: 'pt', countryCode: 'pt'),
-      LanguageModel(pngAsset: 'assets/flag/flag_arabic.png', title: 'Arabic', languageCode: 'ar', countryCode: 'sa'),
-      LanguageModel(pngAsset: 'assets/flag/flag_russia.png', title: 'Russian', languageCode: 'ru', countryCode: 'ru'),
-      LanguageModel(pngAsset: 'assets/flag/flag_france.png', title: 'French', languageCode: 'fr', countryCode: 'fr'),
-      LanguageModel(pngAsset: 'assets/flag/flag_vietnam.png', title: 'Vietnamese', languageCode: 'vi', countryCode: 'vn'),
+      LanguageModel(title: 'हिन्दी', languageCode: 'hi', countryCode: 'in'),
+      LanguageModel(title: 'বাংলা', languageCode: 'bn', countryCode: 'bd'),
+      LanguageModel(title: 'Bahasa Indonesia', languageCode: 'id', countryCode: 'id'),
+      LanguageModel(title: 'English', languageCode: 'en', countryCode: 'us'),
+      LanguageModel(title: 'Filipino', languageCode: 'fil', countryCode: 'ph'),
+      LanguageModel(title: 'Español', languageCode: 'es', countryCode: 'es'),
+      LanguageModel(title: 'Türkçe', languageCode: 'tr', countryCode: 'tr'),
+      LanguageModel(title: 'Português', languageCode: 'pt', countryCode: 'pt'),
+      LanguageModel(title: 'العربية', languageCode: 'ar', countryCode: 'sa'),
+      LanguageModel(title: 'Русский', languageCode: 'ru', countryCode: 'ru'),
+      LanguageModel(title: 'Français', languageCode: 'fr', countryCode: 'fr'),
+      LanguageModel(title: 'Tiếng Việt', languageCode: 'vi', countryCode: 'vn'),
     ]);
 
     if (!isFirstLaunch) {

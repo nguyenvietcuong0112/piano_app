@@ -81,7 +81,6 @@ flutter:
     - assets/json/
     - assets/json/lesson/
     - assets/images/
-    - assets/flag/
     - assets/icons/
     - assets/sounds/bright/
     - assets/sounds/organ_v2/

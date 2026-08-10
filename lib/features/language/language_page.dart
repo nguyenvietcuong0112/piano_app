@@ -287,7 +287,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             ),
           if (controller.selectedIndex != 100 && controller.isShouldShowNext)
             Positioned(
-              right: 20,
+              right: 10,
               bottom: 0,
               top: 0,
               child: GestureDetector(

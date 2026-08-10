@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import '../theme/app_text_styles.dart';
 import '../services/audio_recorder_service.dart';
+import '../services/rewarded_ad_service.dart';
 import '../localization/app_localizations.dart';
 import 'gradient_border_card.dart';
 
@@ -70,6 +72,7 @@ class RecordSelectionDialog extends StatelessWidget {
                   context: context,
                   icon: Icons.mic_rounded,
                   label: context.tr('my_recordings'),
+                  isReward: false,
                   onTap: () => Navigator.pop(context, RecordingMode.mic),
                 ),
                 SizedBox(height: 10.h),
@@ -79,7 +82,18 @@ class RecordSelectionDialog extends StatelessWidget {
                   context: context,
                   icon: Icons.piano_rounded,
                   label: "Piano Sheets",
-                  onTap: () => Navigator.pop(context, RecordingMode.internal),
+                  isReward: true,
+                  onTap: () {
+                    RewardedAdService.showRewardedAd(
+                      context: context,
+                      songId: 'piano_sheets_record',
+                      onRewardEarned: () {
+                        if (context.mounted) {
+                          Navigator.pop(context, RecordingMode.internal);
+                        }
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -94,6 +108,7 @@ class RecordSelectionDialog extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required bool isReward,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -128,6 +143,12 @@ class RecordSelectionDialog extends StatelessWidget {
               label,
               style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
             ),
+            Spacer(),
+            isReward ? SvgPicture.asset(
+              'assets/icons/ic_reward.svg',
+              width: 24.r,
+              height: 24.r,
+            ) : SizedBox(),
           ],
         ),
       ),

@@ -23,6 +23,8 @@ import '../../features/settings/ui/settings_screen.dart';
 import '../../features/main/main_screen.dart';
 
 import '../../features/recording/ui/recordings_screen.dart';
+import '../../features/recording/ui/piano_sheet_playback_screen.dart';
+import '../services/recording_storage_service.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -115,6 +117,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return CustomTransitionPage(
             key: state.pageKey,
             child: PlayerModeScreen(initialIsDualMode: initialIsDual),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 200),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/sheet-playback',
+        name: 'sheet-playback',
+        pageBuilder: (context, state) {
+          final item = state.extra as RecordingItemModel;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: PianoSheetPlaybackScreen(item: item),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },

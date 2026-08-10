@@ -149,13 +149,13 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.h),
+                // SizedBox(height: 10.h),
                 // Theme Title Name
-                Text(
-                  theme.titleName,
-                  style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
+                // Text(
+                //   theme.titleName,
+                //   style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.bold),
+                //   textAlign: TextAlign.center,
+                // ),
               ],
             ),
           ),

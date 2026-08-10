@@ -38,5 +38,5 @@ class AppConstants {
   /// Cấu hình luồng mở app từ lần thứ 2 trở đi:
   /// - `true`: Từ lần 2 mở app -> Splash vào thẳng Main
   /// - `false`: Lần nào mở app cũng qua Splash -> Language -> Onboard -> Main
-  static bool skipLangOnboardOnReopen = true;
+  static bool skipLangOnboardOnReopen = false;
 }
