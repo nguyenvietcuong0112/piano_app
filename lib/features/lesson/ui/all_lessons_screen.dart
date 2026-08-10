@@ -165,9 +165,9 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
           // Songs grouped by Category
           Expanded(
             child: filteredCategories.isEmpty
-                ? const NoDataWidget(
-                    title: "Không tìm thấy bài hát nào",
-                    subtitle: "Không có bài hát nào phù hợp với danh mục hoặc từ khóa bạn chọn.",
+                ? NoDataWidget(
+                    title: context.tr('no_songs_found'),
+                    subtitle: context.tr('no_songs_match_filter'),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.only(bottom: 40),

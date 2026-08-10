@@ -29,10 +29,10 @@ class LessonResultDialog extends StatelessWidget {
       elevation: 0,
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
       child: GradientBorderCard(
-        width: 150.w,
+        width: 220.w,
         borderRadius: 24,
         strokeWidth: 1.5,
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 8.w, 24.h),
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
         backgroundGradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -173,10 +173,16 @@ class LessonResultDialog extends StatelessWidget {
                           ],
                         ),
                         child: Center(
-                          child: Text(
-                            context.tr('replay'),
-                            style: AppTextStyles.textWhite14.copyWith(
-                              fontWeight: FontWeight.bold,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                context.tr('replay'),
+                                style: AppTextStyles.textWhite14.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -216,10 +222,16 @@ class LessonResultDialog extends StatelessWidget {
                           ],
                         ),
                         child: Center(
-                          child: Text(
-                            context.tr('next_lesson'),
-                            style: AppTextStyles.textWhite14.copyWith(
-                              fontWeight: FontWeight.bold,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 6.w),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                context.tr('next_lesson'),
+                                style: AppTextStyles.textWhite14.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),

@@ -89,11 +89,8 @@ class LessonPlayController extends StateNotifier<LessonPlayState> {
   LessonPlayController() : super(const LessonPlayState());
 
   void initSong(int totalNotes) {
-    state = LessonPlayState(
+    state = state.copyWith(
       totalNotesInSong: totalNotes,
-      noteLabelMode: state.noteLabelMode,
-      octaveShift: state.octaveShift,
-      noteSpeedMultiplier: state.noteSpeedMultiplier,
     );
   }
 

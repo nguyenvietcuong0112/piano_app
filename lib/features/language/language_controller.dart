@@ -10,11 +10,13 @@ class LanguageModel {
   final String pngAsset;
   final String title;
   final String languageCode;
+  final String countryCode;
 
   const LanguageModel({
-    required this.pngAsset,
+    this.pngAsset = '',
     required this.title,
     required this.languageCode,
+    required this.countryCode,
   });
 }
 
@@ -37,18 +39,18 @@ class LanguageController extends ChangeNotifier {
     isFirstLaunch = firstLaunch;
     itemsList.clear();
     itemsList.addAll(const [
-      LanguageModel(pngAsset: 'assets/flag/flag_hindi.png', title: 'Hindi', languageCode: 'hi'),
-      LanguageModel(pngAsset: 'assets/flag/flag_bengali.png', title: 'Bengali', languageCode: 'bn'),
-      LanguageModel(pngAsset: 'assets/flag/flag_indonesia.png', title: 'Indonesian', languageCode: 'id'),
-      LanguageModel(pngAsset: 'assets/flag/flag_english.png', title: 'English', languageCode: 'en'),
-      LanguageModel(pngAsset: 'assets/flag/flag_philippine.png', title: 'Filipino', languageCode: 'fil'),
-      LanguageModel(pngAsset: 'assets/flag/flag_spain.png', title: 'Spanish', languageCode: 'es'),
-      LanguageModel(pngAsset: 'assets/flag/flag_turkish.png', title: 'Turkish', languageCode: 'tr'),
-      LanguageModel(pngAsset: 'assets/flag/flag_portuguese.png', title: 'Portuguese', languageCode: 'pt'),
-      LanguageModel(pngAsset: 'assets/flag/flag_arabic.png', title: 'Arabic', languageCode: 'ar'),
-      LanguageModel(pngAsset: 'assets/flag/flag_russia.png', title: 'Russian', languageCode: 'ru'),
-      LanguageModel(pngAsset: 'assets/flag/flag_france.png', title: 'French', languageCode: 'fr'),
-      LanguageModel(pngAsset: 'assets/flag/flag_vietnam.png', title: 'Vietnamese', languageCode: 'vi'),
+      LanguageModel(pngAsset: 'assets/flag/flag_hindi.png', title: 'Hindi', languageCode: 'hi', countryCode: 'in'),
+      LanguageModel(pngAsset: 'assets/flag/flag_bengali.png', title: 'Bengali', languageCode: 'bn', countryCode: 'bd'),
+      LanguageModel(pngAsset: 'assets/flag/flag_indonesia.png', title: 'Indonesian', languageCode: 'id', countryCode: 'id'),
+      LanguageModel(pngAsset: 'assets/flag/flag_english.png', title: 'English', languageCode: 'en', countryCode: 'us'),
+      LanguageModel(pngAsset: 'assets/flag/flag_philippine.png', title: 'Filipino', languageCode: 'fil', countryCode: 'ph'),
+      LanguageModel(pngAsset: 'assets/flag/flag_spain.png', title: 'Spanish', languageCode: 'es', countryCode: 'es'),
+      LanguageModel(pngAsset: 'assets/flag/flag_turkish.png', title: 'Turkish', languageCode: 'tr', countryCode: 'tr'),
+      LanguageModel(pngAsset: 'assets/flag/flag_portuguese.png', title: 'Portuguese', languageCode: 'pt', countryCode: 'pt'),
+      LanguageModel(pngAsset: 'assets/flag/flag_arabic.png', title: 'Arabic', languageCode: 'ar', countryCode: 'sa'),
+      LanguageModel(pngAsset: 'assets/flag/flag_russia.png', title: 'Russian', languageCode: 'ru', countryCode: 'ru'),
+      LanguageModel(pngAsset: 'assets/flag/flag_france.png', title: 'French', languageCode: 'fr', countryCode: 'fr'),
+      LanguageModel(pngAsset: 'assets/flag/flag_vietnam.png', title: 'Vietnamese', languageCode: 'vi', countryCode: 'vn'),
     ]);
 
     if (!isFirstLaunch) {

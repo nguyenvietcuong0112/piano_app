@@ -51,8 +51,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   double _elapsedTimeSeconds = 0.0;
   double _totalDurationSeconds = 180.0;
   bool _isAutoGuideMode = false;
-  int _countdownValue = 0;
+  final int _countdownValue = 0;
   bool _isExiting = false;
+  bool _isLoadingNotes = true;
 
   @override
   void initState() {
@@ -67,28 +68,58 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   }
 
   Future<void> _loadLessonNotes() async {
+    setState(() => _isLoadingNotes = true);
     final ds = LessonDataSource();
-    final container = await ds.getLessonContainer(widget.lesson.lessonsData);
-    if (mounted) {
-      if (container != null) {
-        setState(() {
-          _lessonContainer = container;
-          _noteList = container.data ?? [];
-          _totalDurationSeconds = _calculateTotalSongDuration();
-        });
-      } else {
-        final notes = await ds.getLessonNotes(widget.lesson.lessonsData);
-        setState(() {
-          _noteList = notes;
-          _totalDurationSeconds = _calculateTotalSongDuration();
-        });
+
+    try {
+      final container = await ds.getLessonContainer(widget.lesson.lessonsData).timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          debugPrint("⏰ _loadLessonNotes timed out after 5 seconds");
+          return null;
+        },
+      );
+
+      if (mounted) {
+        final state = ref.read(lessonPlayControllerProvider);
+        final bool wasPlaying = state.isPlaying && !state.isPaused;
+
+        if (container != null && container.data != null && container.data!.isNotEmpty) {
+          setState(() {
+            _lessonContainer = container;
+            _noteList = container.data!;
+            _totalDurationSeconds = _calculateTotalSongDuration();
+          });
+        } else {
+          final notes = await ds.getLessonNotes(widget.lesson.lessonsData).timeout(
+            const Duration(seconds: 3),
+            onTimeout: () => [],
+          );
+          setState(() {
+            _noteList = notes;
+            _totalDurationSeconds = _calculateTotalSongDuration();
+          });
+        }
+
+        final controller = ref.read(lessonPlayControllerProvider.notifier);
+        controller.initSong(_noteList.length);
+        double speedMultiplier = 1.0;
+        if (widget.lesson.level == 1) speedMultiplier = 0.8;
+        if (widget.lesson.level == 3) speedMultiplier = 1.3;
+        controller.setSpeedMultiplier(speedMultiplier);
+
+        if (wasPlaying && _noteList.isNotEmpty) {
+          controller.setPaused(false);
+          controller.setPlayback(true);
+          _startFallingNotesSequence();
+        }
       }
-      final controller = ref.read(lessonPlayControllerProvider.notifier);
-      controller.initSong(_noteList.length);
-      double speedMultiplier = 1.0;
-      if (widget.lesson.level == 1) speedMultiplier = 0.8;
-      if (widget.lesson.level == 3) speedMultiplier = 1.3;
-      controller.setSpeedMultiplier(speedMultiplier);
+    } catch (e) {
+      debugPrint("Error in _loadLessonNotes: $e");
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingNotes = false);
+      }
     }
   }
 
@@ -159,8 +190,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
     if (!state.isPlaying ||
         state.isPaused ||
-        state.currentNoteIndex >= _noteList.length)
+        state.currentNoteIndex >= _noteList.length) {
       return;
+    }
 
     int currentIndex = state.currentNoteIndex;
     int nextDelayMs = 0;
@@ -208,6 +240,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   }
 
   void _togglePlayback() {
+    if (_isLoadingNotes) return;
     final controller = ref.read(lessonPlayControllerProvider.notifier);
     final state = ref.read(lessonPlayControllerProvider);
 
@@ -227,6 +260,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     controller.setPlayback(false);
     _noteTimer?.cancel();
     _stopPlaybackTicker();
+    AudioEngine().stopAllNotes();
   }
 
   Future<void> _finishLesson() async {
@@ -305,8 +339,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     );
 
     if (savedTitle != null && savedTitle.isNotEmpty && item != null) {
-      final minutes = (_elapsedTimeSeconds ~/ 60).toString().padLeft(2, '0');
-      final seconds = (_elapsedTimeSeconds % 60).toString().padLeft(2, '0');
+      final totalSecondsInt = _elapsedTimeSeconds.toInt();
+      final minutes = (totalSecondsInt ~/ 60).toString().padLeft(2, '0');
+      final seconds = (totalSecondsInt % 60).toString().padLeft(2, '0');
       final durationStr = "$minutes:$seconds";
 
       final newItem = RecordingItemModel(
@@ -315,17 +350,19 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
         date: dateStr,
         duration: durationStr == "00:00" ? "00:07" : durationStr,
         filePath: item.filePath,
+        mode: recorder.currentMode == RecordingMode.internal ? 'internal' : 'mic',
       );
 
       await RecordingStorageService.addRecording(newItem);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: const Color(0xFF7E48F0),
-            content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
-          ),
-        );
+        _pauseGame();
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     backgroundColor: const Color(0xFF7E48F0),
+        //     content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
+        //   ),
+        // );
       }
     } else {
       if (item != null) {
@@ -499,45 +536,63 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                           ),
                           const SizedBox(width: 12),
 
-                          // Title Chip
-                          GradientBorderCard(
-                            height: 36.h,
-                            width: 50.w,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            backgroundGradient: const LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-                            ),
-                            borderRadius: 8,
-                            borderGradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
-                                const Color(0xFFFFFFFF).withValues(alpha: 0.1),
-                              ],
-                            ),
-                            child: Center(
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/ic_music.svg',
-                                    width: 24.h,
-                                    height: 24.h,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      widget.lesson.titleName,
-                                      style: AppTextStyles.textWhite12.copyWith(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
+                          // Title Chip (Clickable to change song, same as Play Piano)
+                          GestureDetector(
+                            onTap: () async {
+                              final state = ref.read(lessonPlayControllerProvider);
+                              if (state.isPlaying && !state.isPaused) {
+                                _pauseGame();
+                              }
+                              await context.push('/songs-landscape');
+                              if (mounted) {
+                                SystemChrome.setPreferredOrientations([
+                                  DeviceOrientation.landscapeLeft,
+                                  DeviceOrientation.landscapeRight,
+                                ]);
+                                SystemChrome.setEnabledSystemUIMode(
+                                  SystemUiMode.immersiveSticky,
+                                );
+                              }
+                            },
+                            child: GradientBorderCard(
+                              height: 36.h,
+                              width: 50.w,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              backgroundGradient: const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                              ),
+                              borderRadius: 8,
+                              borderGradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  const Color(0xFFFFFFFF).withValues(alpha: 0.1),
+                                  const Color(0xFFFFFFFF).withValues(alpha: 0.1),
                                 ],
+                              ),
+                              child: Center(
+                                child: Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_music.svg',
+                                      width: 24.h,
+                                      height: 24.h,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        widget.lesson.titleName,
+                                        style: AppTextStyles.textWhite12.copyWith(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -773,6 +828,32 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                           fontSize: 90,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Loading Notes Overlay
+              if (_isLoadingNotes)
+                Positioned.fill(
+                  child: Container(
+                    color: const Color(0xFF101014).withValues(alpha: 0.9),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(
+                            color: Color(0xFFCF6BEE),
+                          ),
+                          SizedBox(height: 14.h),
+                          Text(
+                            context.tr('loading'),
+                            style: AppTextStyles.textWhite14.copyWith(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

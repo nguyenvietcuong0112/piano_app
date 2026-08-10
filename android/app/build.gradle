@@ -30,6 +30,9 @@ android {
         versionCode flutter.versionCode
         versionName flutter.versionName
 
+
+
+        archivesBaseName = "D73_Piano_v${versionName}_c${versionCode}_${new Date().format('ddMMyyyy')}"
         multiDexEnabled true
     }
 

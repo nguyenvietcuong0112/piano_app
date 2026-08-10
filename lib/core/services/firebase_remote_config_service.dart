@@ -18,11 +18,14 @@ class FirebaseRemoteConfigService {
   static const String native_onboarding_4 = "native_onboarding_4";
 
   static const String inter_all = "inter_all";
+  static const String inter_onboard = "inter_onboard";
   static const String interval_inter_ad = "interval_inter_ad";
   static const String native_all = "native_all";
   static const String native_themes = "native_themes";
   static const String native_piano = "native_piano";
   static const String native_home = "native_home";
+
+  static const String reward_all = "reward_all";
 
   static const String time_delay_close_premium = "time_delay_close_premium";
   static const String show_activity_iap = "show_activity_iap";
@@ -50,6 +53,7 @@ class FirebaseRemoteConfigService {
         "native_onboarding_full_2": true,
         "native_onboarding_4": true,
         "native_permission": true,
+        "inter_onboard": true,
         "inter_all": true,
         "native_all": true,
         "native_themes": true,

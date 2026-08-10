@@ -8,6 +8,7 @@ class RecordingItemModel {
   final String date;
   final String duration;
   final String filePath;
+  final String mode; // 'mic' or 'internal'
 
   RecordingItemModel({
     required this.id,
@@ -15,7 +16,20 @@ class RecordingItemModel {
     required this.date,
     required this.duration,
     required this.filePath,
+    this.mode = 'mic',
   });
+
+  String get formattedDuration {
+    if (duration.isEmpty) return "00:00";
+    final parts = duration.split(':');
+    if (parts.length == 2) {
+      final m = int.tryParse(parts[0].split('.')[0]) ?? 0;
+      final secDouble = double.tryParse(parts[1]) ?? 0.0;
+      final s = secDouble.toInt();
+      return "${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}";
+    }
+    return duration;
+  }
 
   RecordingItemModel copyWith({
     String? id,
@@ -23,6 +37,7 @@ class RecordingItemModel {
     String? date,
     String? duration,
     String? filePath,
+    String? mode,
   }) {
     return RecordingItemModel(
       id: id ?? this.id,
@@ -30,6 +45,7 @@ class RecordingItemModel {
       date: date ?? this.date,
       duration: duration ?? this.duration,
       filePath: filePath ?? this.filePath,
+      mode: mode ?? this.mode,
     );
   }
 
@@ -39,6 +55,7 @@ class RecordingItemModel {
         'date': date,
         'duration': duration,
         'filePath': filePath,
+        'mode': mode,
       };
 
   factory RecordingItemModel.fromJson(Map<String, dynamic> json) =>
@@ -48,6 +65,7 @@ class RecordingItemModel {
         date: json['date'] ?? '',
         duration: json['duration'] ?? '',
         filePath: json['filePath'] ?? '',
+        mode: json['mode'] ?? 'mic',
       );
 }
 

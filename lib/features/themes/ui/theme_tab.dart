@@ -38,7 +38,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
         loading: () => const AppLoading(),
         error: (err, stack) => Center(
           child: Text(
-            'Error loading themes: $err',
+            '${context.tr('error_loading_themes')}: $err',
             style: AppTextStyles.textGrey14,
           ),
         ),
@@ -74,9 +74,9 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
                 ];
 
           if (categories.isEmpty) {
-            return const NoDataWidget(
-              title: "Không có chủ đề nào",
-              subtitle: "Không tìm thấy danh mục giao diện.",
+            return NoDataWidget(
+              title: context.tr('no_themes_found'),
+              subtitle: context.tr('no_themes_sub'),
             );
           }
 

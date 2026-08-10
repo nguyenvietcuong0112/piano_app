@@ -66,7 +66,7 @@ const Map<String, String> hi = {
   'next_lesson': 'अगला पाठ',
 
   // My Songs Tab
-  'my_song_collection': 'गानों का संग्रह',
+  'my_song_collection': 'मेरे गाने',
   'learned_count': 'सीखे गए:',
   'stars_count': '5 स्टार:',
   'completed_list': 'पूरे किए गए गानों की सूची',

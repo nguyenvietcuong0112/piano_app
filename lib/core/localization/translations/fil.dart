@@ -66,7 +66,7 @@ const Map<String, String> fil = {
   'next_lesson': 'Susunod na Aralin',
 
   // My Songs Tab
-  'my_song_collection': 'Koleksyon ng Kanta',
+  'my_song_collection': 'Aking Mga Kanta',
   'learned_count': 'Natutunan:',
   'stars_count': '5 Bituin:',
   'completed_list': 'Listahan ng Natapos',

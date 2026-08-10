@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../ads/const/ad_id_extension.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../constants/app_constants.dart';
+import '../localization/app_localizations.dart';
 
 class RewardedAdService {
   static void showRewardedAd({
@@ -26,7 +27,9 @@ class RewardedAdService {
     }
 
     subscription = EasyAds.instance.onEvent.listen((event) {
-      if (event.adUnitType == AdUnitType.rewarded) {
+      final resolvedId = EasyAds.instance.resolveAdUnitId(MyAdIdName.rewardedAd.getId);
+      if (event.adUnitType == AdUnitType.rewarded &&
+          (event.adUnitId == MyAdIdName.rewardedAd.getId || event.adUnitId == resolvedId)) {
         if (event.type == AdEventType.earnedReward) {
           isRewardEarned = true;
         } else if (event.type == AdEventType.adDismissed) {
@@ -38,10 +41,9 @@ class RewardedAdService {
             } else {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content:
-                        Text('Bạn cần xem hết quảng cáo để mở khóa bài hát'),
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text(context.tr('must_watch_ad_to_unlock')),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }

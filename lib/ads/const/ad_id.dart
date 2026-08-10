@@ -47,6 +47,6 @@ Map<String, Map<String, String>> myAdsId = {
           MyAdIdName.nativeAll: 'ca-app-pub-9900730300733887/4119870063',
           MyAdIdName.interAll: 'ca-app-pub-9900730300733887/7675971695',
           MyAdIdName.rewardedAd: 'ca-app-pub-9900730300733887/2423645012',
-          MyAdIdName.nativeBanner: '',
+          MyAdIdName.nativeBanner: 'ca-app-pub-9900730300733887/5972077591',
         },
 };

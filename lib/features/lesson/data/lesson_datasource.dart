@@ -41,15 +41,41 @@ class LessonDataSource {
   }
 
   Future<LessonNoteContainer?> getLessonContainer(String fileNameOrUrl) async {
+    final isWebUrl = fileNameOrUrl.startsWith('http://') ||
+        fileNameOrUrl.startsWith('https://');
+
+    if (!isWebUrl) {
+      // 1. Try local assets first for local json filenames (instant load)
+      try {
+        final jsonString =
+            await rootBundle.loadString('assets/json/lesson/$fileNameOrUrl');
+        final Map<String, dynamic> jsonMap = json.decode(jsonString);
+        final container = LessonNoteContainer.fromJson(jsonMap);
+        if (container.data != null && container.data!.isNotEmpty) {
+          return container;
+        }
+      } catch (_) {}
+
+      try {
+        final jsonString =
+            await rootBundle.loadString('assets/json/$fileNameOrUrl');
+        final Map<String, dynamic> jsonMap = json.decode(jsonString);
+        final container = LessonNoteContainer.fromJson(jsonMap);
+        if (container.data != null && container.data!.isNotEmpty) {
+          return container;
+        }
+      } catch (_) {}
+    }
+
+    // 2. Fetch from network API if web URL or fallback
     try {
-      final String targetUrl = fileNameOrUrl.startsWith('http://') ||
-              fileNameOrUrl.startsWith('https://')
+      final String targetUrl = isWebUrl
           ? fileNameOrUrl
           : '${AppConstants.baseApiUrl}/lessons/$fileNameOrUrl';
 
       final response = await http
           .get(Uri.parse(targetUrl))
-          .timeout(const Duration(seconds: 8));
+          .timeout(const Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
@@ -60,28 +86,8 @@ class LessonDataSource {
         }
       }
     } catch (e) {
-      debugPrint("API lesson notes fetch failed, falling back to asset: $e");
+      debugPrint("API lesson notes fetch failed: $e");
     }
-
-    try {
-      final jsonString =
-          await rootBundle.loadString('assets/json/lesson/$fileNameOrUrl');
-      final Map<String, dynamic> jsonMap = json.decode(jsonString);
-      final container = LessonNoteContainer.fromJson(jsonMap);
-      if (container.data != null && container.data!.isNotEmpty) {
-        return container;
-      }
-    } catch (_) {}
-
-    try {
-      final jsonString =
-          await rootBundle.loadString('assets/json/$fileNameOrUrl');
-      final Map<String, dynamic> jsonMap = json.decode(jsonString);
-      final container = LessonNoteContainer.fromJson(jsonMap);
-      if (container.data != null && container.data!.isNotEmpty) {
-        return container;
-      }
-    } catch (_) {}
 
     return null;
   }

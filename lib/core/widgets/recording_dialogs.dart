@@ -137,17 +137,26 @@ class RecordSelectionDialog extends StatelessWidget {
 
 class RecordSaveDialog extends StatefulWidget {
   final String defaultTitle;
+  final String? titleText;
 
   const RecordSaveDialog({
     super.key,
     required this.defaultTitle,
+    this.titleText,
   });
 
-  static Future<String?> show(BuildContext context, {required String defaultTitle}) {
+  static Future<String?> show(
+    BuildContext context, {
+    required String defaultTitle,
+    String? titleText,
+  }) {
     return showDialog<String>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.65),
-      builder: (context) => RecordSaveDialog(defaultTitle: defaultTitle),
+      builder: (context) => RecordSaveDialog(
+        defaultTitle: defaultTitle,
+        titleText: titleText,
+      ),
     );
   }
 
@@ -192,7 +201,7 @@ class _RecordSaveDialogState extends State<RecordSaveDialog> {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        context.tr('save_recording'),
+                        widget.titleText ?? context.tr('save_recording'),
                         style: AppTextStyles.textWhite16,
                       ),
                     ),

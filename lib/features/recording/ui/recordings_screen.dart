@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/no_data_widget.dart';
 import '../../../core/widgets/primary_button.dart';
+import '../../../core/widgets/recording_dialogs.dart';
 import '../../../ads/const/ad_id_name.dart';
 import '../../../ads/const/ad_id_extension.dart';
 import '../../../core/constants/app_constants.dart';
@@ -27,10 +31,84 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
   List<RecordingItemModel> _recordings = [];
   bool _isLoading = true;
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  String? _playingId;
+  bool _isPlaying = false;
+  StreamSubscription? _playerCompleteSubscription;
+  StreamSubscription? _playerStateSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadRecordings();
+    _initPlayerListeners();
+  }
+
+  void _initPlayerListeners() {
+    _playerCompleteSubscription = _audioPlayer.onPlayerComplete.listen((event) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _playingId = null;
+        });
+      }
+    });
+
+    _playerStateSubscription = _audioPlayer.onPlayerStateChanged.listen((state) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = state == PlayerState.playing;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _playerCompleteSubscription?.cancel();
+    _playerStateSubscription?.cancel();
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlayRecording(RecordingItemModel item) async {
+    if (_playingId == item.id) {
+      if (_isPlaying) {
+        await _audioPlayer.pause();
+      } else {
+        await _audioPlayer.resume();
+      }
+    } else {
+      await _audioPlayer.stop();
+      final file = File(item.filePath);
+      if (!await file.exists()) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('⚠️ File bản ghi không tồn tại')),
+          );
+        }
+        return;
+      }
+      try {
+        setState(() {
+          _playingId = item.id;
+          _isPlaying = true;
+        });
+        await _audioPlayer.play(DeviceFileSource(item.filePath));
+      } catch (e) {
+        debugPrint("Error playing audio: $e");
+        if (mounted) {
+          setState(() {
+            _playingId = null;
+            _isPlaying = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('⚠️ Không thể phát file âm thanh này')),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _loadRecordings() async {
@@ -67,46 +145,23 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
     );
 
     if (confirmed == true) {
+      if (_playingId == id) {
+        await _audioPlayer.stop();
+        setState(() {
+          _playingId = null;
+          _isPlaying = false;
+        });
+      }
       await RecordingStorageService.deleteRecording(id);
       _loadRecordings();
     }
   }
 
   Future<void> _handleRename(RecordingItemModel item) async {
-    final controller = TextEditingController(text: item.title);
-    final newTitle = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1C182F),
-        title: Text(context.tr('rename_rec'), style: AppTextStyles.textWhite16),
-        content: TextField(
-          controller: controller,
-          style: AppTextStyles.textWhite14,
-          decoration: InputDecoration(
-            hintText: context.tr('enter_rec_title'),
-            hintStyle: AppTextStyles.textGrey14,
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFCF6BEE)),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFCF6BEE), width: 2),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.tr('cancel'), style: AppTextStyles.textGrey14),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFCF6BEE),
-            ),
-            child: Text(context.tr('save'), style: AppTextStyles.textWhite14),
-          ),
-        ],
-      ),
+    final newTitle = await RecordSaveDialog.show(
+      context,
+      defaultTitle: item.title,
+      titleText: context.tr('rename_rec'),
     );
 
     if (newTitle != null && newTitle.isNotEmpty) {
@@ -341,15 +396,17 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
       );
     }
 
-    if (_recordings.isEmpty) {
+    final micList = _recordings.where((item) => item.mode != 'internal').toList();
+
+    if (micList.isEmpty) {
       return _buildEmptyRecordingsView();
     }
 
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      itemCount: _recordings.length,
+      itemCount: micList.length,
       itemBuilder: (context, index) {
-        final item = _recordings[index];
+        final item = micList[index];
         return _buildRecordingRowItem(item);
       },
     );
@@ -365,62 +422,78 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
   }
 
   Widget _buildRecordingRowItem(RecordingItemModel item) {
+    final isCurrentPlaying = _playingId == item.id && _isPlaying;
+
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF131024),
+        color: isCurrentPlaying ? const Color(0xFF1E1738) : const Color(0xFF131024),
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: isCurrentPlaying
+              ? const Color(0xFFCF6BEE).withValues(alpha: 0.6)
+              : Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          // Music Note Purple Circle Icon Badge
-          Container(
-            width: 38.r,
-            height: 38.r,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Color(0xFF7E48F0), Color(0xFF9B63F8)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
+          // Play / Pause Circle Icon Button
+          GestureDetector(
+            onTap: () => _togglePlayRecording(item),
+            child: Container(
+              width: 38.r,
+              height: 38.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: isCurrentPlaying
+                      ? [const Color(0xFFCF6BEE), const Color(0xFFE28BFA)]
+                      : [const Color(0xFF7E48F0), const Color(0xFF9B63F8)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
               ),
-            ),
-            child: Icon(
-              Icons.music_note_rounded,
-              color: Colors.white,
-              size: 20.r,
+              child: Icon(
+                isCurrentPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 22.r,
+              ),
             ),
           ),
           SizedBox(width: 12.w),
 
           // Recording Title & Date Column
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: AppTextStyles.textWhite14.copyWith(fontWeight: FontWeight.w600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 3.h),
-                Text(
-                  item.date,
-                  style: AppTextStyles.textGrey12.copyWith(color: Colors.white.withValues(alpha: 0.45)),
-                ),
-              ],
+            child: GestureDetector(
+              onTap: () => _togglePlayRecording(item),
+              behavior: HitTestBehavior.opaque,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: AppTextStyles.textWhite14.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isCurrentPlaying ? const Color(0xFFCF6BEE) : Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    item.date,
+                    style: AppTextStyles.textGrey12.copyWith(color: Colors.white.withValues(alpha: 0.45)),
+                  ),
+                ],
+              ),
             ),
           ),
 
           // Duration
           Text(
-            item.duration,
+            item.formattedDuration,
             style: AppTextStyles.textPurple12.copyWith(color: const Color(0xFFB880FF), fontSize: 12.r, fontWeight: FontWeight.w500),
           ),
           SizedBox(width: 16.w),
@@ -428,10 +501,10 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
           // Delete Action Button
           GestureDetector(
             onTap: () => _handleDelete(item.id),
-            child: Icon(
-              Icons.delete_outline_rounded,
-              color: const Color(0xFFB880FF),
-              size: 20.r,
+            child: SvgPicture.asset(
+                'assets/icons/ic_delete.svg',
+                width: 20.r,
+                height: 20.r
             ),
           ),
           SizedBox(width: 14.w),
@@ -439,10 +512,10 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
           // Edit / Rename Action Button
           GestureDetector(
             onTap: () => _handleRename(item),
-            child: Icon(
-              Icons.edit_outlined,
-              color: const Color(0xFFB880FF),
-              size: 20.r,
+            child: SvgPicture.asset(
+              'assets/icons/ic_edit.svg',
+              width: 20.r,
+              height: 20.r
             ),
           ),
         ],
@@ -451,11 +524,30 @@ class _RecordingsScreenState extends State<RecordingsScreen> {
   }
 
   Widget _buildPianoSheetsContent() {
-    return const NoDataWidget(
-      imageAsset: 'assets/images/img_nodata.png',
-      imageHeight: 110,
-      title: "No piano sheets available",
-      subtitle: "Your exported piano sheet notes will be displayed here",
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFFCF6BEE)),
+      );
+    }
+
+    final sheetList = _recordings.where((item) => item.mode == 'internal').toList();
+
+    if (sheetList.isEmpty) {
+      return NoDataWidget(
+        imageAsset: 'assets/images/img_nodata.png',
+        imageHeight: 110,
+        title: context.tr('no_piano_sheets'),
+        subtitle: context.tr('no_piano_sheets_sub'),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      itemCount: sheetList.length,
+      itemBuilder: (context, index) {
+        final item = sheetList[index];
+        return _buildRecordingRowItem(item);
+      },
     );
   }
 }

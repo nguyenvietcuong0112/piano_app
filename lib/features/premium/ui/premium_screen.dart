@@ -55,16 +55,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
       final success = await IAPHelper.buyProduct(productDetails);
       if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not initiate purchase. Please try again.'),
+          SnackBar(
+            content: Text(context.tr('purchase_init_error')),
           ),
         );
       }
     } else {
       // Fallback if products could not be fetched from store (e.g. Sandbox/Emulator without Store login)
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Store products not available. Check your internet or Google Play / App Store connection.'),
+        SnackBar(
+          content: Text(context.tr('store_not_available')),
         ),
       );
     }
@@ -72,9 +72,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   Future<void> _handleRestore() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Restoring purchases...'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(context.tr('restoring_purchases')),
+        duration: const Duration(seconds: 2),
       ),
     );
     await IAPHelper.restorePurchases();
@@ -159,7 +159,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                     // Weekly Package Card
                                     _buildPackageCard(
                                       packageKey: 'weekly',
-                                      title: "Weekly PRO",
+                                      title: context.tr('weekly_pro'),
                                       price: weeklyPrice,
                                       isPopular: false,
                                     ),
@@ -169,9 +169,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                     // Monthly Package Card
                                     _buildPackageCard(
                                       packageKey: 'monthly',
-                                      title: "Monthly PRO",
+                                      title: context.tr('monthly_pro'),
                                       price: monthlyPrice,
-                                      subtitle: "Save 44% compared to weekly",
+                                      subtitle: context.tr('save_44_percent'),
                                       isPopular: true,
                                     ),
                                   ],
@@ -184,7 +184,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                           // Pricing Note
                           Text(
-                            "\$1.99/week. Cancel Anytime",
+                            context.tr('cancel_anytime'),
                             style: AppTextStyles.textWhite12.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -417,7 +417,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             ),
                             SizedBox(width: 3.w),
                             Text(
-                              "Most Popular",
+                              context.tr('most_popular'),
                               style: AppTextStyles.textWhite12.copyWith(
                                 fontSize: 10,
                                 color: isSelected ? Colors.white : AppColors.brandPurple,

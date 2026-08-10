@@ -39,7 +39,7 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
         height: double.infinity,
         child: PageView.builder(
           controller: controller.pageController,
-          // physics: const NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: steps.length,
           onPageChanged: controller.onChangePage,
           itemBuilder: (context, index) {

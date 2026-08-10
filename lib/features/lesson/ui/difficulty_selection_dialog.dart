@@ -160,32 +160,19 @@ class _DifficultySelectionDialogState
         SizedBox(height: isLandscape ? 10.h : 14.h),
 
         // Title: Unlock This Song
-        RichText(
+        Text(
+          context.tr('unlock_this_song'),
           textAlign: TextAlign.center,
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: "Unlock This ",
-                style: (isLandscape
-                        ? AppTextStyles.textWhite16
-                        : AppTextStyles.textWhite20)
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-              TextSpan(
-                text: "Song",
-                style: (isLandscape
-                        ? AppTextStyles.textPurple16
-                        : AppTextStyles.textPurple20)
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+          style: (isLandscape
+                  ? AppTextStyles.textWhite16
+                  : AppTextStyles.textWhite20)
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: isLandscape ? 4.h : 6.h),
 
         // Subtitle
         Text(
-          "Watch a short video or go Premium to unlock this song.",
+          context.tr('unlock_song_sub'),
           textAlign: TextAlign.center,
           style: AppTextStyles.textGrey12.copyWith(
             fontSize: isLandscape ? 10 : 12,
@@ -244,14 +231,14 @@ class _DifficultySelectionDialogState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Get Premium",
+                        context.tr('get_premium'),
                         style: AppTextStyles.textWhite14.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: isLandscape ? 12 : 14,
                         ),
                       ),
                       Text(
-                        "Unlimited songs & no limits",
+                        context.tr('get_premium_sub'),
                         style: AppTextStyles.textWhite12.copyWith(
                           fontSize: isLandscape ? 9 : 11,
                           color: Colors.white70,
@@ -316,14 +303,14 @@ class _DifficultySelectionDialogState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Continue with Ad",
+                        context.tr('continue_with_ad'),
                         style: AppTextStyles.textWhite14.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: isLandscape ? 12 : 14,
                         ),
                       ),
                       Text(
-                        "Watch an ad to unlock",
+                        context.tr('watch_ad_sub'),
                         style: AppTextStyles.textGrey12.copyWith(
                           fontSize: isLandscape ? 9 : 11,
                         ),
@@ -434,7 +421,7 @@ class _DifficultySelectionDialogState
                       ),
                     )
                   : Text(
-                      "Download",
+                      context.tr('download'),
                       style: (isLandscape
                               ? AppTextStyles.textWhite14
                               : AppTextStyles.textWhite16)
@@ -481,7 +468,7 @@ class _DifficultySelectionDialogState
         Text(
           widget.song.authorName.isNotEmpty
               ? widget.song.authorName
-              : "Ready to play",
+              : context.tr('ready_to_play'),
           textAlign: TextAlign.center,
           style: AppTextStyles.textGrey12.copyWith(
             fontSize: isLandscape ? 10 : 12,
@@ -553,7 +540,7 @@ class _DifficultySelectionDialogState
             ),
             child: Center(
               child: Text(
-                "Play now",
+                context.tr('play_now'),
                 style: (isLandscape
                         ? AppTextStyles.textWhite14
                         : AppTextStyles.textWhite16)

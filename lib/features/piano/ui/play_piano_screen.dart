@@ -134,18 +134,19 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
           date: dateStr,
           duration: "00:07",
           filePath: savedPath,
+          mode: recorder.currentMode == RecordingMode.internal ? 'internal' : 'mic',
         );
 
         await RecordingStorageService.addRecording(newItem);
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: const Color(0xFF7E48F0),
-              content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
-            ),
-          );
-        }
+        // if (mounted) {
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     backgroundColor: const Color(0xFF7E48F0),
+          //     content: Text("✅ ${context.tr('saved_recording')} $savedTitle"),
+          //   ),
+          // );
+        // }
       } else {
         if (savedPath != null) {
           final f = File(savedPath);

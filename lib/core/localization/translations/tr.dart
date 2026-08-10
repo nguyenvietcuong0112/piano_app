@@ -66,7 +66,7 @@ const Map<String, String> tr = {
   'next_lesson': 'Sonraki Ders',
 
   // My Songs Tab
-  'my_song_collection': 'Şarkı Koleksiyonum',
+  'my_song_collection': 'Şarkılarım',
   'learned_count': 'Öğrenilen:',
   'stars_count': '5 Yıldız:',
   'completed_list': 'Tamamlananlar Listesi',

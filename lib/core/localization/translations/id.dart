@@ -66,7 +66,7 @@ const Map<String, String> id = {
   'next_lesson': 'Pelajaran Berikutnya',
 
   // My Songs Tab
-  'my_song_collection': 'Koleksi Lagu Saya',
+  'my_song_collection': 'Lagu Saya',
   'learned_count': 'Dipelajari:',
   'stars_count': '5 Bintang:',
   'completed_list': 'Daftar Selesai',

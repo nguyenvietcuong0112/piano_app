@@ -4,6 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/ads_service.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -73,7 +82,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
           // List of Theme Cards
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.only(bottom: 30.h),
+              padding: EdgeInsets.only(bottom: 16.h),
               itemCount: widget.category.items.length,
               itemBuilder: (context, index) {
                 final theme = widget.category.items[index];
@@ -81,6 +90,21 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
               },
             ),
           ),
+
+          // Native All Ad
+          if (!AppConstants.isPremiumUser.value &&
+              !AdsService.checkIsOrganic &&
+              FirebaseRemoteConfigService.getBoolConfigByKey(
+                FirebaseRemoteConfigService.native_all,
+              )) ...[
+            SizedBox(height: 8.h),
+            EasyNativeAd(
+              factoryId: NativeFactoryId.nativeMedia,
+              adId: MyAdIdName.nativeAll.getId,
+              adIdName: MyAdIdName.nativeAll,
+              height: AdDimen.mediumNativeHeight,
+            ),
+          ],
         ],
       ),
     );

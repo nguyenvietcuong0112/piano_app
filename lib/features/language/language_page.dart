@@ -1,3 +1,4 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -168,7 +169,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                       gradient: LinearGradient(
                         colors: [
                           Color(0xFFFFFF).withOpacity(0.5), // opacity 0.5
-                          Color(0xFFFFFF), // opacity 0.5
+                          Color(0xFFFFFF).withOpacity(0.1), // opacity 0.5
                           Color(0xAD57E6).withOpacity(0.5),
                         ],
                       ),
@@ -181,15 +182,14 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.asset(
-                              controller.itemsList[index].pngAsset,
-                              width: 38,
-                              height: 26,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.flag, color: Colors.white),
+                          SizedBox(
+                            width: 38,
+                            height: 26,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: CountryFlag.fromCountryCode(
+                                controller.itemsList[index].countryCode,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 15),

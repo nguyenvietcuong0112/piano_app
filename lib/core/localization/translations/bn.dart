@@ -66,7 +66,7 @@ const Map<String, String> bn = {
   'next_lesson': 'পরবর্তী পাঠ',
 
   // My Songs Tab
-  'my_song_collection': 'আমার গানের সংগ্রহ',
+  'my_song_collection': 'আমার গান',
   'learned_count': 'শেখা হয়েছে:',
   'stars_count': '৫ স্টার:',
   'completed_list': 'সম্পন্ন গানের তালিকা',

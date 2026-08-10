@@ -66,7 +66,7 @@ const Map<String, String> pt = {
   'next_lesson': 'Próxima Aula',
 
   // My Songs Tab
-  'my_song_collection': 'Coleção de Músicas',
+  'my_song_collection': 'Minhas Músicas',
   'learned_count': 'Aprendidas:',
   'stars_count': '5 Estrelas:',
   'completed_list': 'Lista de Concluídas',
