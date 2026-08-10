@@ -4,6 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -86,32 +92,36 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Bar with Back Button & Title
+          // Header Bar with Back Button & Centered Title
           Padding(
             padding: EdgeInsets.only(top: 8.h, bottom: 12.h),
-            child: Row(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 40.sp,
-                    height: 40.sp,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E2C),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-                    ),
-                    child:  SvgPicture.asset(
-                      'assets/icons/ic_back.svg',
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
                       width: 40.sp,
                       height: 40.sp,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E2C),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                      ),
+                      child: SvgPicture.asset(
+                        'assets/icons/ic_back.svg',
+                        width: 40.sp,
+                        height: 40.sp,
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 14.w),
                 Text(
                   context.tr('all_lessons'),
                   style: AppTextStyles.textWhite22,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -308,6 +318,18 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                     },
                   ),
           ),
+          if (!AppConstants.isPremiumUser.value &&
+              FirebaseRemoteConfigService.getBoolConfigByKey(
+                FirebaseRemoteConfigService.native_all,
+              )) ...[
+            SizedBox(height: 8.h),
+            EasyNativeAd(
+              factoryId: NativeFactoryId.nativeMedia,
+              adId: MyAdIdName.nativeAll.getId,
+              adIdName: MyAdIdName.nativeAll,
+              height: AdDimen.mediumNativeHeight,
+            ),
+          ],
         ],
       ),
     );

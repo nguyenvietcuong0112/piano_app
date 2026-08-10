@@ -36,7 +36,7 @@ const Map<String, String> ar = {
   'learn_now': 'تعلم الآن',
 
   // Lessons & Search
-  'all_lessons': 'جميع الدروس',
+  'all_lessons': 'الأغاني',
   'search_song_hint': 'البحث عن أغنية...',
   'all': 'الكل',
   'completed': 'مكتمل',

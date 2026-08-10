@@ -21,7 +21,7 @@
             <!-- Left Media Container (rounded 8dp) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_media"
-                android:layout_width="160dp"
+                android:layout_width="180dp"
                 android:layout_height="0dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp"

@@ -36,7 +36,7 @@ const Map<String, String> en = {
   'learn_now': 'Learn Now',
 
   // Lessons & Search
-  'all_lessons': 'All Lessons',
+  'all_lessons': 'Songs',
   'search_song_hint': 'Search song...',
   'all': 'All',
   'completed': 'Completed',

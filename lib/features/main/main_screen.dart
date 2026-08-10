@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../ads/const/ad_id_extension.dart';
+import '../../ads/const/ad_id_name.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/exit_confirmation_dialog.dart';
@@ -33,10 +37,44 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   void _onTap(int index) {
-    widget.navigationShell.goBranch(
-      index,
-      initialLocation: index == widget.navigationShell.currentIndex,
-    );
+    if (index == widget.navigationShell.currentIndex) {
+      widget.navigationShell.goBranch(index, initialLocation: true);
+      return;
+    }
+
+    final bool canShowAd = !AppConstants.isPremiumUser.value &&
+        FirebaseRemoteConfigService.getBoolConfigByKey(
+          FirebaseRemoteConfigService.inter_all,
+        );
+
+    if (canShowAd) {
+      EasyAds.instance.showInterstitialAd(
+        context,
+        adId: MyAdIdName.interAll.getId,
+        adIdName: MyAdIdName.interAll,
+        adDissmissed: () {
+          if (mounted) {
+            widget.navigationShell.goBranch(
+              index,
+              initialLocation: false,
+            );
+          }
+        },
+        onFailed: () {
+          if (mounted) {
+            widget.navigationShell.goBranch(
+              index,
+              initialLocation: false,
+            );
+          }
+        },
+      );
+    } else {
+      widget.navigationShell.goBranch(
+        index,
+        initialLocation: false,
+      );
+    }
   }
 
   @override

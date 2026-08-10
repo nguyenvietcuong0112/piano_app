@@ -3,8 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/ads_service.dart';
 import '../../../core/services/audio_engine.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_scaffold.dart';
@@ -16,25 +23,49 @@ class PianoTab extends ConsumerWidget {
 
   void _openPianoWithInstrument(
       BuildContext context, WidgetRef ref, String instrumentFolder) async {
-    ref.read(pianoSettingsProvider.notifier).setSoundPreset(instrumentFolder);
-    AudioEngine().loadInstrument(instrumentFolder);
-    await context.push('/play');
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    final canShowAd = !AppConstants.isPremiumUser.value &&
+        FirebaseRemoteConfigService.getBoolConfigByKey(
+          FirebaseRemoteConfigService.inter_all,
+        );
+
+    void navigate() async {
+      ref.read(pianoSettingsProvider.notifier).setSoundPreset(instrumentFolder);
+      AudioEngine().loadInstrument(instrumentFolder);
+      await context.push('/play');
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    }
+
+    if (canShowAd) {
+      EasyAds.instance.showInterstitialAd(
+        context,
+        adId: MyAdIdName.interAll.getId,
+        adIdName: MyAdIdName.interAll,
+        adDissmissed: () {
+          if (context.mounted) navigate();
+        },
+        onFailed: () {
+          if (context.mounted) navigate();
+        },
+      );
+    } else {
+      navigate();
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppScaffold(
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.only(top: 12.h, bottom: 90.h),
+      useSafeArea: false,
+      body: Padding(
+        padding: EdgeInsets.only(top: 8.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Acoustic Piano Card (Fixed)
             GradientBorderCard(
-              height: 155.h,
+              height: 140.h,
               borderRadius: 22,
               bgImageAsset: 'assets/images/img_acoustic_piano.png',
               imageFit: BoxFit.fill,
@@ -66,12 +97,12 @@ class PianoTab extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          SizedBox(height: 6.h),
+                          SizedBox(height: 4.h),
                           Text(
                             context.tr('home_banner_sub'),
                             style: AppTextStyles.textGrey12.copyWith(height: 1.3),
                           ),
-                          SizedBox(height: 14.h),
+                          SizedBox(height: 10.h),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                             decoration: BoxDecoration(
@@ -107,63 +138,80 @@ class PianoTab extends ConsumerWidget {
               ),
             ),
 
-            SizedBox(height: 16.h),
+            SizedBox(height: 8.h),
 
-            // Section Title: "More Instruments"
+            // Native All Small Media Ad (Fixed - Below Acoustic, Above Instruments, with Organic Check)
+            if (!AppConstants.isPremiumUser.value &&
+                !AdsService.checkIsOrganic &&
+                FirebaseRemoteConfigService.getBoolConfigByKey(
+                  FirebaseRemoteConfigService.native_all,
+                )) ...[
+              EasyNativeAd(
+                factoryId: NativeFactoryId.nativeMediaSmall,
+                adId: MyAdIdName.nativeAll.getId,
+                adIdName: MyAdIdName.nativeAll,
+                height: AdDimen.smallNativeAdHeight,
+              ),
+              SizedBox(height: 8.h),
+            ],
+
+            // Section Title: "More Instruments" (Fixed)
             Text(
               context.tr('instrument'),
               style: AppTextStyles.textWhite18,
             ),
-            SizedBox(height: 8.h),
-            // 2x2 Grid of Instruments
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 14.w,
-              mainAxisSpacing: 14.h,
-              childAspectRatio: 182.sp / 220.sp,
-              children: [
-                // 1. ORGAN
-                _buildInstrumentCard(
-                  context: context,
-                  ref: ref,
-                  title: "ORGAN",
-                  subtitle: "Classic organ sounds",
-                  folder: "organ_v2",
-                  bgImageAsset: 'assets/images/img_organ.png',
-                ),
+            SizedBox(height: 6.h),
 
-                // 2. SYNTH
-                _buildInstrumentCard(
-                  context: context,
-                  ref: ref,
-                  title: "SYNTH",
-                  subtitle: "Modern synth tones",
-                  folder: "synth",
-                  bgImageAsset: 'assets/images/img_synth.png',
-                ),
+            // 2x2 Grid of Instruments (Only Instruments List is Scrollable)
+            Expanded(
+              child: GridView.count(
+                padding: EdgeInsets.only(bottom: 90.h),
+                crossAxisCount: 2,
+                crossAxisSpacing: 14.w,
+                mainAxisSpacing: 14.h,
+                childAspectRatio: 182.sp / 220.sp,
+                children: [
+                  // 1. ORGAN
+                  _buildInstrumentCard(
+                    context: context,
+                    ref: ref,
+                    title: "ORGAN",
+                    subtitle: "Classic organ sounds",
+                    folder: "organ_v2",
+                    bgImageAsset: 'assets/images/img_organ.png',
+                  ),
 
-                // 3. ROHDES
-                _buildInstrumentCard(
-                  context: context,
-                  ref: ref,
-                  title: "ROHDES",
-                  subtitle: "Smooth electric piano",
-                  folder: "rhodes",
-                  bgImageAsset: 'assets/images/img_rohdes.png',
-                ),
+                  // 2. SYNTH
+                  _buildInstrumentCard(
+                    context: context,
+                    ref: ref,
+                    title: "SYNTH",
+                    subtitle: "Modern synth tones",
+                    folder: "synth",
+                    bgImageAsset: 'assets/images/img_synth.png',
+                  ),
 
-                // 4. BRIGHT
-                _buildInstrumentCard(
-                  context: context,
-                  ref: ref,
-                  title: "BRIGHT",
-                  subtitle: "Bright piano sound",
-                  folder: "bright",
-                  bgImageAsset: 'assets/images/img_bright.png',
-                ),
-              ],
+                  // 3. ROHDES
+                  _buildInstrumentCard(
+                    context: context,
+                    ref: ref,
+                    title: "ROHDES",
+                    subtitle: "Smooth electric piano",
+                    folder: "rhodes",
+                    bgImageAsset: 'assets/images/img_rohdes.png',
+                  ),
+
+                  // 4. BRIGHT
+                  _buildInstrumentCard(
+                    context: context,
+                    ref: ref,
+                    title: "BRIGHT",
+                    subtitle: "Bright piano sound",
+                    folder: "bright",
+                    bgImageAsset: 'assets/images/img_bright.png',
+                  ),
+                ],
+              ),
             ),
           ],
         ),

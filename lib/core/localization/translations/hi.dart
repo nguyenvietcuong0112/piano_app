@@ -36,7 +36,7 @@ const Map<String, String> hi = {
   'learn_now': 'सीखें',
 
   // Lessons & Search
-  'all_lessons': 'सभी पाठ',
+  'all_lessons': 'गाने',
   'search_song_hint': 'गाना खोजें...',
   'all': 'सभी',
   'completed': 'पूरा हुआ',

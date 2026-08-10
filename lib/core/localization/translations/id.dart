@@ -36,7 +36,7 @@ const Map<String, String> id = {
   'learn_now': 'Belajar',
 
   // Lessons & Search
-  'all_lessons': 'Semua Pelajaran',
+  'all_lessons': 'Lagu',
   'search_song_hint': 'Cari lagu...',
   'all': 'Semua',
   'completed': 'Selesai',

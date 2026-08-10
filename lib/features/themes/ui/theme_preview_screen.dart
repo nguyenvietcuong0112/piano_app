@@ -4,6 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -158,8 +165,6 @@ class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
                 ),
               ),
 
-              SizedBox(height: 28.h),
-
               // Dynamic Action Area: Success State vs Download/Apply Button
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -167,6 +172,20 @@ class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
                     ? _buildAppliedSuccessSection(context)
                     : _buildDownloadOrApplyButton(),
               ),
+
+              const Spacer(),
+
+              if (!AppConstants.isPremiumUser.value &&
+                  FirebaseRemoteConfigService.getBoolConfigByKey(
+                    FirebaseRemoteConfigService.native_all,
+                  )) ...[
+                EasyNativeAd(
+                  factoryId: NativeFactoryId.nativeMedia,
+                  adId: MyAdIdName.nativeAll.getId,
+                  adIdName: MyAdIdName.nativeAll,
+                  height: AdDimen.mediumNativeHeight,
+                ),
+              ],
             ],
           ),
         );
@@ -222,7 +241,26 @@ class _ThemePreviewScreenState extends ConsumerState<ThemePreviewScreen> {
         if (!_isDownloaded) {
           _startDownload();
         } else {
-          _applyTheme();
+          final bool canShowAd = !AppConstants.isPremiumUser.value &&
+              FirebaseRemoteConfigService.getBoolConfigByKey(
+                FirebaseRemoteConfigService.inter_all,
+              );
+
+          if (canShowAd) {
+            EasyAds.instance.showInterstitialAd(
+              context,
+              adId: MyAdIdName.interAll.getId,
+              adIdName: MyAdIdName.interAll,
+              adDissmissed: () {
+                if (mounted) _applyTheme();
+              },
+              onFailed: () {
+                if (mounted) _applyTheme();
+              },
+            );
+          } else {
+            _applyTheme();
+          }
         }
       },
     );

@@ -391,7 +391,26 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     _isExiting = false;
 
     if (shouldExit && mounted) {
-      context.pop();
+      final bool canShowAd = !AppConstants.isPremiumUser.value &&
+          FirebaseRemoteConfigService.getBoolConfigByKey(
+            FirebaseRemoteConfigService.inter_all,
+          );
+
+      if (canShowAd) {
+        EasyAds.instance.showInterstitialAd(
+          context,
+          adId: MyAdIdName.interAll.getId,
+          adIdName: MyAdIdName.interAll,
+          adDissmissed: () {
+            if (mounted) context.pop();
+          },
+          onFailed: () {
+            if (mounted) context.pop();
+          },
+        );
+      } else {
+        context.pop();
+      }
     } else if (wasPlaying && mounted) {
       _togglePlayback();
     }

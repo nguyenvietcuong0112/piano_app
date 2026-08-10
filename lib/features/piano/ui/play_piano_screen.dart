@@ -80,7 +80,26 @@ class _PlayPianoScreenState extends ConsumerState<PlayPianoScreen> {
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
-      if (mounted) {
+      if (!mounted) return;
+
+      final bool canShowAd = !AppConstants.isPremiumUser.value &&
+          FirebaseRemoteConfigService.getBoolConfigByKey(
+            FirebaseRemoteConfigService.inter_all,
+          );
+
+      if (canShowAd) {
+        EasyAds.instance.showInterstitialAd(
+          context, 
+          adId: MyAdIdName.interAll.getId,
+          adIdName: MyAdIdName.interAll,
+          adDissmissed: () {
+            if (mounted) context.pop();
+          },
+          onFailed: () {
+            if (mounted) context.pop();
+          },
+        );
+      } else {
         context.pop();
       }
     }

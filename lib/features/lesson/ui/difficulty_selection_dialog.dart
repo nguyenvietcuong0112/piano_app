@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -63,7 +64,7 @@ class _DifficultySelectionDialogState
         vertical: isLandscape ? 8.h : 20.h,
       ),
       child: Container(
-        width: isLandscape ? 260.w : 340.w,
+        width: isLandscape ? 160.w : 340.w,
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.92,
         ),
@@ -205,37 +206,36 @@ class _DifficultySelectionDialogState
               vertical: isLandscape ? 8.h : 10.h,
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(16.r),
               gradient: const LinearGradient(
-                colors: [Color(0xFFCF6BEE), Color(0xFF7A44DA)],
+                colors: [Color(0xFF7A44DA),Color(0xFFCF6BEE)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF7A44DA).withValues(alpha: 0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+              border:  GradientBoxBorder(
+                width: 1,
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFCE64F0).withValues(alpha: 0.5),
+                    Color(0xFF999999).withValues(alpha: 0.5),
+                    Color(0xFFFFFFFF).withValues(alpha: 0.5),
+                  ],
+                  stops: [0.0, 0.5, 1.0],
                 ),
-              ],
+              ),
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    'assets/icons/ic_get_premium.svg',
-                    width: isLandscape ? 16 : 20,
-                    height: isLandscape ? 16 : 20,
-                    errorBuilder: (context, error, stack) => const Icon(
-                      Icons.star_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                SvgPicture.asset(
+                  'assets/icons/ic_get_premium.svg',
+                  width: isLandscape ? 16 : 32,
+                  height: isLandscape ? 16 : 32,
+                  errorBuilder: (context, error, stack) => const Icon(
+                    Icons.star_rounded,
+                    color: Colors.white,
+                    size: 20,
                   ),
                 ),
                 SizedBox(width: 10.w),
@@ -305,17 +305,10 @@ class _DifficultySelectionDialogState
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF7A44DA).withValues(alpha: 0.25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    color: const Color(0xFFCF6BEE),
-                    size: isLandscape ? 16 : 20,
-                  ),
+                SvgPicture.asset(
+                  'assets/icons/ic_continue_with_ads.svg',
+                  width: 32.r,
+                  height: 32.r,
                 ),
                 SizedBox(width: 10.w),
                 Expanded(

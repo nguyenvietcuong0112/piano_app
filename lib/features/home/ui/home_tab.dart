@@ -7,6 +7,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -60,7 +66,35 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     }
   }
 
+  void _onAcousticPianoTap() async {
+    final canShowAd = !AppConstants.isPremiumUser.value &&
+        FirebaseRemoteConfigService.getBoolConfigByKey(
+          FirebaseRemoteConfigService.inter_all,
+        );
 
+    void navigate() async {
+      await context.push('/play');
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    }
+
+    if (canShowAd) {
+      EasyAds.instance.showInterstitialAd(
+        context,
+        adId: MyAdIdName.interAll.getId,
+        adIdName: MyAdIdName.interAll,
+        adDissmissed: () {
+          if (mounted) navigate();
+        },
+        onFailed: () {
+          if (mounted) navigate();
+        },
+      );
+    } else {
+      navigate();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,18 +102,20 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final unlockedLessons = ref.watch(unlockedLessonsProvider);
 
     return AppScaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 12.h, bottom: 90.h),
+      useSafeArea: false,
+      body: Padding(
+        padding: EdgeInsets.only(top: 8.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Acoustic Piano Card (Fixed)
             GradientBorderCard(
-              height: 150.h,
+              height: 140.h,
               borderRadius: 20,
               bgImageAsset: 'assets/images/img_acoustic_piano.png',
               imageFit: BoxFit.fill,
-              onTap: () => context.push('/play'),
-              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+              onTap: _onAcousticPianoTap,
+              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
               child: Row(
                 children: [
                   Expanded(
@@ -99,12 +135,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 6.h),
+                          SizedBox(height: 4.h),
                           Text(
                             context.tr('home_banner_sub'),
                             style: AppTextStyles.textWhite12,
                           ),
-                          SizedBox(height: 12.h),
+                          SizedBox(height: 10.h),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                             decoration: BoxDecoration(
@@ -116,7 +152,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                 gradient: LinearGradient(
                                   colors: [
                                     const Color(0xFFFFFFFF).withValues(alpha: 0.5),
-                                    const Color(0xFFFFFFFF),
+                                    Color(0xFFFFFFFF).withValues(alpha: 0),
                                     const Color(0xFFAD57E6).withValues(alpha: 0.5),
                                   ],
                                 ),
@@ -142,7 +178,23 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 ],
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 8.h),
+
+            // Native Home Ad (Fixed - placed between Acoustic Piano and Popular Songs)
+            if (!AppConstants.isPremiumUser.value &&
+                FirebaseRemoteConfigService.getBoolConfigByKey(
+                  FirebaseRemoteConfigService.native_home,
+                )) ...[
+              EasyNativeAd(
+                factoryId: NativeFactoryId.nativeMediaSmall,
+                adId: MyAdIdName.nativeHome.getId,
+                adIdName: MyAdIdName.nativeHome,
+                height: AdDimen.smallNativeAdHeight,
+              ),
+              SizedBox(height: 8.h),
+            ],
+
+            // Popular Songs Header (Fixed)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -165,193 +217,196 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 ),
               ],
             ),
-            SizedBox(height: 8.h),
-            lessonsAsync.when(
-              loading: () => SizedBox(
-                height: 200.h,
-                child: const Center(
-                  child: AppLoading(),
-                ),
-              ),
-              error: (err, stack) => Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h),
-                child: Center(
-                  child: Text(
-                    "Error: $err",
-                    style: AppTextStyles.textGrey14,
+            SizedBox(height: 6.h),
+
+            // Popular Songs List (Only list is scrollable)
+            Expanded(
+              child: lessonsAsync.when(
+                loading: () => const SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: AppLoading(),
                   ),
                 ),
-              ),
-              data: (lessonsResponse) {
-                if (lessonsResponse != null && lessonsResponse.categories.isNotEmpty) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_songStarsMap.length <= 3) {
-                      _loadSongStars(lessonsResponse);
-                    }
-                  });
-                }
-                final popularCategory = (lessonsResponse != null && lessonsResponse.categories.isNotEmpty)
-                    ? lessonsResponse.categories.firstWhere(
-                        (c) => c.categoryID == 1,
-                        orElse: () => lessonsResponse.categories.first,
-                      )
-                    : null;
-                final popularSongs = popularCategory?.items ?? [];
-
-                if (popularSongs.isEmpty) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.h),
-                    child: Center(
-                      child: Text(
-                        "No songs available",
-                        style: AppTextStyles.textGrey14,
-                      ),
+                error: (err, stack) => Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.h),
+                  child: Center(
+                    child: Text(
+                      "Error: $err",
+                      style: AppTextStyles.textGrey14,
                     ),
-                  );
-                }
+                  ),
+                ),
+                data: (lessonsResponse) {
+                  if (lessonsResponse != null && lessonsResponse.categories.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (_songStarsMap.length <= 3) {
+                        _loadSongStars(lessonsResponse);
+                      }
+                    });
+                  }
+                  final popularCategory = (lessonsResponse != null && lessonsResponse.categories.isNotEmpty)
+                      ? lessonsResponse.categories.firstWhere(
+                          (c) => c.categoryID == 1,
+                          orElse: () => lessonsResponse.categories.first,
+                        )
+                      : null;
+                  final popularSongs = popularCategory?.items ?? [];
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
-                  itemBuilder: (context, index) {
-                    final song = popularSongs[index];
-                    final songIdStr = song.id.toString();
-                    final starCount = _songStarsMap[songIdStr] ?? 0;
-                    final showRewardBadge = !AppConstants.isPremiumUser.value &&
-                        !unlockedLessons.contains(songIdStr);
-
-                    return GestureDetector(
-                      onTap: () async {
-                        final selectedLevel = await DifficultySelectionDialog.show(
-                          context,
-                          song: song,
-                        );
-                        if (selectedLevel != null && context.mounted) {
-                          final updatedSong = song.copyWith(level: selectedLevel);
-                          await context.push('/lesson-play', extra: updatedSong);
-                          await SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.portraitUp,
-                          ]);
-                          _loadSongStars();
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.10),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            // Song Thumbnail + VIP Crown Badge
-                            Stack(
-                              children: [
-                                SongThumbnail(
-                                  thumbnailUrl: song.thumbnail,
-                                  width: 100.sp,
-                                  height: 80.sp,
-                                  borderRadius: 12,
-                                ),
-                                if (showRewardBadge)
-                                  Positioned(
-                                    top: 6.sp,
-                                    left: 6.sp,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/ic_reward.svg',
-                                      width: 24.sp,
-                                      height: 24.sp,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            SizedBox(width: 10.w),
-                            // Song Title, Author & 5-Star Rating
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    song.titleName,
-                                    style: AppTextStyles.textWhite14,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 4.h),
-                                  Text(
-                                    song.authorName,
-                                    style: AppTextStyles.textGrey12,
-                                  ),
-                                  SizedBox(height: 4.h),
-                                  // Star Rating Row
-                                  Row(
-                                    children: List.generate(5, (starIndex) {
-                                      bool isStarFilled = starIndex < starCount;
-                                      return Padding(
-                                        padding: const EdgeInsets.only(right: 2),
-                                        child: Icon(
-                                          Icons.star_rounded,
-                                          size: 14.sp,
-                                          color: isStarFilled ? AppColors.levelMedium : AppColors.keyWhiteBorder,
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Play Button Pill
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD065F2),
-                                borderRadius: BorderRadius.circular(16.r),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFF7745D3).withValues(alpha: 0.25),
-                                    const Color(0xFFCC69EE).withValues(alpha: 0.25),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/ic_play.svg',
-                                    width: 12.sp,
-                                    height: 12.sp,
-                                    colorFilter: const ColorFilter.mode(
-                                      AppColors.textPurple,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  SizedBox(width: 5.w),
-                                  Text(
-                                    context.tr('practice_now'),
-                                    style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                  if (popularSongs.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20.h),
+                      child: Center(
+                        child: Text(
+                          "No songs available",
+                          style: AppTextStyles.textGrey14,
                         ),
                       ),
                     );
-                  },
-                );
-              },
+                  }
+
+                  return ListView.builder(
+                    padding: EdgeInsets.only(bottom: 90.h),
+                    itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
+                    itemBuilder: (context, index) {
+                      final song = popularSongs[index];
+                      final songIdStr = song.id.toString();
+                      final starCount = _songStarsMap[songIdStr] ?? 0;
+                      final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                          !unlockedLessons.contains(songIdStr);
+
+                      return GestureDetector(
+                        onTap: () async {
+                          final selectedLevel = await DifficultySelectionDialog.show(
+                            context,
+                            song: song,
+                          );
+                          if (selectedLevel != null && context.mounted) {
+                            final updatedSong = song.copyWith(level: selectedLevel);
+                            await context.push('/lesson-play', extra: updatedSong);
+                            await SystemChrome.setPreferredOrientations([
+                              DeviceOrientation.portraitUp,
+                            ]);
+                            _loadSongStars();
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF141126), Color(0xFF0F0F1E)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.10),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              // Song Thumbnail + VIP Crown Badge
+                              Stack(
+                                children: [
+                                  SongThumbnail(
+                                    thumbnailUrl: song.thumbnail,
+                                    width: 100.sp,
+                                    height: 80.sp,
+                                    borderRadius: 12,
+                                  ),
+                                  if (showRewardBadge)
+                                    Positioned(
+                                      top: 6.sp,
+                                      left: 6.sp,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/ic_reward.svg',
+                                        width: 24.sp,
+                                        height: 24.sp,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              SizedBox(width: 10.w),
+                              // Song Title, Author & 5-Star Rating
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      song.titleName,
+                                      style: AppTextStyles.textWhite14,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      song.authorName,
+                                      style: AppTextStyles.textGrey12,
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    // Star Rating Row
+                                    Row(
+                                      children: List.generate(5, (starIndex) {
+                                        bool isStarFilled = starIndex < starCount;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(right: 2),
+                                          child: Icon(
+                                            Icons.star_rounded,
+                                            size: 14.sp,
+                                            color: isStarFilled ? AppColors.levelMedium : AppColors.keyWhiteBorder,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Play Button Pill
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD065F2),
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xFF7745D3).withValues(alpha: 0.25),
+                                      const Color(0xFFCC69EE).withValues(alpha: 0.25),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/ic_play.svg',
+                                      width: 12.sp,
+                                      height: 12.sp,
+                                      colorFilter: const ColorFilter.mode(
+                                        AppColors.textPurple,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    SizedBox(width: 5.w),
+                                    Text(
+                                      context.tr('practice_now'),
+                                      style: AppTextStyles.textPurple12.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

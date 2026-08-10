@@ -36,7 +36,7 @@ const Map<String, String> tr = {
   'learn_now': 'Öğren',
 
   // Lessons & Search
-  'all_lessons': 'Tüm Dersler',
+  'all_lessons': 'Şarkılar',
   'search_song_hint': 'Şarkı ara...',
   'all': 'Tümü',
   'completed': 'Tamamlandı',

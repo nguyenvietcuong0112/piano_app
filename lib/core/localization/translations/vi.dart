@@ -36,7 +36,7 @@ const Map<String, String> vi = {
   'learn_now': 'Học ngay',
 
   // Lessons & Search
-  'all_lessons': 'Tất Cả Bài Học',
+  'all_lessons': 'Bài Hát',
   'search_song_hint': 'Tìm kiếm bài hát...',
   'all': 'Tất cả',
   'completed': 'Đã hoàn thành',

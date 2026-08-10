@@ -358,8 +358,8 @@ class OnboardController extends ChangeNotifier {
       if (!context.mounted) return;
       EasyAds.instance.showInterstitialAd(
         context,
-        adId: MyAdIdName.interstitialOnboard.getId,
-        adIdName: MyAdIdName.interstitialOnboard,
+        adId: MyAdIdName.interOnboard.getId,
+        adIdName: MyAdIdName.interOnboard,
         adDissmissed: () {
           if (context.mounted) context.go('/home');
         },

@@ -36,7 +36,7 @@ const Map<String, String> bn = {
   'learn_now': 'শিখুন',
 
   // Lessons & Search
-  'all_lessons': 'সব পাঠ',
+  'all_lessons': 'গানসমূহ',
   'search_song_hint': 'গান খুঁজুন...',
   'all': 'সব',
   'completed': 'সম্পন্ন',

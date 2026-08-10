@@ -7,6 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
+import '../../../ads/const/ad_id_extension.dart';
+import '../../../ads/const/ad_id_factory.dart';
+import '../../../ads/const/ad_id_name.dart';
+import '../../../ads/dimens/ad_dimen.dart';
+import '../../../core/services/ads_service.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/shared_preference_service.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -46,6 +53,21 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
         _completedSongs = list;
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _navigateToPlaySong(LessonsItem lessonItem) async {
+    final selectedLevel = await DifficultySelectionDialog.show(
+      context,
+      song: lessonItem,
+    );
+    if (selectedLevel != null && context.mounted) {
+      final updatedItem = lessonItem.copyWith(level: selectedLevel);
+      await context.push('/lesson-play', extra: updatedItem);
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      _loadCompletedSongs();
     }
   }
 
@@ -155,7 +177,19 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
               //     ),
               //   ],
               // ),
-              // const SizedBox(height: 10),
+              if (!AppConstants.isPremiumUser.value &&
+                  !AdsService.checkIsOrganic &&
+                  FirebaseRemoteConfigService.getBoolConfigByKey(
+                    FirebaseRemoteConfigService.native_piano,
+                  )) ...[
+                EasyNativeAd(
+                  factoryId: NativeFactoryId.nativeMediaSmall,
+                  adId: MyAdIdName.nativeAll.getId,
+                  adIdName: MyAdIdName.nativeAll,
+                  height: AdDimen.smallNativeAdHeight,
+                ),
+                SizedBox(height: 12.h),
+              ],
 
               if (_isLoading)
                 const Padding(
@@ -201,18 +235,26 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
                     );
 
                     return GestureDetector(
-                      onTap: () async {
-                        final selectedLevel = await DifficultySelectionDialog.show(
-                          context,
-                          song: lessonItem,
-                        );
-                        if (selectedLevel != null && context.mounted) {
-                          final updatedItem = lessonItem.copyWith(level: selectedLevel);
-                          await context.push('/lesson-play', extra: updatedItem);
-                          await SystemChrome.setPreferredOrientations([
-                            DeviceOrientation.portraitUp,
-                          ]);
-                          _loadCompletedSongs();
+                      onTap: () {
+                        final canShowAd = !AppConstants.isPremiumUser.value &&
+                            FirebaseRemoteConfigService.getBoolConfigByKey(
+                              FirebaseRemoteConfigService.inter_all,
+                            );
+
+                        if (canShowAd) {
+                          EasyAds.instance.showInterstitialAd(
+                            context,
+                            adId: MyAdIdName.interAll.getId,
+                            adIdName: MyAdIdName.interAll,
+                            adDissmissed: () {
+                              if (mounted) _navigateToPlaySong(lessonItem);
+                            },
+                            onFailed: () {
+                              if (mounted) _navigateToPlaySong(lessonItem);
+                            },
+                          );
+                        } else {
+                          _navigateToPlaySong(lessonItem);
                         }
                       },
                       child: Container(

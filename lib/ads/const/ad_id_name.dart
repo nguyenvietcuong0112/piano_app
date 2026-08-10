@@ -46,7 +46,7 @@ class MyAdIdName {
   static const nativeFull = "nativeFull";
   static const rewardedAd = "rewardedAd";
   static const nativeBanner = "nativeBanner";
-  static const interstitialOnboard = "interstitialOnboard";
+  static const interOnboard = "interOnboard";
   static const nativeHome = "nativeHome";
   static const nativeAll = "nativeAll";
 }

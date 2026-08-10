@@ -36,7 +36,7 @@ const Map<String, String> fil = {
   'learn_now': 'Matuto',
 
   // Lessons & Search
-  'all_lessons': 'Lahat ng Aralin',
+  'all_lessons': 'Mga Kanta',
   'search_song_hint': 'Maghanap ng kanta...',
   'all': 'Lahat',
   'completed': 'Kumpleto na',
