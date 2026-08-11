@@ -183,9 +183,12 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                         children: [
                           // Songs List in this Category
                           ...category.items.map((song) {
+                            final firstSongIds = displayCategories.where((c) => c.items.isNotEmpty).map((c) => c.items.first.id.toString()).toSet();
                             final songIdStr = song.id.toString();
+                            final isFirstInCategory = firstSongIds.contains(songIdStr);
                             final starCount = _songStarsMap[songIdStr] ?? 0;
                             final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                                !isFirstInCategory &&
                                 !unlockedLessons.contains(songIdStr);
 
                             return GestureDetector(
@@ -193,6 +196,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                 final selectedLevel = await DifficultySelectionDialog.show(
                                   context,
                                   song: song,
+                                  isFreeOverride: isFirstInCategory,
                                 );
                                 if (selectedLevel != null && context.mounted) {
                                   final updatedSong = song.copyWith(level: selectedLevel);

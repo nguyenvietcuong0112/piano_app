@@ -5,9 +5,12 @@ import '../theme/app_text_styles.dart';
 import '../services/audio_recorder_service.dart';
 import '../services/rewarded_ad_service.dart';
 import '../localization/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/lesson/state/lesson_provider.dart';
+import '../constants/app_constants.dart';
 import 'gradient_border_card.dart';
 
-class RecordSelectionDialog extends StatelessWidget {
+class RecordSelectionDialog extends ConsumerWidget {
   const RecordSelectionDialog({super.key});
 
   static Future<RecordingMode?> show(BuildContext context) {
@@ -19,7 +22,10 @@ class RecordSelectionDialog extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unlockedLessons = ref.watch(unlockedLessonsProvider);
+    final isUnlocked = AppConstants.isPremiumUser.value || unlockedLessons.contains('piano_sheets_record');
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -82,12 +88,20 @@ class RecordSelectionDialog extends StatelessWidget {
                   context: context,
                   icon: Icons.piano_rounded,
                   label: "Piano Sheets",
-                  isReward: true,
+                  isReward: !isUnlocked,
                   onTap: () {
+                    if (isUnlocked) {
+                      Navigator.pop(context, RecordingMode.internal);
+                      return;
+                    }
+
                     RewardedAdService.showRewardedAd(
                       context: context,
                       songId: 'piano_sheets_record',
-                      onRewardEarned: () {
+                      onRewardEarned: () async {
+                        await ref
+                            .read(unlockedLessonsProvider.notifier)
+                            .unlockLesson('piano_sheets_record');
                         if (context.mounted) {
                           Navigator.pop(context, RecordingMode.internal);
                         }

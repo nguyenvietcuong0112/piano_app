@@ -16,14 +16,26 @@ import '../state/lesson_provider.dart';
 
 class DifficultySelectionDialog extends ConsumerStatefulWidget {
   final LessonsItem song;
+  final bool isFreeOverride;
 
-  const DifficultySelectionDialog({super.key, required this.song});
+  const DifficultySelectionDialog({
+    super.key,
+    required this.song,
+    this.isFreeOverride = false,
+  });
 
-  static Future<int?> show(BuildContext context, {required LessonsItem song}) {
+  static Future<int?> show(
+    BuildContext context, {
+    required LessonsItem song,
+    bool isFreeOverride = false,
+  }) {
     return showDialog<int>(
       context: context,
       barrierDismissible: true,
-      builder: (context) => DifficultySelectionDialog(song: song),
+      builder: (context) => DifficultySelectionDialog(
+        song: song,
+        isFreeOverride: isFreeOverride,
+      ),
     );
   }
 
@@ -55,7 +67,7 @@ class _DifficultySelectionDialogState
     final unlockedLessons = ref.watch(unlockedLessonsProvider);
     final songIdStr = widget.song.id.toString();
     final isPremium = AppConstants.isPremiumUser.value;
-    final isUnlocked = isPremium || unlockedLessons.contains(songIdStr);
+    final isUnlocked = isPremium || unlockedLessons.contains(songIdStr) || widget.isFreeOverride;
 
     return Dialog(
       backgroundColor: Colors.transparent,

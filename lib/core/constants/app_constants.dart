@@ -48,9 +48,9 @@ class AppConstants {
   static const String appIdIOS = '';
 
   // GSM & Adjust Constants
-  static const String gsmAppId = '';
-  static const String adjustToken = '';
-  static const String adjustIapToken = '';
+  static const String gsmAppId = '6a7188d19e47ab334c22479e';
+  static const String adjustToken = 'uy7wa8li29ds';
+  static const String adjustIapToken = '333lcd';
 
   static final ValueNotifier<bool> isPremiumUser = ValueNotifier<bool>(false)
     ..addListener(() {
@@ -61,7 +61,7 @@ class AppConstants {
   static int interval_inter_ad = 35;
   static int adImpressionCount = 0;
   static String selectedLanguageCode = 'en';
-  static String GSMAccessToken = '';
+  static String GSMAccessToken = '6a7188d19e47ab334c22479e';
 
   /// Cấu hình luồng mở app từ lần thứ 2 trở đi:
   /// - `true`: Từ lần 2 mở app -> Splash vào thẳng Main

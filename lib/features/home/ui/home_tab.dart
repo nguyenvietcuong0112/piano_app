@@ -267,9 +267,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
                   itemBuilder: (context, index) {
                     final song = popularSongs[index];
+                    final firstSongIds = (lessonsResponse != null) ? lessonsResponse.categories.where((c) => c.items.isNotEmpty).map((c) => c.items.first.id.toString()).toSet() : <String>{};
                     final songIdStr = song.id.toString();
+                    final isFirstInCategory = firstSongIds.contains(songIdStr);
                     final starCount = _songStarsMap[songIdStr] ?? 0;
                     final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                        !isFirstInCategory &&
                         !unlockedLessons.contains(songIdStr);
 
                     return GestureDetector(
@@ -277,6 +280,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         final selectedLevel = await DifficultySelectionDialog.show(
                           context,
                           song: song,
+                          isFreeOverride: isFirstInCategory,
                         );
                         if (selectedLevel != null && context.mounted) {
                           final updatedSong = song.copyWith(level: selectedLevel);

@@ -147,11 +147,11 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
           child: ListView.builder(
             itemCount: controller.itemsList.length,
             scrollDirection: Axis.vertical,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 20,
               right: 20,
               top: 0,
-              bottom: hideAd ? 20 : AdDimen.mediumNativeHeight + 10,
+              bottom: 20,
             ),
             itemBuilder: (context, index) {
               final isSelected = controller.selectedIndex == index;

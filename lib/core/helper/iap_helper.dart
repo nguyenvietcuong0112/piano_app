@@ -145,12 +145,20 @@ class IAPHelper {
 
     if (product != null) {
       if (purchaseDetails.productID == weeklyProductId) {
+        AdjustHelper().trackEventBuyWeeklySuccess(
+          purchase: purchaseDetails,
+          productDetail: product,
+        );
         FirebaseHelper.logEventPurchaseSuccessWeekly(
           purchase: purchaseDetails,
           productDetail: product,
           isGoogle: isGoogle,
         );
       } else if (purchaseDetails.productID == monthlyProductId) {
+        AdjustHelper().trackEventBuyMonthlySuccess(
+          purchase: purchaseDetails,
+          productDetail: product,
+        );
         FirebaseHelper.logEventPurchaseSuccessMonthly(
           purchase: purchaseDetails,
           productDetail: product,

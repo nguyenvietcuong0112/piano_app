@@ -320,9 +320,14 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => LessonResultDialog(
+      builder: (dialogContext) => LessonResultDialog(
         state: state,
         songTitle: widget.lesson.titleName,
+        onNextSong: () {
+          if (context.mounted) {
+            context.pop();
+          }
+        },
         onReplay: () {
           ref.read(lessonPlayControllerProvider.notifier).resetNoteIndex();
           _pianoKey.currentState?.clearFallingNotes();

@@ -48,7 +48,7 @@ void main() async {
   await _initializeAds();
 
   runApp(
-    const ProviderScope(
+    const ProviderScope( 
       child: MyApp(),
     ),
   );
