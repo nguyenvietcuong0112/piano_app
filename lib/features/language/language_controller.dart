@@ -28,6 +28,7 @@ class LanguageController extends ChangeNotifier {
   bool isShouldShowNext = false;
   bool isShouldShowAds = true;
   bool isLoading = false;
+  bool canClick = false;
   bool _isDisposed = false;
 
   Timer? _nextDelayTimer;
@@ -37,16 +38,16 @@ class LanguageController extends ChangeNotifier {
     isFirstLaunch = firstLaunch;
     itemsList.clear();
     itemsList.addAll(const [
-      LanguageModel(title: 'हिन्दी', languageCode: 'hi', countryCode: 'in'),
       LanguageModel(title: 'বাংলা', languageCode: 'bn', countryCode: 'bd'),
       LanguageModel(title: 'Bahasa Indonesia', languageCode: 'id', countryCode: 'id'),
-      LanguageModel(title: 'English', languageCode: 'en', countryCode: 'us'),
       LanguageModel(title: 'Filipino', languageCode: 'fil', countryCode: 'ph'),
       LanguageModel(title: 'Español', languageCode: 'es', countryCode: 'es'),
       LanguageModel(title: 'Türkçe', languageCode: 'tr', countryCode: 'tr'),
       LanguageModel(title: 'Português', languageCode: 'pt', countryCode: 'pt'),
       LanguageModel(title: 'العربية', languageCode: 'ar', countryCode: 'sa'),
       LanguageModel(title: 'Русский', languageCode: 'ru', countryCode: 'ru'),
+      LanguageModel(title: 'हिन्दी', languageCode: 'hi', countryCode: 'in'),
+      LanguageModel(title: 'English', languageCode: 'en', countryCode: 'us'),
       LanguageModel(title: 'Français', languageCode: 'fr', countryCode: 'fr'),
       LanguageModel(title: 'Tiếng Việt', languageCode: 'vi', countryCode: 'vn'),
     ]);
@@ -55,12 +56,13 @@ class LanguageController extends ChangeNotifier {
       getPreviousSelectedLanguage();
     }
 
-    isLoading = true;
+    isLoading = false;
+    canClick = false;
     _notify();
 
     _loadingTimer?.cancel();
-    _loadingTimer = Timer(const Duration(milliseconds: 1000), () {
-      isLoading = false;
+    _loadingTimer = Timer(const Duration(milliseconds: 2000), () {
+      canClick = true;
       _notify();
     });
   }
@@ -96,6 +98,7 @@ class LanguageController extends ChangeNotifier {
   }
 
   void onSelectItem(int index) {
+    if (!canClick || isLoading) return;
     selectedIndex = index;
     isShowClickAds = true;
     isShouldShowNext = true;
@@ -103,6 +106,7 @@ class LanguageController extends ChangeNotifier {
   }
 
   void onSelectBack(BuildContext context) {
+    if (!canClick || isLoading) return;
     Navigator.pop(context);
   }
 
@@ -111,6 +115,7 @@ class LanguageController extends ChangeNotifier {
     required WidgetRef ref,
     required VoidCallback onNavigateNext,
   }) {
+    if (!canClick || isLoading) return;
     if (selectedIndex >= 0 && selectedIndex < itemsList.length) {
       final code = itemsList[selectedIndex].languageCode;
       AppConstants.selectedLanguageCode = code;

@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
@@ -80,6 +82,7 @@ class IAPHelper {
 
   static Future<bool> buyProduct(ProductDetails productDetails) async {
     try {
+      EasyAds.instance.appLifecycleReactor?.setIsExcludeScreen(true);
       isLoading.value = true;
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: productDetails);
@@ -96,6 +99,7 @@ class IAPHelper {
 
   static Future<void> restorePurchases() async {
     try {
+      EasyAds.instance.appLifecycleReactor?.setIsExcludeScreen(true);
       isLoading.value = true;
       await _iap.restorePurchases();
     } catch (e) {

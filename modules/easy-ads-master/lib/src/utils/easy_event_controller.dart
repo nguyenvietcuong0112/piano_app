@@ -11,6 +11,8 @@ class EasyEventController {
   Stream<AdEvent> get onEvent => _onEventController.stream;
   final _onEventController = StreamController<AdEvent>.broadcast();
 
+  void fireEvent(AdEvent event) => _onEventController.add(event);
+
   void fireNetworkInitializedEvent(AdNetwork adNetwork, bool status) {
     _onEventController.add(AdEvent(
       type: AdEventType.adNetworkInitialized,

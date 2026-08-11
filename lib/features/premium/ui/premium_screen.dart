@@ -1,3 +1,4 @@
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -45,6 +46,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _handleBuy() async {
+    EasyAds.instance.appLifecycleReactor?.setIsExcludeScreen(true);
     final productId = _selectedPackage == 'weekly'
         ? IAPHelper.weeklyProductId
         : IAPHelper.monthlyProductId;
@@ -71,6 +73,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _handleRestore() async {
+    EasyAds.instance.appLifecycleReactor?.setIsExcludeScreen(true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(context.tr('restoring_purchases')),

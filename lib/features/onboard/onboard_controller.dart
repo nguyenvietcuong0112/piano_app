@@ -10,6 +10,7 @@ import '../../ads/const/ad_id_factory.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/ads_service.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/services/shared_preference_service.dart';
 
@@ -94,7 +95,7 @@ class OnboardController extends ChangeNotifier {
   }
 
   // --- Ad Management ---
-  void reloadAds() {
+  Future<void> reloadAds() async {
     if (AppConstants.isPremiumUser.value) {
       isIntro1AdLoading = false;
       isIntro4AdLoading = false;
@@ -103,9 +104,11 @@ class OnboardController extends ChangeNotifier {
       return;
     }
 
+    await AdsService.initOrganic();
+
     isIntro4AdReady = false;
     _initIntro1AdState();
-    _initFullAds();
+    await _initFullAds();
     _listenAdEvents();
   }
 
@@ -141,13 +144,16 @@ class OnboardController extends ChangeNotifier {
     _notify();
   }
 
-  void _initFullAds() {
+  Future<void> _initFullAds() async {
+    final isOrganic = await AdsService.isOrganicAsync();
     final showFull1 = FirebaseRemoteConfigService.getBoolConfigByKey(
-      FirebaseRemoteConfigService.native_onboarding_full_1,
-    );
+          FirebaseRemoteConfigService.native_onboarding_full_1,
+        ) &&
+        !isOrganic;
     final showFull2 = FirebaseRemoteConfigService.getBoolConfigByKey(
-      FirebaseRemoteConfigService.native_onboarding_full_2,
-    );
+          FirebaseRemoteConfigService.native_onboarding_full_2,
+        ) &&
+        !isOrganic;
 
     if (showFull1) {
       nativeOnboardFull1 = EasyAds.instance.createNative(
@@ -354,7 +360,8 @@ class OnboardController extends ChangeNotifier {
 
   Future<void> _finishOnboarding(BuildContext context) async {
     await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
-    if (!AppConstants.isPremiumUser.value) {
+    final isOrganic = await AdsService.isOrganicAsync();
+    if (!AppConstants.isPremiumUser.value && !isOrganic) {
       if (!context.mounted) return;
       EasyAds.instance.showInterstitialAd(
         context,

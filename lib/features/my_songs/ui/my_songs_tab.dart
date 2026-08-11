@@ -178,7 +178,7 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
               //   ],
               // ),
               if (!AppConstants.isPremiumUser.value &&
-                  !AdsService.checkIsOrganic &&
+                  !AdsService.isOrganic.value &&
                   FirebaseRemoteConfigService.getBoolConfigByKey(
                     FirebaseRemoteConfigService.native_piano,
                   )) ...[

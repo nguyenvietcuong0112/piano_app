@@ -83,6 +83,30 @@ class EasyAds {
   void setPremiumUser(bool value) {
     _isPremiumUser = value;
     _logger.logInfo('EasyAds: setPremiumUser = $value');
+    if (value) {
+      for (final ad in _nativeAdCache.values) {
+        ad.dispose();
+      }
+      _nativeAdCache.clear();
+
+      for (final ad in _interstitialAdCache.values) {
+        ad.dispose();
+      }
+      _interstitialAdCache.clear();
+
+      for (final ad in _rewardAdCache.values) {
+        ad.dispose();
+      }
+      _rewardAdCache.clear();
+
+      _eventController.fireEvent(
+        AdEvent(
+          type: AdEventType.adFailedToLoad,
+          adNetwork: AdNetwork.admob,
+          adUnitType: AdUnitType.banner,
+        ),
+      );
+    }
   }
 
   void setManualAppOpenAdShowing(bool value) =>

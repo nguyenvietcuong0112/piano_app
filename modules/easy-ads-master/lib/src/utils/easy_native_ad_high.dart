@@ -54,6 +54,10 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
   @override
   void initState() {
     super.initState();
+    if (EasyAds.instance.isPremiumUser) {
+      _isAdLoading = false;
+      return;
+    }
     _isAdLoading = true;
 
     // Check / preload HIGH in cache
@@ -71,6 +75,15 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
     }
 
     _timer = Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      if (EasyAds.instance.isPremiumUser) {
+        _timer?.cancel();
+        _timer = null;
+        _ad = null;
+        _isAdLoading = false;
+        if (mounted) setState(() {});
+        return;
+      }
+
       // If HIGH loaded -> use it and stop
       if (_nativeAdHigh?.isAdLoaded == true) {
         _timer?.cancel();
@@ -128,6 +141,15 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
     });
 
     _adEventSubscription = EasyAds.instance.onEvent.listen((event) {
+      if (EasyAds.instance.isPremiumUser) {
+        _timer?.cancel();
+        _timer = null;
+        _ad = null;
+        _isAdLoading = false;
+        if (mounted) setState(() {});
+        return;
+      }
+
       if (event.adUnitType == AdUnitType.native) {
         if (_finalized &&
             !_impressionSent &&
@@ -149,6 +171,9 @@ class _EasyNativeAdHighState extends State<EasyNativeAdHigh> {
 
   @override
   Widget build(BuildContext context) {
+    if (EasyAds.instance.isPremiumUser) {
+      return const SizedBox();
+    }
     if (_isAdLoading) {
       return EasyLoadingAd(height: widget.height);
     }

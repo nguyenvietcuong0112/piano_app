@@ -35,6 +35,7 @@ class _EasyNativeAdCachedState extends State<EasyNativeAdCached> {
   @override
   void initState() {
     super.initState();
+    if (EasyAds.instance.isPremiumUser) return;
     _nativeAd = EasyAds.instance.getCachedNativeAd(widget.cacheKey);
 
     if (_nativeAd == null) {
@@ -49,6 +50,11 @@ class _EasyNativeAdCachedState extends State<EasyNativeAdCached> {
     }
 
     _streamSubscription = EasyAds.instance.onEvent.listen((event) {
+      if (EasyAds.instance.isPremiumUser) {
+        _nativeAd = null;
+        if (mounted) setState(() {});
+        return;
+      }
       if (event.adUnitId == widget.adId && event.type == AdEventType.adLoaded) {
         if (mounted) {
           setState(() {
@@ -67,6 +73,7 @@ class _EasyNativeAdCachedState extends State<EasyNativeAdCached> {
 
   @override
   Widget build(BuildContext context) {
+    if (EasyAds.instance.isPremiumUser) return const SizedBox();
     final ad = _nativeAd;
 
     if (ad == null || ad.isAdLoading) {

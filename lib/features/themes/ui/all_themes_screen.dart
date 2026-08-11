@@ -93,7 +93,7 @@ class _AllThemesScreenState extends ConsumerState<AllThemesScreen> {
 
           // Native All Ad
           if (!AppConstants.isPremiumUser.value &&
-              !AdsService.checkIsOrganic &&
+              !AdsService.isOrganic.value &&
               FirebaseRemoteConfigService.getBoolConfigByKey(
                 FirebaseRemoteConfigService.native_all,
               )) ...[

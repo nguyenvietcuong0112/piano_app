@@ -84,7 +84,7 @@ class _ThemeTabState extends ConsumerState<ThemeTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!AppConstants.isPremiumUser.value &&
-                  !AdsService.checkIsOrganic &&
+                  !AdsService.isOrganic.value &&
                   FirebaseRemoteConfigService.getBoolConfigByKey(
                     FirebaseRemoteConfigService.native_themes,
                   )) ...[

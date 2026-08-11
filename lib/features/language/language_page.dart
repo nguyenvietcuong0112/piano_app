@@ -15,6 +15,7 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/app_loading.dart';
 import 'language_controller.dart';
 
 class LanguagePage extends ConsumerStatefulWidget {
@@ -68,8 +69,9 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
                 child: Container(
                   color: const Color(0xFF131722).withValues(alpha: 0.8),
                   child: const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
+                    child: AppLoading(
+                      width: 100,
+                      height: 100,
                     ),
                   ),
                 ),
@@ -290,28 +292,32 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
               right: 10,
               bottom: 0,
               top: 0,
-              child: GestureDetector(
-                onTap: () {
-                  controller.onClickNext(
-                    context,
-                    ref: ref,
-                    onNavigateNext: () => context.go('/onboard'),
-                  );
-                },
-                child: const Row(
-                  children: [
-                    SizedBox(
-                      width: 80,
-                      height: 36,
-                      child: Center(
-                        child: Icon(
-                          Icons.done,
-                          color: AppColors.textWhite,
-                          size: 25,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: controller.canClick ? 1.0 : 0.4,
+                child: GestureDetector(
+                  onTap: () {
+                    controller.onClickNext(
+                      context,
+                      ref: ref,
+                      onNavigateNext: () => context.go('/onboard'),
+                    );
+                  },
+                  child: const Row(
+                    children: [
+                      SizedBox(
+                        width: 80,
+                        height: 36,
+                        child: Center(
+                          child: Icon(
+                            Icons.done,
+                            color: AppColors.textWhite,
+                            size: 25,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

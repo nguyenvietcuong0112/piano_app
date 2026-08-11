@@ -142,7 +142,7 @@ class PianoTab extends ConsumerWidget {
 
             // Native All Small Media Ad (Fixed - Below Acoustic, Above Instruments, with Organic Check)
             if (!AppConstants.isPremiumUser.value &&
-                !AdsService.checkIsOrganic &&
+                !AdsService.isOrganic.value &&
                 FirebaseRemoteConfigService.getBoolConfigByKey(
                   FirebaseRemoteConfigService.native_all,
                 )) ...[

@@ -31,12 +31,12 @@ class AdsService {
     }
   }
 
-  static bool get checkIsOrganic => isOrganic.value;
-
   static Future<bool> isOrganicAsync() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool(keyIsOrganic) ?? false;
+      final bool value = prefs.getBool(keyIsOrganic) ?? false;
+      isOrganic.value = value;
+      return value;
     } catch (e) {
       return false;
     }

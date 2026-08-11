@@ -3,6 +3,7 @@ import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../const/ad_id_factory.dart';
 import '../const/ad_id_name.dart';
@@ -41,6 +42,12 @@ class _NativeFullScreenState extends State<NativeFullScreen>
   void initState() {
     super.initState();
     debugPrint('🎬 NativeFull initState - _navigated: $_navigated');
+    if (EasyAds.instance.isPremiumUser || AppConstants.isPremiumUser.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleNavigate();
+      });
+      return;
+    }
     EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(true);
     WidgetsBinding.instance.addObserver(this);
 

@@ -32,6 +32,7 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
 
   @override
   Widget build(BuildContext context) {
+    if (EasyAds.instance.isPremiumUser) return const SizedBox();
     final adWidget = _bannerAd?.show();
     if (adWidget == null) return const SizedBox();
     return Container(
@@ -43,6 +44,7 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
 
   AdSize? adSize;
   Future<void> _initAd() async {
+    if (EasyAds.instance.isPremiumUser) return;
     if (adSize != null) {
       return;
     }
@@ -67,6 +69,13 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
     );
     _bannerAd?.load();
     _streamSubscription = EasyAds.instance.onEvent.listen((event) {
+      if (EasyAds.instance.isPremiumUser) {
+        _reloadTimer?.cancel();
+        _bannerAd?.dispose();
+        _bannerAd = null;
+        if (mounted) setState(() {});
+        return;
+      }
       if (event.adUnitType == AdUnitType.banner) {
         if (mounted) {
           setState(() {});
@@ -79,6 +88,7 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
 
   void _startReloadTimer() {
     _reloadTimer?.cancel();
+    if (EasyAds.instance.isPremiumUser) return;
     if (widget.reloadInterval != null && widget.reloadInterval! > 0) {
       _reloadTimer = Timer.periodic(Duration(seconds: widget.reloadInterval!), (timer) {
         _reloadAd();
@@ -87,6 +97,13 @@ class _EasyBannerAdState extends State<EasyBannerAd> {
   }
 
   void _reloadAd() {
+    if (EasyAds.instance.isPremiumUser) {
+      _reloadTimer?.cancel();
+      _bannerAd?.dispose();
+      _bannerAd = null;
+      if (mounted) setState(() {});
+      return;
+    }
     _bannerAd?.dispose();
     _bannerAd = EasyAds.instance.createBanner(
       adNetwork: widget.adNetwork,
