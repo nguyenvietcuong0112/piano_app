@@ -233,7 +233,7 @@ class _SongsLandscapeScreenState extends ConsumerState<SongsLandscapeScreen> {
                               Stack(
                                 children: [
                                   SongThumbnail(
-                                    thumbnailUrl: song.thumbnail,
+                                    thumbnailUrl: song.fullThumbnailUrl,
                                     width: 50,
                                     height: 50,
                                     borderRadius: 8,

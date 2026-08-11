@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../ads/dimens/ad_dimen.dart';
@@ -54,6 +55,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   final int _countdownValue = 0;
   bool _isExiting = false;
   bool _isLoadingNotes = true;
+  bool _isTransitioningOrientation = false;
 
   @override
   void initState() {
@@ -72,7 +74,27 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     final ds = LessonDataSource();
 
     try {
-      final container = await ds.getLessonContainer(widget.lesson.lessonsData).timeout(
+      LessonsItem targetLesson = widget.lesson;
+      if (targetLesson.id > 0) {
+        String modeName = 'Easy';
+        if (targetLesson.level == 2) modeName = 'Medium';
+        if (targetLesson.level == 3) modeName = 'Hard';
+
+        final detail = await ds
+            .getSongDetail(targetLesson.id, difficulty: modeName)
+            .timeout(const Duration(seconds: 4), onTimeout: () => null);
+
+        if (detail != null) {
+          targetLesson = targetLesson.copyWith(
+            jsonUrlEasy: detail.jsonUrlEasy,
+            jsonUrlMedium: detail.jsonUrlMedium,
+            jsonUrlHard: detail.jsonUrlHard,
+            audioUrl: detail.audioUrl,
+          );
+        }
+      }
+
+      final container = await ds.getLessonContainer(targetLesson.lessonsData).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
           debugPrint("⏰ _loadLessonNotes timed out after 5 seconds");
@@ -91,7 +113,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
             _totalDurationSeconds = _calculateTotalSongDuration();
           });
         } else {
-          final notes = await ds.getLessonNotes(widget.lesson.lessonsData).timeout(
+          final notes = await ds.getLessonNotes(targetLesson.lessonsData).timeout(
             const Duration(seconds: 3),
             onTimeout: () => [],
           );
@@ -434,18 +456,34 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
           );
 
       if (canShowAd) {
-        EasyAds.instance.showInterstitialAd(
-          context,
-          adId: MyAdIdName.interAll.getId,
-          adIdName: MyAdIdName.interAll,
-          adDissmissed: () {
-            if (mounted) context.pop();
-          },
-          onFailed: () {
-            if (mounted) context.pop();
-          },
-        );
+        setState(() {
+          _isTransitioningOrientation = true;
+        });
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
+        await Future.delayed(const Duration(milliseconds: 200));
+        
+        if (mounted) {
+          EasyAds.instance.showInterstitialAd(
+            context,
+            adId: MyAdIdName.interAll.getId,
+            adIdName: MyAdIdName.interAll,
+            adDissmissed: () {
+              if (mounted) context.pop();
+            },
+            onFailed: () {
+              if (mounted) context.pop();
+            },
+          );
+        }
       } else {
+        setState(() {
+          _isTransitioningOrientation = true;
+        });
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
         context.pop();
       }
     } else if (wasPlaying && mounted) {
@@ -455,6 +493,14 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    
+    // Return a solid black screen during orientation transitions 
+    // to hide ugly layout snapping and provide a cinematic fade-like effect
+    if (!isLandscape || _isTransitioningOrientation) {
+      return const Scaffold(backgroundColor: Colors.black);
+    }
+
     final lessonState = ref.watch(lessonPlayControllerProvider);
     final controller = ref.read(lessonPlayControllerProvider.notifier);
 
@@ -842,8 +888,11 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const CircularProgressIndicator(
-                            color: Color(0xFFCF6BEE),
+                          Lottie.asset(
+                            'assets/json/loading.json',
+                            width: 60.sp,
+                            height: 60.sp,
+                            fit: BoxFit.contain,
                           ),
                           SizedBox(height: 14.h),
                           Text(

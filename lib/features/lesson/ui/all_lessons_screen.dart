@@ -224,7 +224,7 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                     Stack(
                                       children: [
                                         SongThumbnail(
-                                          thumbnailUrl: song.thumbnail,
+                                          thumbnailUrl: song.fullThumbnailUrl,
                                           width: 100.sp,
                                           height: 80.sp,
                                           borderRadius: 12,
@@ -255,8 +255,12 @@ class _AllLessonsScreenState extends ConsumerState<AllLessonsScreen> {
                                           ),
                                           SizedBox(height: 3.h),
                                           Text(
-                                            "${song.authorName} • ${song.duration}",
+                                            (song.genre != null && song.genre!.isNotEmpty)
+                                                ? "${song.authorName} • ${song.genre}"
+                                                : song.authorName,
                                             style: AppTextStyles.textGrey12,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                           SizedBox(height: 3.h),
 

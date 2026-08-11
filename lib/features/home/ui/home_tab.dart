@@ -105,8 +105,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       useSafeArea: false,
       body: Padding(
         padding: EdgeInsets.only(top: 8.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
             // Acoustic Piano Card (Fixed)
             GradientBorderCard(
@@ -180,7 +180,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             SizedBox(height: 8.h),
 
-            // Native Home Ad (Fixed - placed between Acoustic Piano and Popular Songs)
+            // Native Home Ad
             if (!AppConstants.isPremiumUser.value &&
                 FirebaseRemoteConfigService.getBoolConfigByKey(
                   FirebaseRemoteConfigService.native_home,
@@ -194,7 +194,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               SizedBox(height: 8.h),
             ],
 
-            // Popular Songs Header (Fixed)
+            // Popular Songs Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -219,74 +219,71 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             ),
             SizedBox(height: 6.h),
 
-            // Popular Songs List (Only list is scrollable)
-            Expanded(
-              child: lessonsAsync.when(
-                loading: () => const SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: AppLoading(),
+            // Popular Songs List
+            lessonsAsync.when(
+              loading: () => const SizedBox(
+                height: 200,
+                child: Center(
+                  child: AppLoading(),
+                ),
+              ),
+              error: (err, stack) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                child: Center(
+                  child: Text(
+                    "Error: $err",
+                    style: AppTextStyles.textGrey14,
                   ),
                 ),
-                error: (err, stack) => Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20.h),
-                  child: Center(
-                    child: Text(
-                      "Error: $err",
-                      style: AppTextStyles.textGrey14,
-                    ),
-                  ),
-                ),
-                data: (lessonsResponse) {
-                  if (lessonsResponse != null && lessonsResponse.categories.isNotEmpty) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (_songStarsMap.length <= 3) {
-                        _loadSongStars(lessonsResponse);
-                      }
-                    });
-                  }
-                  final popularCategory = (lessonsResponse != null && lessonsResponse.categories.isNotEmpty)
-                      ? lessonsResponse.categories.firstWhere(
-                          (c) => c.categoryID == 1,
-                          orElse: () => lessonsResponse.categories.first,
-                        )
-                      : null;
-                  final popularSongs = popularCategory?.items ?? [];
+              ),
+              data: (lessonsResponse) {
+                if (lessonsResponse != null && lessonsResponse.categories.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_songStarsMap.length <= 3) {
+                      _loadSongStars(lessonsResponse);
+                    }
+                  });
+                }
+                final popularSongs = (lessonsResponse != null)
+                    ? lessonsResponse.categories.expand((c) => c.items).toList()
+                    : <LessonsItem>[];
 
-                  if (popularSongs.isEmpty) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20.h),
-                      child: Center(
-                        child: Text(
-                          "No songs available",
-                          style: AppTextStyles.textGrey14,
-                        ),
+                if (popularSongs.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.h),
+                    child: Center(
+                      child: Text(
+                        "No songs available",
+                        style: AppTextStyles.textGrey14,
                       ),
-                    );
-                  }
+                    ),
+                  );
+                }
 
-                  return ListView.builder(
-                    padding: EdgeInsets.only(bottom: 90.h),
-                    itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
-                    itemBuilder: (context, index) {
-                      final song = popularSongs[index];
-                      final songIdStr = song.id.toString();
-                      final starCount = _songStarsMap[songIdStr] ?? 0;
-                      final showRewardBadge = !AppConstants.isPremiumUser.value &&
-                          !unlockedLessons.contains(songIdStr);
+                return ListView.builder(
+                  padding: EdgeInsets.only(bottom: 90.h),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: popularSongs.length > 10 ? 10 : popularSongs.length,
+                  itemBuilder: (context, index) {
+                    final song = popularSongs[index];
+                    final songIdStr = song.id.toString();
+                    final starCount = _songStarsMap[songIdStr] ?? 0;
+                    final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                        !unlockedLessons.contains(songIdStr);
 
-                      return GestureDetector(
-                        onTap: () async {
-                          final selectedLevel = await DifficultySelectionDialog.show(
-                            context,
-                            song: song,
-                          );
-                          if (selectedLevel != null && context.mounted) {
-                            final updatedSong = song.copyWith(level: selectedLevel);
-                            await context.push('/lesson-play', extra: updatedSong);
-                            await SystemChrome.setPreferredOrientations([
-                              DeviceOrientation.portraitUp,
-                            ]);
+                    return GestureDetector(
+                      onTap: () async {
+                        final selectedLevel = await DifficultySelectionDialog.show(
+                          context,
+                          song: song,
+                        );
+                        if (selectedLevel != null && context.mounted) {
+                          final updatedSong = song.copyWith(level: selectedLevel);
+                          await context.push('/lesson-play', extra: updatedSong);
+                          await SystemChrome.setPreferredOrientations([
+                            DeviceOrientation.portraitUp,
+                          ]);
                             _loadSongStars();
                           }
                         },
@@ -311,7 +308,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                               Stack(
                                 children: [
                                   SongThumbnail(
-                                    thumbnailUrl: song.thumbnail,
+                                    thumbnailUrl: song.fullThumbnailUrl,
                                     width: 100.sp,
                                     height: 80.sp,
                                     borderRadius: 12,
@@ -342,8 +339,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                     ),
                                     SizedBox(height: 4.h),
                                     Text(
-                                      song.authorName,
+                                      (song.genre != null && song.genre!.isNotEmpty)
+                                          ? "${song.authorName} • ${song.genre}"
+                                          : song.authorName,
                                       style: AppTextStyles.textGrey12,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: 4.h),
                                     // Star Rating Row
@@ -407,7 +408,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   );
                 },
               ),
-            ),
           ],
         ),
       ),

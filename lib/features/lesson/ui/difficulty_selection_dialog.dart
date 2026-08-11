@@ -140,12 +140,12 @@ class _DifficultySelectionDialogState
         // Song Thumbnail with Crown Badge
         Stack(
           children: [
-            SongThumbnail(
-              thumbnailUrl: widget.song.thumbnail,
-              width: thumbSize,
-              height: thumbSize,
-              borderRadius: 14,
-            ),
+        SongThumbnail(
+          thumbnailUrl: widget.song.fullThumbnailUrl,
+          width: thumbSize,
+          height: thumbSize,
+          borderRadius: 14,
+        ),
             Positioned(
               top: 4,
               left: 4,
@@ -444,7 +444,7 @@ class _DifficultySelectionDialogState
       children: [
         // Song Thumbnail
         SongThumbnail(
-          thumbnailUrl: widget.song.thumbnail,
+          thumbnailUrl: widget.song.fullThumbnailUrl,
           width: thumbSize,
           height: thumbSize,
           borderRadius: 14,

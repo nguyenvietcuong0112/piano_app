@@ -9,23 +9,56 @@ import '../domain/lesson_model.dart';
 
 @lazySingleton
 class LessonDataSource {
-  Future<LessonsResponse?> getAllLessons() async {
+  Future<LessonsResponse?> getAllLessons({
+    int skip = 0,
+    int limit = 100,
+    String difficulty = 'All',
+    String? search,
+  }) async {
     // 1. Attempt API fetch from Server
     try {
-      final apiUrl = Uri.parse('${AppConstants.baseApiUrl}/lessons');
-      final response =
-          await http.get(apiUrl).timeout(const Duration(seconds: 8));
+      final headers = await AppConstants.getApiHeaders();
+
+      final Map<String, String> queryParams = {
+        'skip': skip.toString(),
+        'limit': limit.toString(),
+        'difficulty': difficulty,
+      };
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+      if (headers.containsKey('param1')) queryParams['param1'] = headers['param1']!;
+      if (headers.containsKey('param2')) queryParams['param2'] = headers['param2']!;
+
+      final apiUrl = Uri.parse('${AppConstants.baseApiUrl}/songs/').replace(queryParameters: queryParams);
+      debugPrint("🚀 [API Request] GET All Songs: $apiUrl");
+      debugPrint("🚀 [API Headers] Headers: $headers");
+
+      final response = await http.get(
+        apiUrl,
+        headers: headers,
+      ).timeout(const Duration(seconds: 10));
+
+      debugPrint("📥 [API Response Code] ${response.statusCode}");
+      final String rawBody = utf8.decode(response.bodyBytes);
+      debugPrint("📥 [API Response Body] $rawBody");
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonMap = json.decode(response.body);
-        final lessonsResponse = LessonsResponse.fromJson(jsonMap);
-        if (lessonsResponse.categories.isNotEmpty) {
-          debugPrint("Successfully loaded lessons from API: $apiUrl");
-          return lessonsResponse;
+        final decoded = json.decode(rawBody);
+        if (decoded is Map<String, dynamic>) {
+          final lessonsResponse = LessonsResponse.fromJson(decoded);
+          if (lessonsResponse.categories.isNotEmpty && lessonsResponse.categories.first.items.isNotEmpty) {
+            debugPrint("✅ [API Success] Loaded ${lessonsResponse.total} songs from API");
+            return lessonsResponse;
+          }
+        } else {
+          debugPrint("❌ [API Decode Error] Expected JSON Map but got ${decoded.runtimeType}: $decoded");
         }
+      } else {
+        debugPrint("❌ [API Error] Status code ${response.statusCode}: $rawBody");
       }
     } catch (e) {
-      debugPrint("API fetch failed, falling back to local asset: $e");
+      debugPrint("❌ [API Exception] Fetch failed, falling back to local asset: $e");
     }
 
     // 2. Fallback to local lessons.json asset
@@ -40,7 +73,54 @@ class LessonDataSource {
     }
   }
 
+  /// GET song detail by ID and difficulty mode (Easy, Medium, Hard)
+  /// GET https://api.1teps.com/piano/api/songs/{id}?difficulty={difficulty}
+  Future<LessonsItem?> getSongDetail(int songId, {String difficulty = 'Easy'}) async {
+    try {
+      final headers = await AppConstants.getApiHeaders();
+
+      final Map<String, String> queryParams = {
+        'difficulty': difficulty,
+      };
+      if (headers.containsKey('param1')) queryParams['param1'] = headers['param1']!;
+      if (headers.containsKey('param2')) queryParams['param2'] = headers['param2']!;
+
+      final apiUrl = Uri.parse('${AppConstants.baseApiUrl}/songs/$songId').replace(
+        queryParameters: queryParams,
+      );
+      debugPrint("🚀 [API Detail Request] GET Song Detail: $apiUrl");
+      debugPrint("🚀 [API Detail Headers] Headers: $headers");
+
+      final response = await http.get(
+        apiUrl,
+        headers: headers,
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint("📥 [API Detail Response Code] ${response.statusCode}");
+      final String rawBody = utf8.decode(response.bodyBytes);
+      debugPrint("📥 [API Detail Response Body] $rawBody");
+
+      if (response.statusCode == 200) {
+        final decoded = json.decode(rawBody);
+        if (decoded is Map<String, dynamic>) {
+          final item = LessonsItem.fromJson(decoded);
+          debugPrint("✅ [API Detail Success] Loaded detail for songId=$songId");
+          return item;
+        } else {
+          debugPrint("❌ [API Detail Decode Error] Expected JSON Map but got ${decoded.runtimeType}: $decoded");
+        }
+      } else {
+        debugPrint("❌ [API Detail Error] Status code ${response.statusCode}: $rawBody");
+      }
+    } catch (e) {
+      debugPrint("❌ [API Detail Exception] getSongDetail error for songId=$songId: $e");
+    }
+    return null;
+  }
+
   Future<LessonNoteContainer?> getLessonContainer(String fileNameOrUrl) async {
+    if (fileNameOrUrl.isEmpty) return null;
+
     final isWebUrl = fileNameOrUrl.startsWith('http://') ||
         fileNameOrUrl.startsWith('https://');
 
@@ -71,19 +151,30 @@ class LessonDataSource {
     try {
       final String targetUrl = isWebUrl
           ? fileNameOrUrl
-          : '${AppConstants.baseApiUrl}/lessons/$fileNameOrUrl';
+          : (fileNameOrUrl.startsWith('/')
+              ? '${AppConstants.baseApiHost}$fileNameOrUrl'
+              : '${AppConstants.baseApiUrl}/songs/$fileNameOrUrl');
 
       final response = await http
           .get(Uri.parse(targetUrl))
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonMap = json.decode(response.body);
-        final container = LessonNoteContainer.fromJson(jsonMap);
-        if (container.data != null && container.data!.isNotEmpty) {
-          debugPrint("Successfully loaded lesson notes from API: $targetUrl");
-          return container;
+        final bodyStr = utf8.decode(response.bodyBytes);
+        debugPrint("📥 [API Note Download] Success! First 100 chars: ${bodyStr.length > 100 ? bodyStr.substring(0, 100) : bodyStr}");
+        try {
+          final Map<String, dynamic> jsonMap = json.decode(bodyStr);
+          final container = LessonNoteContainer.fromJson(jsonMap);
+          if (container.data != null && container.data!.isNotEmpty) {
+            debugPrint("✅ Successfully loaded lesson notes from API: $targetUrl");
+            return container;
+          }
+        } catch (e) {
+          debugPrint("❌ [API Note Decode Error] Could not parse JSON from $targetUrl: $e");
+          debugPrint("❌ [API Note Raw Content]: $bodyStr");
         }
+      } else {
+        debugPrint("Lesson notes API returned status code ${response.statusCode}: $targetUrl");
       }
     } catch (e) {
       debugPrint("API lesson notes fetch failed: $e");
@@ -97,7 +188,6 @@ class LessonDataSource {
     if (container?.data != null && container!.data!.isNotEmpty) {
       return container.data!;
     }
-
 
     try {
       final jsonString =
@@ -129,3 +219,4 @@ class LessonDataSource {
     ];
   }
 }
+
