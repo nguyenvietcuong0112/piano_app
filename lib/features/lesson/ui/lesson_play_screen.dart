@@ -371,6 +371,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       final seconds = (totalSecondsInt % 60).toString().padLeft(2, '0');
       final durationStr = "$minutes:$seconds";
 
+      final noteEvents = recorder.currentMode == RecordingMode.internal
+          ? controller.stopRecordingNotes()
+          : null;
+
       final newItem = RecordingItemModel(
         id: item.id,
         title: savedTitle,
@@ -378,6 +382,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
         duration: durationStr == "00:00" ? "00:07" : durationStr,
         filePath: item.filePath,
         mode: recorder.currentMode == RecordingMode.internal ? 'internal' : 'mic',
+        noteEvents: noteEvents,
       );
 
       await RecordingStorageService.addRecording(newItem);
@@ -773,66 +778,65 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                               height: 36.h,
                             ),
                           ),
-                          const SizedBox(width: 12),
 
                           // Temporary Auto Test Button for testing songs
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isAutoGuideMode = !_isAutoGuideMode;
-                              });
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  duration: const Duration(seconds: 1),
-                                  backgroundColor: _isAutoGuideMode
-                                      ? const Color(0xFF4CAF50)
-                                      : const Color(0xFFE53935),
-                                  content: Text(
-                                    _isAutoGuideMode
-                                        ? "🤖 Auto-Play Test: ON"
-                                        : "🤖 Auto-Play Test: OFF",
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: 36.h,
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: _isAutoGuideMode
-                                    ? const Color(0xFF4CAF50).withValues(alpha: 0.8)
-                                    : const Color(0xFF2B2544),
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border.all(
-                                  color: _isAutoGuideMode
-                                      ? Colors.greenAccent
-                                      : Colors.white24,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    _isAutoGuideMode
-                                        ? Icons.smart_toy_rounded
-                                        : Icons.smart_toy_outlined,
-                                    color: Colors.white,
-                                    size: 18.sp,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "Auto Test",
-                                    style: AppTextStyles.textWhite12.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     setState(() {
+                          //       _isAutoGuideMode = !_isAutoGuideMode;
+                          //     });
+                          //     ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          //     ScaffoldMessenger.of(context).showSnackBar(
+                          //       SnackBar(
+                          //         duration: const Duration(seconds: 1),
+                          //         backgroundColor: _isAutoGuideMode
+                          //             ? const Color(0xFF4CAF50)
+                          //             : const Color(0xFFE53935),
+                          //         content: Text(
+                          //           _isAutoGuideMode
+                          //               ? "🤖 Auto-Play Test: ON"
+                          //               : "🤖 Auto-Play Test: OFF",
+                          //           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          //         ),
+                          //       ),
+                          //     );
+                          //   },
+                          //   child: Container(
+                          //     height: 36.h,
+                          //     padding: const EdgeInsets.symmetric(horizontal: 10),
+                          //     decoration: BoxDecoration(
+                          //       color: _isAutoGuideMode
+                          //           ? const Color(0xFF4CAF50).withValues(alpha: 0.8)
+                          //           : const Color(0xFF2B2544),
+                          //       borderRadius: BorderRadius.circular(8.r),
+                          //       border: Border.all(
+                          //         color: _isAutoGuideMode
+                          //             ? Colors.greenAccent
+                          //             : Colors.white24,
+                          //       ),
+                          //     ),
+                          //     child: Row(
+                          //       mainAxisSize: MainAxisSize.min,
+                          //       children: [
+                          //         Icon(
+                          //           _isAutoGuideMode
+                          //               ? Icons.smart_toy_rounded
+                          //               : Icons.smart_toy_outlined,
+                          //           color: Colors.white,
+                          //           size: 18.sp,
+                          //         ),
+                          //         const SizedBox(width: 4),
+                          //         Text(
+                          //           "Auto Test",
+                          //           style: AppTextStyles.textWhite12.copyWith(
+                          //             fontWeight: FontWeight.bold,
+                          //             color: Colors.white,
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -855,6 +859,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                       isLessonMode: true,
                       isAutoGuideMode: _isAutoGuideMode,
                       noteSpeed: 3.2 * lessonState.noteSpeedMultiplier,
+                      onNotePressed: (keyName, label) {
+                        controller.setPlayedKeyStatus(keyName, label);
+                      },
                       onNoteHit: (keyName, isPerfect) {
                         controller.recordHit(isPerfect: isPerfect);
                       },

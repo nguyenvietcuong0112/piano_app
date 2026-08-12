@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/helper/iap_helper.dart';
+import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -22,16 +24,41 @@ class PremiumScreen extends StatefulWidget {
 class _PremiumScreenState extends State<PremiumScreen> {
   // 'monthly' or 'weekly'
   String _selectedPackage = 'monthly';
+  
+  int _countdown = 0;
+  int _totalCountdown = 0;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
     super.initState();
     AppConstants.isPremiumUser.addListener(_onPremiumStatusChanged);
     IAPHelper.queryProducts();
+
+    _totalCountdown = FirebaseRemoteConfigService.getIntConfigByKey(
+      FirebaseRemoteConfigService.time_delay_close_premium,
+      defaultValue: 3,
+    );
+    _countdown = _totalCountdown;
+    if (_countdown > 0) {
+      _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (_countdown > 1) {
+          setState(() {
+            _countdown--;
+          });
+        } else {
+          setState(() {
+            _countdown = 0;
+          });
+          timer.cancel();
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     AppConstants.isPremiumUser.removeListener(_onPremiumStatusChanged);
     super.dispose();
   }
@@ -41,6 +68,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
       EasyLoading.showSuccess('Premium Unlocked!');
       if (context.canPop()) {
         context.pop();
+      } else {
+        context.go('/home');
       }
     }
   }
@@ -85,9 +114,20 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0XFF06012F),
-      body: ValueListenableBuilder<bool>(
+    return PopScope(
+      canPop: _countdown == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _countdown == 0) {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/home');
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0XFF06012F),
+        body: ValueListenableBuilder<bool>(
         valueListenable: IAPHelper.isLoading,
         builder: (context, isLoading, child) {
           return Stack(
@@ -254,23 +294,66 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     Positioned(
                       top: 8.h,
                       right: 16.w,
-                      child: GestureDetector(
-                        onTap: () => context.pop(),
-                        child: Container(
-                          width: 36.r,
-                          height: 36.r,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white24),
-                          ),
-                          child: Icon(
-                            Icons.close_rounded,
-                            color: Colors.white,
-                            size: 20.sp,
-                          ),
-                        ),
-                      ),
+                      child: _countdown > 0
+                          ? SizedBox(
+                              width: 36.r,
+                              height: 36.r,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                      begin: 1.0,
+                                      end: _totalCountdown > 0 
+                                          ? _countdown / _totalCountdown 
+                                          : 0.0,
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                    builder: (context, value, _) {
+                                      return SizedBox(
+                                        width: 36.r,
+                                        height: 36.r,
+                                        child: CircularProgressIndicator(
+                                          value: value,
+                                          color: Colors.white70,
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    '$_countdown',
+                                    style: AppTextStyles.textWhite14.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                if (context.canPop()) {
+                                  context.pop();
+                                } else {
+                                  context.go('/home');
+                                }
+                              },
+                              child: Container(
+                                width: 36.r,
+                                height: 36.r,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.white,
+                                  size: 20.sp,
+                                ),
+                              ),
+                            ),
                     ),
 
                     if (isLoading)
@@ -291,8 +374,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFeatureItem(String iconText, String title) {
     return Row(

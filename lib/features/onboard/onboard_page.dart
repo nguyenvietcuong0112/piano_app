@@ -135,9 +135,9 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
             ),
             const SizedBox(height: 20),
 
-            // Bottom Layout Conditional on Ad
-            if (hasAd) ...[
-              // Pages 1 & 4 (With Ads)
+            // Bottom Layout Conditional on Page Index
+            if (controller.currentTabOnboard == 0 || controller.currentTabOnboard == 3) ...[
+              // Pages 1 & 4 (Small Button Layout)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -149,15 +149,18 @@ class _OnboardPageState extends ConsumerState<OnboardPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              EasyNativeAd(
-                key: ValueKey(step.adId),
-                factoryId: step.factoryId,
-                adId: step.adId,
-                adIdName: step.adIdName,
-                height: AdDimen.mediumNativeHeight,
-              ),
+              if (hasAd)
+                EasyNativeAd(
+                  key: ValueKey(step.adId),
+                  factoryId: step.factoryId,
+                  adId: step.adId,
+                  adIdName: step.adIdName,
+                  height: AdDimen.mediumNativeHeight,
+                )
+              else
+                SizedBox(height: AdDimen.mediumNativeHeight),
             ] else ...[
-              // Pages 2 & 3 (Without Ads)
+              // Pages 2 & 3 (Big Button Layout)
               SizedBox(
                 height: 20,
                 child: Center(child: _buildDotsIndicator(controller)),

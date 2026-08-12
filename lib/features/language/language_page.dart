@@ -115,6 +115,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             adIdName: MyAdIdName.nativeLanguageClick,
             adIdNameHigh: MyAdIdName.nativeLanguageClickHigh,
             height: AdDimen.mediumNativeHeight,
+            onImpression: controller.onAdImpression,
           )
         : EasyNativeAdHigh(
             key: const ValueKey('nativeLanguage'),
@@ -148,7 +149,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
             itemCount: controller.itemsList.length,
             scrollDirection: Axis.vertical,
             padding: const EdgeInsets.only(
-              left: 20,
+              left: 20, 
               right: 20,
               top: 0,
               bottom: 20,

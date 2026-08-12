@@ -70,7 +70,6 @@ class _PianoSheetPlaybackScreenState extends ConsumerState<PianoSheetPlaybackScr
           }
         }
       }
-      _startPlayback();
     });
   }
 

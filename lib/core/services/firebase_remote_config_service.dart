@@ -59,7 +59,7 @@ class FirebaseRemoteConfigService {
         "native_themes": true,
         "native_piano": true,
         "interval_inter_ad": 30,
-        "time_delay_close_premium": 0,
+        "time_delay_close_premium": 3,
       });
       await remoteConfig.fetchAndActivate();
     } catch (e) {}

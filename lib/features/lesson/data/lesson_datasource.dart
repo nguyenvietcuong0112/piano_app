@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -41,7 +42,7 @@ class LessonDataSource {
 
       debugPrint("📥 [API Response Code] ${response.statusCode}");
       final String rawBody = utf8.decode(response.bodyBytes);
-      debugPrint("📥 [API Response Body] $rawBody");
+      log("📥 [API Response Body] $rawBody", name: 'LessonAPI');
 
       if (response.statusCode == 200) {
         final decoded = json.decode(rawBody);

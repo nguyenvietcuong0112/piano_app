@@ -101,9 +101,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final lessonsAsync = ref.watch(lessonsProvider);
     final unlockedLessons = ref.watch(unlockedLessonsProvider);
 
-    return AppScaffold(
-      useSafeArea: false,
-      body: Padding(
+    return ValueListenableBuilder<bool>(
+      valueListenable: AppConstants.isPremiumUser,
+      builder: (context, isPremium, child) {
+        return AppScaffold(
+          useSafeArea: false,
+          body: Padding(
         padding: EdgeInsets.only(top: 8.h),
         child: ListView(
           padding: EdgeInsets.zero,
@@ -181,7 +184,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
             SizedBox(height: 8.h),
 
             // Native Home Ad
-            if (!AppConstants.isPremiumUser.value &&
+            if (!isPremium &&
                 FirebaseRemoteConfigService.getBoolConfigByKey(
                   FirebaseRemoteConfigService.native_home,
                 )) ...[
@@ -271,7 +274,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     final songIdStr = song.id.toString();
                     final isFirstInCategory = firstSongIds.contains(songIdStr);
                     final starCount = _songStarsMap[songIdStr] ?? 0;
-                    final showRewardBadge = !AppConstants.isPremiumUser.value &&
+                    final showRewardBadge = !isPremium &&
                         !isFirstInCategory &&
                         !unlockedLessons.contains(songIdStr);
 
@@ -415,6 +418,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }

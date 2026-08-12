@@ -21,14 +21,15 @@ class AppConstants {
         //     ? info.packageName
         //     : 'com.pianokeyboard.virtualpiano.learnpiano';
         packageName = '1';
+        buildNumber = '1';
         version = info.version;
-        buildNumber = info.buildNumber.isNotEmpty
-            ? info.buildNumber
-            : (info.version.isNotEmpty ? info.version : '1');
+        // buildNumber = info.buildNumber.isNotEmpty
+        //     ? info.buildNumber
+        //     : (info.version.isNotEmpty ? info.version : '1');
       } catch (e) {
         debugPrint("Error fetching PackageInfo: $e");
         if (packageName.isEmpty) {
-          packageName = 'com.pianokeyboard.virtualpiano.learnpiano';
+          packageName = '1';
         }
         if (buildNumber.isEmpty) buildNumber = '1';
       }

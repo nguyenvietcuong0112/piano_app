@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
+import '../../ads/const/ad_id_extension.dart';
+import '../../ads/const/ad_id_name.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/localization/locale_provider.dart';
 import '../../core/services/shared_preference_service.dart';
@@ -33,6 +36,7 @@ class LanguageController extends ChangeNotifier {
 
   Timer? _nextDelayTimer;
   Timer? _loadingTimer;
+  StreamSubscription? _adEventSubscription;
 
   void init({bool firstLaunch = false}) {
     isFirstLaunch = firstLaunch;
@@ -56,14 +60,34 @@ class LanguageController extends ChangeNotifier {
       getPreviousSelectedLanguage();
     }
 
-    isLoading = false;
+    isLoading = true;
     canClick = false;
     _notify();
 
     _loadingTimer?.cancel();
-    _loadingTimer = Timer(const Duration(milliseconds: 2000), () {
+    _loadingTimer = Timer(const Duration(milliseconds: 3000), () {
+      isLoading = false;
       canClick = true;
       _notify();
+    });
+
+    _listenAdEvents();
+  }
+
+  void _listenAdEvents() {
+    _adEventSubscription?.cancel();
+    _adEventSubscription = EasyAds.instance.onEvent.listen((event) {
+      if (event.adUnitId == MyAdIdName.nativeLanguageClick.getId) {
+        if (event.type == AdEventType.adLoaded || event.type == AdEventType.adFailedToLoad) {
+          _nextDelayTimer?.cancel();
+          _nextDelayTimer = Timer(const Duration(milliseconds: 500), () {
+            if (!isShouldShowNext) {
+              isShouldShowNext = true;
+              _notify();
+            }
+          });
+        }
+      }
     });
   }
 
@@ -72,6 +96,7 @@ class LanguageController extends ChangeNotifier {
     _isDisposed = true;
     _nextDelayTimer?.cancel();
     _loadingTimer?.cancel();
+    _adEventSubscription?.cancel();
     super.dispose();
   }
 
@@ -99,10 +124,40 @@ class LanguageController extends ChangeNotifier {
 
   void onSelectItem(int index) {
     if (!canClick || isLoading) return;
+    
+    if (isShowClickAds) {
+      // Đã click rồi, Ads hiện tại đã là native_language_click
+      selectedIndex = index;
+      isShouldShowNext = true;
+      _notify();
+      return;
+    }
+
+    // Lần click đầu tiên: Đổi Ads sang click ads, ẩn Next, đợi Ads load hoặc timeout
     selectedIndex = index;
     isShowClickAds = true;
-    isShouldShowNext = true;
+    isShouldShowNext = false;
     _notify();
+
+    _nextDelayTimer?.cancel();
+    _nextDelayTimer = Timer(const Duration(seconds: 3), () {
+      if (!isShouldShowNext) {
+        isShouldShowNext = true;
+        _notify();
+      }
+    });
+  }
+
+  void onAdImpression() {
+    if (isShouldShowNext) return;
+    
+    _nextDelayTimer?.cancel();
+    _nextDelayTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!isShouldShowNext) {
+        isShouldShowNext = true;
+        _notify();
+      }
+    });
   }
 
   void onSelectBack(BuildContext context) {

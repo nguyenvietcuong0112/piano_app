@@ -13,6 +13,7 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/services/ads_service.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/services/shared_preference_service.dart';
+import '../../core/router/app_router.dart';
 
 /// Data model representing a single onboarding page or full ad page.
 class OnboardStep {
@@ -360,6 +361,24 @@ class OnboardController extends ChangeNotifier {
 
   Future<void> _finishOnboarding(BuildContext context) async {
     await SharedPreferenceUtils.setIsNoFirstOpenApp(true);
+    final showPremium = FirebaseRemoteConfigService.getBoolConfigByKey(
+        FirebaseRemoteConfigService.show_activity_iap);
+    final bool goToPremium = showPremium && !AppConstants.isPremiumUser.value;
+
+    void _navigateNext() {
+      if (context.mounted) {
+        context.go('/home');
+        if (goToPremium) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final ctx = rootNavigatorKey.currentContext;
+            if (ctx != null && ctx.mounted) {
+              ctx.push('/premium');
+            }
+          });
+        }
+      }
+    }
+
     final isOrganic = await AdsService.isOrganicAsync();
     if (!AppConstants.isPremiumUser.value && !isOrganic) {
       if (!context.mounted) return;
@@ -367,15 +386,11 @@ class OnboardController extends ChangeNotifier {
         context,
         adId: MyAdIdName.interOnboard.getId,
         adIdName: MyAdIdName.interOnboard,
-        adDissmissed: () {
-          if (context.mounted) context.go('/home');
-        },
-        onFailed: () {
-          if (context.mounted) context.go('/home');
-        },
+        adDissmissed: _navigateNext,
+        onFailed: _navigateNext,
       );
     } else {
-      if (context.mounted) context.go('/home');
+      _navigateNext();
     }
   }
 

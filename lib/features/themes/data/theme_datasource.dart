@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,9 @@ class ThemeDataSource {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final jsonMap = json.decode(utf8.decode(response.bodyBytes));
+        final rawBody = utf8.decode(response.bodyBytes);
+        log("📥 [API Response Body] $rawBody", name: 'ThemeAPI');
+        final jsonMap = json.decode(rawBody);
         final themeResp = ThemeResponse.fromJson(jsonMap);
 
         if (themeResp.themeCategories.isNotEmpty) {

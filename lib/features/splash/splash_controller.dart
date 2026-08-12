@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 
 import '../../ads/const/ad_id_name.dart';
@@ -11,6 +12,7 @@ import '../../core/helper/firebase_helper.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../language/language_page.dart';
 
+import '../../core/router/app_router.dart';
 import '../../core/services/shared_preference_service.dart';
 
 class SplashController extends ChangeNotifier {
@@ -87,8 +89,19 @@ class SplashController extends ChangeNotifier {
 
   void goNextScreen(BuildContext context, {required VoidCallback onFinished}) {
     EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(false);
+    final showPremium = FirebaseRemoteConfigService.getBoolConfigByKey(
+        FirebaseRemoteConfigService.show_activity_iap);
+
     if (isNoFirstOpenApp && AppConstants.skipLangOnboardOnReopen) {
       onFinished();
+      if (showPremium && !AppConstants.isPremiumUser.value) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final ctx = rootNavigatorKey.currentContext;
+          if (ctx != null && ctx.mounted) {
+            ctx.push('/premium');
+          }
+        });
+      }
     } else {
       Navigator.pushReplacement(
         context,

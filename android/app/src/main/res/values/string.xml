@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="applicationName">abc</string>
-    <string name="facebook_app_id">1234</string>
-    <string name="facebook_client_token">5678</string>
+    <string name="applicationName">Learn Piano: Play Songs</string>
+    <string name="facebook_app_id">2318677512002108</string>
+    <string name="facebook_client_token">ec3cd28199c13fcd9c40092e7f065a0d</string>
 </resources>

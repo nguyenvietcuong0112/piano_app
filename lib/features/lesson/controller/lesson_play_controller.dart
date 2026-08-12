@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/services/recording_storage_service.dart';
 
 class LessonPlayState {
   final bool isPlaying;
@@ -88,6 +89,9 @@ class LessonPlayState {
 class LessonPlayController extends StateNotifier<LessonPlayState> {
   LessonPlayController() : super(const LessonPlayState());
 
+  final List<RecordedNoteEvent> _recordedNoteEvents = [];
+  DateTime? _recordingStartTime;
+
   void initSong(int totalNotes) {
     state = state.copyWith(
       totalNotesInSong: totalNotes,
@@ -167,7 +171,35 @@ class LessonPlayController extends StateNotifier<LessonPlayState> {
   }
 
   void toggleRecording() {
-    state = state.copyWith(isRecording: !state.isRecording);
+    if (!state.isRecording) {
+      // Starting record
+      _recordedNoteEvents.clear();
+      _recordingStartTime = DateTime.now();
+      state = state.copyWith(isRecording: true);
+    } else {
+      // Just toggle state; actual stopping is handled by stopRecordingNotes
+      state = state.copyWith(isRecording: false);
+    }
+  }
+
+  void setPlayedKeyStatus(String keyName, String label) {
+    if (state.isRecording && _recordingStartTime != null) {
+      final elapsedMs =
+          DateTime.now().difference(_recordingStartTime!).inMilliseconds;
+      _recordedNoteEvents.add(RecordedNoteEvent(
+        keyName: keyName,
+        label: label,
+        timestampMs: elapsedMs,
+      ));
+    }
+  }
+
+  List<RecordedNoteEvent>? stopRecordingNotes() {
+    final resultEvents = List<RecordedNoteEvent>.from(_recordedNoteEvents);
+    _recordedNoteEvents.clear();
+    _recordingStartTime = null;
+    state = state.copyWith(isRecording: false);
+    return resultEvents.isNotEmpty ? resultEvents : null;
   }
 }
 

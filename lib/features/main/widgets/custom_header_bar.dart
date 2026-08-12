@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_text_styles.dart';
 
 class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
@@ -39,17 +40,27 @@ class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // VIP / Crown Button
-              GestureDetector(
-                onTap: onVipTap ?? () => context.push('/premium'),
-                child: Center(
-                  child: SvgPicture.asset(
-                    'assets/icons/ic_premium.svg',
-                    width: 40.sp,
-                    height: 40.sp,
-                  ),
-                ),
+              ValueListenableBuilder<bool>(
+                valueListenable: AppConstants.isPremiumUser,
+                builder: (context, isPremium, child) {
+                  if (isPremium) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: GestureDetector(
+                      onTap: onVipTap ?? () => context.push('/premium'),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icons/ic_premium.svg',
+                          width: 40.sp,
+                          height: 40.sp,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-              const SizedBox(width: 10),
 
               // Settings Button
               GestureDetector(
