@@ -25,6 +25,10 @@ import '../../lesson/domain/lesson_model.dart';
 import '../../lesson/state/lesson_provider.dart';
 import '../../lesson/ui/difficulty_selection_dialog.dart';
 
+/// A simple refresh signal provider. Incrementing its value triggers
+/// MySongsTab to reload completed songs data from SharedPreferences.
+final completedSongsRefreshProvider = StateProvider<int>((ref) => 0);
+
 class MySongsTab extends ConsumerStatefulWidget {
   const MySongsTab({super.key});
 
@@ -32,17 +36,32 @@ class MySongsTab extends ConsumerStatefulWidget {
   ConsumerState<MySongsTab> createState() => _MySongsTabState();
 }
 
-class _MySongsTabState extends ConsumerState<MySongsTab> {
+class _MySongsTabState extends ConsumerState<MySongsTab>
+    with WidgetsBindingObserver {
   List<Map<String, dynamic>> _completedSongs = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
     _loadCompletedSongs();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadCompletedSongs();
+    }
   }
 
   Future<void> _loadCompletedSongs() async {
@@ -67,15 +86,18 @@ class _MySongsTabState extends ConsumerState<MySongsTab> {
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
       ]);
-      _loadCompletedSongs();
+      await  _loadCompletedSongs();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Listen for refresh signals from other screens (e.g. after finishing a song)
+    ref.listen<int>(completedSongsRefreshProvider, (previous, next) {
+      _loadCompletedSongs();
+    });
+
     final unlockedLessons = ref.watch(unlockedLessonsProvider);
-    int totalCompleted = _completedSongs.length;
-    int perfectMastered = _completedSongs.where((s) => (s['stars'] as num?)?.toInt() == 5).length;
 
     return AppScaffold(
       body: RefreshIndicator(

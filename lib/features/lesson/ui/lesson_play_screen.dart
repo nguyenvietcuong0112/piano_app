@@ -33,6 +33,7 @@ import '../domain/lesson_model.dart';
 import '../controller/lesson_play_controller.dart';
 import 'lesson_result_dialog.dart';
 import 'speed_controller_dialog.dart';
+import '../../my_songs/ui/my_songs_tab.dart';
 
 class LessonPlayScreen extends ConsumerStatefulWidget {
   final LessonsItem lesson;
@@ -49,7 +50,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
   List<LessonNote> _noteList = [];
   Timer? _noteTimer;
   Timer? _playbackTickerTimer;
-  double _elapsedTimeSeconds = 0.0;
+  final Stopwatch _stopwatch = Stopwatch();
   double _totalDurationSeconds = 180.0;
   bool _isAutoGuideMode = false;
   final int _countdownValue = 0;
@@ -145,6 +146,8 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     }
   }
 
+  /// Calculates total real-world playback duration (in seconds) by simulating
+  /// the exact same scheduling logic used in [_scheduleNextNote].
   double _calculateTotalSongDuration() {
     int parsedMetaSec = 180;
     final parts = widget.lesson.duration.split(':');
@@ -154,13 +157,30 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     }
 
     if (_noteList.isNotEmpty) {
-      int totalNoteMs = 0;
-      for (var n in _noteList) {
-        totalNoteMs += n.breakTime;
+      final speed = ref.read(lessonPlayControllerProvider).noteSpeedMultiplier;
+      int totalRealMs = 0;
+
+      // Simulate the scheduling loop in _scheduleNextNote
+      int i = 0;
+      while (i < _noteList.length) {
+        int lastBreakTime = 0;
+        while (i < _noteList.length) {
+          lastBreakTime = _noteList[i].breakTime;
+          i++;
+          if (lastBreakTime > 0) break;
+        }
+        // Only add delay if there are more notes to schedule
+        if (i < _noteList.length && lastBreakTime > 0) {
+          totalRealMs +=
+              (lastBreakTime / speed).round().clamp(20, 5000);
+        }
       }
-      int lastNoteMs = _noteList.last.duration;
-      // 2000ms is the falling duration from top screen to keyboard
-      double calcSec = (totalNoteMs + lastNoteMs + 2000) / 1000.0;
+
+      // Finish delay: wait for last note to travel + play audio
+      int lastNoteDuration = _noteList.last.duration;
+      totalRealMs += ((2200 + lastNoteDuration) / speed).round();
+
+      double calcSec = totalRealMs / 1000.0;
       if (calcSec > 5) {
         return calcSec;
       }
@@ -170,6 +190,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   void _startPlaybackTicker() {
     _playbackTickerTimer?.cancel();
+    _stopwatch.start();
     _playbackTickerTimer = Timer.periodic(const Duration(milliseconds: 100), (
       timer,
     ) {
@@ -178,10 +199,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
       if (mounted) {
         setState(() {
-          _elapsedTimeSeconds += 0.1 * state.noteSpeedMultiplier;
-          if (_elapsedTimeSeconds > _totalDurationSeconds) {
-            _elapsedTimeSeconds = _totalDurationSeconds;
-          }
+          // Just trigger a rebuild — elapsed time is read from _stopwatch
         });
       }
     });
@@ -189,6 +207,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
   void _stopPlaybackTicker() {
     _playbackTickerTimer?.cancel();
+    _stopwatch.stop();
   }
 
   void _startFallingNotesSequence() {
@@ -198,9 +217,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
 
     if (state.currentNoteIndex >= _noteList.length) {
       controller.resetNoteIndex();
-      setState(() {
-        _elapsedTimeSeconds = 0.0;
-      });
+      _stopwatch.reset();
     }
     _startPlaybackTicker();
     _scheduleNextNote();
@@ -289,9 +306,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     _noteTimer?.cancel();
     _stopPlaybackTicker();
     if (mounted) {
-      setState(() {
-        _elapsedTimeSeconds = _totalDurationSeconds;
-      });
+      setState(() {});
     }
 
     final state = ref.read(lessonPlayControllerProvider);
@@ -315,6 +330,9 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
       accuracy: state.accuracy,
     );
 
+    // Signal MySongsTab to reload its data
+    ref.read(completedSongsRefreshProvider.notifier).state++;
+
     if (!mounted) return;
 
     showDialog(
@@ -324,18 +342,23 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
         state: state,
         songTitle: widget.lesson.titleName,
         onNextSong: () {
+          Navigator.of(dialogContext).pop(); // đóng dialog
+
           if (context.mounted) {
-            context.pop();
+            context.pop(); // quay về MySongsTab
           }
         },
         onReplay: () {
+          Navigator.of(dialogContext).pop();
+
           ref.read(lessonPlayControllerProvider.notifier).resetNoteIndex();
           _pianoKey.currentState?.clearFallingNotes();
+
           if (mounted) {
-            setState(() {
-              _elapsedTimeSeconds = 0.0;
-            });
+            _stopwatch.reset();
+            setState(() {});
           }
+
           _startFallingNotesSequence();
         },
       ),
@@ -366,7 +389,7 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     );
 
     if (savedTitle != null && savedTitle.isNotEmpty && item != null) {
-      final totalSecondsInt = _elapsedTimeSeconds.toInt();
+      final totalSecondsInt = _stopwatch.elapsed.inSeconds;
       final minutes = (totalSecondsInt ~/ 60).toString().padLeft(2, '0');
       final seconds = (totalSecondsInt % 60).toString().padLeft(2, '0');
       final durationStr = "$minutes:$seconds";
@@ -514,10 +537,14 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
     final lessonState = ref.watch(lessonPlayControllerProvider);
     final controller = ref.read(lessonPlayControllerProvider.notifier);
 
+    double elapsedSeconds = _stopwatch.elapsed.inMilliseconds / 1000.0;
+    if (elapsedSeconds > _totalDurationSeconds) {
+      elapsedSeconds = _totalDurationSeconds;
+    }
     double progress = _totalDurationSeconds > 0
-        ? (_elapsedTimeSeconds / _totalDurationSeconds).clamp(0.0, 1.0)
+        ? (elapsedSeconds / _totalDurationSeconds).clamp(0.0, 1.0)
         : 0.0;
-    int currentSec = _elapsedTimeSeconds.toInt();
+    int currentSec = elapsedSeconds.toInt();
     String elapsedStr =
         "${(currentSec ~/ 60).toString().padLeft(2, '0')}:${(currentSec % 60).toString().padLeft(2, '0')}";
     int totalDurSec = _totalDurationSeconds.toInt();
@@ -769,6 +796,10 @@ class _LessonPlayScreenState extends ConsumerState<LessonPlayScreen> {
                                 initialSpeed: lessonState.noteSpeedMultiplier,
                                 onSpeedChanged: (speed) {
                                   controller.setSpeedMultiplier(speed);
+                                  setState(() {
+                                    _totalDurationSeconds =
+                                        _calculateTotalSongDuration();
+                                  });
                                 },
                               );
                             },
