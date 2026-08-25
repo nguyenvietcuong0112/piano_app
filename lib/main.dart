@@ -19,7 +19,7 @@ import 'core/services/audio_engine.dart';
 import 'core/theme/theme_service.dart';
 import 'di/dependency_injection.dart';
 
-const String env = Environment.prod;
+const String env = Environment.dev;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
