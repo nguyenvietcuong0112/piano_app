@@ -11,6 +11,7 @@ import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/exit_confirmation_dialog.dart';
+import '../../core/router/app_route_observer.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
 import 'widgets/custom_header_bar.dart';
 
@@ -33,10 +34,29 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(false);
       EasyAds.instance.appLifecycleReactor?.setAllowAppOpenAd(true);
+      _trackTab(widget.navigationShell.currentIndex);
     });
   }
 
+  void _trackTab(int index) {
+    switch (index) {
+      case 0:
+        AppRouteObserver.logScreen('HomeScreen');
+        break;
+      case 1:
+        AppRouteObserver.logScreen('ThemesScreen');
+        break;
+      case 2:
+        AppRouteObserver.logScreen('PianoScreen');
+        break;
+      case 3:
+        AppRouteObserver.logScreen('MySongsScreen');
+        break;
+    }
+  }
+
   void _onTap(int index) {
+    _trackTab(index);
     if (index == widget.navigationShell.currentIndex) {
       widget.navigationShell.goBranch(index, initialLocation: true);
       return;

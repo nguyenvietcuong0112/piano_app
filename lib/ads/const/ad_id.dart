@@ -42,7 +42,7 @@ Map<String, Map<String, String>> myAdsId = {
           MyAdIdName.nativeOnboardFull1Ad: 'ca-app-pub-9900730300733887/5934800600',
           MyAdIdName.nativeOnboardFull2Ad: 'ca-app-pub-9900730300733887/2259993485',
           MyAdIdName.nativeOnboard4Ad: 'ca-app-pub-9900730300733887/9755340123',
-          MyAdIdName.interOnboard: 'ca-app-pub-9900730300733887/5624523428',
+          MyAdIdName.interOnboard: 'ca-app-pub-9900730300733887/2251613992',
           MyAdIdName.nativeHome: 'ca-app-pub-9900730300733887/6096396798',
           MyAdIdName.nativeAll: 'ca-app-pub-9900730300733887/4119870063',
           MyAdIdName.interAll: 'ca-app-pub-9900730300733887/7675971695',

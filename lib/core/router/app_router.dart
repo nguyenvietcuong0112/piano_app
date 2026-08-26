@@ -25,13 +25,16 @@ import '../../features/main/main_screen.dart';
 import '../../features/recording/ui/recordings_screen.dart';
 import '../../features/recording/ui/piano_sheet_playback_screen.dart';
 import '../services/recording_storage_service.dart';
+import 'app_route_observer.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
+final appRouteObserver = AppRouteObserver();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
+    observers: [appRouteObserver],
     debugLogDiagnostics: false,
     routes: [
       GoRoute(

@@ -14,6 +14,7 @@ import '../../core/services/ads_service.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/services/shared_preference_service.dart';
 import '../../core/router/app_router.dart';
+import '../../core/router/app_route_observer.dart';
 
 /// Data model representing a single onboarding page or full ad page.
 class OnboardStep {
@@ -70,6 +71,7 @@ class OnboardController extends ChangeNotifier {
 
   void init() {
     reloadAds();
+    AppRouteObserver.logScreen('OnboardScreen_1');
   }
 
   @override
@@ -310,6 +312,11 @@ class OnboardController extends ChangeNotifier {
       }
     }
     currentTabOnboard = (introCount - 1).clamp(0, 3);
+    if (value >= 0 && value < steps.length && steps[value].isFullAd) {
+      AppRouteObserver.logScreen('OnboardScreen_FullAd');
+    } else {
+      AppRouteObserver.logScreen('OnboardScreen_${currentTabOnboard + 1}');
+    }
     _notify();
   }
 

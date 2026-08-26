@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/helper/firebase_helper.dart';
 import '../../../core/helper/iap_helper.dart';
 import '../../../core/services/firebase_remote_config_service.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -32,6 +33,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseHelper.logEventName(FirebaseHelper.premium_view);
     AppConstants.isPremiumUser.addListener(_onPremiumStatusChanged);
     IAPHelper.queryProducts();
 
