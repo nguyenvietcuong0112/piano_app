@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,16 +18,14 @@ import 'core/services/audio_engine.dart';
 import 'core/theme/theme_service.dart';
 import 'di/dependency_injection.dart';
 
-const String env = Environment.prod;
+const String env = Environment.dev;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (PlatformDispatcher.instance.views.isEmpty) {
-    return;
-  }
+
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
@@ -43,15 +40,23 @@ void main() async {
 
   await configureDependencies();
   await ThemeService.init();
-  await AudioEngine().ensureInitialized();
 
-  await _initializeAds();
 
   runApp(
     const ProviderScope( 
       child: MyApp(),
     ),
   );
+  _initAsyncServices();
+
+}
+
+void _initAsyncServices() {
+  // Tải âm thanh ở background
+  AudioEngine().ensureInitialized();
+
+  // Khởi tạo Ads ở background
+  _initializeAds();
 }
 
 Future<void> _initializeAds() async {
@@ -61,8 +66,13 @@ Future<void> _initializeAds() async {
     await EasyAds.instance.initFirebaseAnalytics(FirebaseHelper.analytics);
     EasyAds.adIdResolver = (adId) => adId.getId;
 
-    // Encapsulated Consent Flow (ATT & UMP GDPR)
-    await EasyAds.instance.initConsent();
+    // Encapsulated Consent Flow (ATT & UMP GDPR) with 4s timeout
+    await EasyAds.instance.initConsent().timeout(
+      const Duration(seconds: 4),
+      onTimeout: () {
+        debugPrint('⚠️ Consent initialization timed out after 4s');
+      },
+    );
 
     final IAdIdManager adIdManager = MyAdIdManager();
 
@@ -70,9 +80,14 @@ Future<void> _initializeAds() async {
       adIdManager,
       navigatorKey: rootNavigatorKey,
       unityTestMode: true,
-      adMobAdRequest: const AdRequest(httpTimeoutMillis: 60000),
+      adMobAdRequest: const AdRequest(httpTimeoutMillis: 30000),
       admobConfiguration: RequestConfiguration(testDeviceIds: ['']),
       loadingSplash: const AdLoadingPage(),
+    ).timeout(
+      const Duration(seconds: 6),
+      onTimeout: () {
+        debugPrint('⚠️ EasyAds initialization timed out after 6s');
+      },
     );
 
     debugPrint('✅ EasyAds initialized');

@@ -39,6 +39,7 @@ class SplashController extends ChangeNotifier {
 
   Future<void> _checkInternetAndStart(BuildContext context, {required VoidCallback onFinished}) async {
     isNoFirstOpenApp = await SharedPreferenceUtils.getIsNoFirstOpenApp();
+    await SharedPreferenceService.initFirstAppOpenTimeIfNeeded();
     if (!context.mounted) return;
     startFakeDuration(context, onFinished: onFinished);
   }

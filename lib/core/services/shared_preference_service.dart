@@ -14,6 +14,10 @@ class SharedPreferenceService {
   static const String keyAudioVolume = 'AUDIO_VOLUME';
   static const String keyIsPremiumUser = 'IS_PREMIUM_USER';
   static const String keyUnlockedLessons = 'UNLOCKED_LESSONS';
+  static const String keyFirstAppOpenTime = 'FIRST_APP_OPEN_TIME_MS';
+
+  // --- Flash Sale 5h Countdown ---
+  static const int flashSaleDurationMs = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
 
   // --- Unlocked Lessons ---
   static Future<List<String>> getUnlockedLessons() async {
@@ -102,6 +106,66 @@ class SharedPreferenceService {
       debugPrint('SharedPreferenceService setIsNoFirstOpenApp error: $e');
       return false;
     }
+  }
+
+  /// Initializes the first open app timestamp if it hasn't been set yet.
+  static Future<int> initFirstAppOpenTimeIfNeeded() async {
+    try {
+      final prefs = await getInstance();
+      int? time = prefs.getInt(keyFirstAppOpenTime);
+      if (time == null) {
+        time = DateTime.now().millisecondsSinceEpoch;
+        await prefs.setInt(keyFirstAppOpenTime, time);
+      }
+      return time;
+    } catch (e) {
+      debugPrint('SharedPreferenceService initFirstAppOpenTimeIfNeeded error: $e');
+      return DateTime.now().millisecondsSinceEpoch;
+    }
+  }
+
+  /// Returns the remaining duration of the 5-hour flash sale.
+  static Future<Duration> getFlashSaleRemainingDuration() async {
+    try {
+      final firstOpenTime = await initFirstAppOpenTimeIfNeeded();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final elapsed = now - firstOpenTime;
+      final remainingMs = flashSaleDurationMs - elapsed;
+      if (remainingMs <= 0) {
+        return Duration.zero;
+      }
+      return Duration(milliseconds: remainingMs);
+    } catch (e) {
+      debugPrint('SharedPreferenceService getFlashSaleRemainingDuration error: $e');
+      return Duration.zero;
+    }
+  }
+
+  /// Returns whether the 5-hour flash sale is currently active.
+  static Future<bool> isFlashSaleActive() async {
+    final remaining = await getFlashSaleRemainingDuration();
+    return remaining > Duration.zero;
+  }
+
+  /// Returns the remaining duration synchronously if preferences are already loaded.
+  static Duration getFlashSaleRemainingDurationSync() {
+    try {
+      if (_prefs == null) return Duration.zero;
+      final firstOpen = _prefs!.getInt(keyFirstAppOpenTime);
+      if (firstOpen == null) return Duration.zero;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final elapsed = now - firstOpen;
+      final remainingMs = flashSaleDurationMs - elapsed;
+      if (remainingMs <= 0) return Duration.zero;
+      return Duration(milliseconds: remainingMs);
+    } catch (e) {
+      return Duration.zero;
+    }
+  }
+
+  /// Returns whether the flash sale is active synchronously.
+  static bool isFlashSaleActiveSync() {
+    return getFlashSaleRemainingDurationSync() > Duration.zero;
   }
 
   // --- Selected Theme ---

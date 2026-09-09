@@ -11,11 +11,31 @@ import 'firebase_helper.dart';
 class IAPHelper {
   static const String weeklyProductId = 'com.learnpiano.weekly';
   static const String monthlyProductId = 'com.learnpiano.monthly';
+  static const String yearlyProductId = 'com.learnpiano.yearly';
+  static const String lifetimeProductId = 'com.learnpiano.lifetime';
+  static const String lifetimeSaleProductId = 'com.learnpiano.saleofff';
+  static const String lifetimeSaleFallbackProductId = 'com.learnpiano.saleoff';
 
   static final Set<String> productIds = {
     weeklyProductId,
     monthlyProductId,
+    yearlyProductId,
+    lifetimeProductId,
+    lifetimeSaleProductId,
+    lifetimeSaleFallbackProductId,
   };
+
+  /// Returns whichever sale product ID is present in the loaded product details map,
+  /// defaulting to lifetimeSaleProductId.
+  static String get effectiveLifetimeSaleProductId {
+    if (productsMap.value.containsKey(lifetimeSaleProductId)) {
+      return lifetimeSaleProductId;
+    }
+    if (productsMap.value.containsKey(lifetimeSaleFallbackProductId)) {
+      return lifetimeSaleFallbackProductId;
+    }
+    return lifetimeSaleProductId;
+  }
 
   static final InAppPurchase _iap = InAppPurchase.instance;
   static StreamSubscription<List<PurchaseDetails>>? _subscription;
@@ -127,6 +147,7 @@ class IAPHelper {
           _handleSuccessfulPurchase(purchaseDetails);
         } else if (purchaseDetails.status == PurchaseStatus.canceled) {
           isLoading.value = false;
+          FirebaseHelper.logEventPaymentCancel(productId: purchaseDetails.productID);
         }
 
         if (purchaseDetails.pendingCompletePurchase) {
@@ -160,6 +181,25 @@ class IAPHelper {
           productDetail: product,
         );
         FirebaseHelper.logEventPurchaseSuccessMonthly(
+          purchase: purchaseDetails,
+          productDetail: product,
+          isGoogle: isGoogle,
+        );
+      } else if (purchaseDetails.productID == yearlyProductId) {
+        FirebaseHelper.logEventPurchaseSuccessYearly(
+          purchase: purchaseDetails,
+          productDetail: product,
+          isGoogle: isGoogle,
+        );
+      } else if (purchaseDetails.productID == lifetimeProductId) {
+        FirebaseHelper.logEventPurchaseSuccessLifetime(
+          purchase: purchaseDetails,
+          productDetail: product,
+          isGoogle: isGoogle,
+        );
+      } else if (purchaseDetails.productID == lifetimeSaleProductId ||
+          purchaseDetails.productID == lifetimeSaleFallbackProductId) {
+        FirebaseHelper.logEventPurchaseSuccessLifetimeSale(
           purchase: purchaseDetails,
           productDetail: product,
           isGoogle: isGoogle,

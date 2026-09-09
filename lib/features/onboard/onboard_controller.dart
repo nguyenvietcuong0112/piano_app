@@ -387,7 +387,11 @@ class OnboardController extends ChangeNotifier {
     }
 
     final isOrganic = await AdsService.isOrganicAsync();
-    if (!AppConstants.isPremiumUser.value && !isOrganic) {
+    final showInterOnboard = FirebaseRemoteConfigService.getBoolConfigByKey(
+      FirebaseRemoteConfigService.inter_onboard,
+    );
+
+    if (!AppConstants.isPremiumUser.value && !isOrganic && showInterOnboard) {
       if (!context.mounted) return;
       EasyAds.instance.showInterstitialAd(
         context,

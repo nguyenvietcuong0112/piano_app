@@ -41,6 +41,7 @@ class FirebaseHelper {
   static const EVENT_CLICK_PURCHASE_YEARLY = 'click_purchase_yearly';
   static const EVENT_CLICK_PURCHASE_YEARLY_SALE = 'click_purchase_yearly_sale';
   static const EVENT_CLICK_PURCHASE_LIFETIME = 'click_purchase_lifetime';
+  static const EVENT_CLICK_PURCHASE_LIFETIME_SALE = 'click_purchase_lifetime_sale';
   static const EVENT_CLICK_PURCHASE_3MONTHS = 'click_purchase_3months';
   static const EVENT_CLICK_PURCHASE_REMOVE_ADS = 'click_purchase_remove_ads';
   static const EVENT_PURCHASE_SUCCESS_WEEKLY = 'purchase_success_weekly';
@@ -48,6 +49,7 @@ class FirebaseHelper {
   static const EVENT_PURCHASE_SUCCESS_YEARLY = 'purchase_success_yearly';
   static const EVENT_PURCHASE_SUCCESS_YEARLY_SALE = 'purchase_success_yearly_sale';
   static const EVENT_PURCHASE_SUCCESS_LIFETIME = 'purchase_success_lifetime';
+  static const EVENT_PURCHASE_SUCCESS_LIFETIME_SALE = 'purchase_success_lifetime_sale';
   static const EVENT_PURCHASE_SUCCESS_3MONTHS = 'purchase_success_3months';
   static const EVENT_PURCHASE_SUCCESS_REMOVE_ADS =
       'purchase_success_remove_ads';
@@ -200,6 +202,16 @@ class FirebaseHelper {
     );
   }
 
+  static logEventClickPurchaseWeekly({required String productId}) async {
+    await FirebaseAnalytics.instance.logEvent(
+      name: EVENT_CLICK_PURCHASE_WEEKLY,
+      parameters: {
+        "productID": productId,
+        "store": Platform.isIOS ? "Apple" : "Google",
+      },
+    );
+  }
+
   static logEventClickPurchaseRemoveAds({required String productId}) async {
     await FirebaseAnalytics.instance.logEvent(
       name: EVENT_CLICK_PURCHASE_REMOVE_ADS,
@@ -243,6 +255,26 @@ class FirebaseHelper {
   static logEventClickPurchaseLifetime({required String productId}) async {
     await FirebaseAnalytics.instance.logEvent(
       name: EVENT_CLICK_PURCHASE_LIFETIME,
+      parameters: {
+        "productID": productId,
+        "store": Platform.isIOS ? "Apple" : "Google",
+      },
+    );
+  }
+
+  static logEventClickPurchaseLifetimeSale({required String productId}) async {
+    await FirebaseAnalytics.instance.logEvent(
+      name: EVENT_CLICK_PURCHASE_LIFETIME_SALE,
+      parameters: {
+        "productID": productId,
+        "store": Platform.isIOS ? "Apple" : "Google",
+      },
+    );
+  }
+
+  static logEventPaymentCancel({required String productId}) async {
+    await FirebaseAnalytics.instance.logEvent(
+      name: payment_cancel,
       parameters: {
         "productID": productId,
         "store": Platform.isIOS ? "Apple" : "Google",
@@ -372,6 +404,33 @@ class FirebaseHelper {
     } catch (_) {}
     await FirebaseAnalytics.instance.logEvent(
       name: EVENT_PURCHASE_SUCCESS_LIFETIME,
+      parameters: {
+        "purchase_id": purchase.purchaseID.toString(),
+        "product_id": purchase.productID,
+        "status": purchase.status.name,
+        "demand": '',
+        "decimalvalue": productDetail.rawPrice.toString(),
+        "currencyCode": productDetail.currencyCode,
+        "store": isGoogle ? "Google" : "Apple",
+        "locale": '${languageCode}_$countryCode',
+      },
+    );
+  }
+
+  static logEventPurchaseSuccessLifetimeSale(
+      {required PurchaseDetails purchase,
+      required ProductDetails productDetail,
+      required bool isGoogle}) async {
+    String languageCode = '';
+    String countryCode = '';
+    try {
+      if (userLocale != null) {
+        languageCode = userLocale!.languageCode;
+        countryCode = userLocale!.countryCode ?? '';
+      }
+    } catch (_) {}
+    await FirebaseAnalytics.instance.logEvent(
+      name: EVENT_PURCHASE_SUCCESS_LIFETIME_SALE,
       parameters: {
         "purchase_id": purchase.purchaseID.toString(),
         "product_id": purchase.productID,

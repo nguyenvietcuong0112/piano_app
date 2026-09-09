@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +10,7 @@ import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/rewarded_ad_service.dart';
+import '../../../core/services/shared_preference_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/song_thumbnail.dart';
@@ -50,12 +53,68 @@ class _DifficultySelectionDialogState
   bool _isDownloading = false;
   bool _isDownloaded = false;
 
+  bool _isFlashSaleActive = false;
+  Duration _flashSaleRemaining = Duration.zero;
+  Timer? _flashSaleTimer;
+
   @override
   void initState() {
     super.initState();
     _selectedLevel = widget.song.level.clamp(1, 3);
     // Consider song downloaded if lessonsData is present
     _isDownloaded = widget.song.lessonsData.isNotEmpty;
+
+    // Initialize Flash Sale countdown state
+    _flashSaleRemaining = SharedPreferenceService.getFlashSaleRemainingDurationSync();
+    _isFlashSaleActive = _flashSaleRemaining > Duration.zero;
+    if (_isFlashSaleActive) {
+      _startFlashSaleTimer();
+    }
+    _initFlashSale();
+  }
+
+  Future<void> _initFlashSale() async {
+    final remaining = await SharedPreferenceService.getFlashSaleRemainingDuration();
+    if (!mounted) return;
+    if (remaining > Duration.zero) {
+      setState(() {
+        _isFlashSaleActive = true;
+        _flashSaleRemaining = remaining;
+      });
+      _startFlashSaleTimer();
+    } else {
+      setState(() {
+        _isFlashSaleActive = false;
+        _flashSaleRemaining = Duration.zero;
+      });
+    }
+  }
+
+  void _startFlashSaleTimer() {
+    _flashSaleTimer?.cancel();
+    _flashSaleTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_flashSaleRemaining.inSeconds > 1) {
+        setState(() {
+          _flashSaleRemaining -= const Duration(seconds: 1);
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _flashSaleRemaining = Duration.zero;
+          _isFlashSaleActive = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _flashSaleTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -171,14 +230,38 @@ class _DifficultySelectionDialogState
         ),
         SizedBox(height: isLandscape ? 10.h : 14.h),
 
-        // Title: Unlock This Song
-        Text(
-          context.tr('unlock_this_song'),
-          textAlign: TextAlign.center,
-          style: (isLandscape
-                  ? AppTextStyles.textWhite16
-                  : AppTextStyles.textWhite20)
-              .copyWith(fontWeight: FontWeight.bold),
+        // Title: Unlock This Song (with 'Song' in purple)
+        Builder(
+          builder: (context) {
+            final title = context.tr('unlock_this_song');
+            final baseStyle = (isLandscape
+                    ? AppTextStyles.textWhite16
+                    : AppTextStyles.textWhite20)
+                .copyWith(fontWeight: FontWeight.bold);
+
+            if (title.contains('Song')) {
+              final parts = title.split('Song');
+              return RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: baseStyle,
+                  children: [
+                    TextSpan(text: parts[0]),
+                    TextSpan(
+                      text: 'Song',
+                      style: baseStyle.copyWith(color: const Color(0xFFCF6BEE)),
+                    ),
+                    if (parts.length > 1) TextSpan(text: parts[1]),
+                  ],
+                ),
+              );
+            }
+            return Text(
+              title,
+              textAlign: TextAlign.center,
+              style: baseStyle,
+            );
+          },
         ),
         SizedBox(height: isLandscape ? 4.h : 6.h),
 
@@ -190,7 +273,14 @@ class _DifficultySelectionDialogState
             fontSize: isLandscape ? 10 : 12,
           ),
         ),
-        SizedBox(height: isLandscape ? 14.h : 20.h),
+
+        // Flash Sale Banner (if active)
+        if (_isFlashSaleActive) ...[
+          SizedBox(height: isLandscape ? 8.h : 5.h),
+          _buildFlashSaleBanner(isLandscape),
+        ],
+
+        SizedBox(height: isLandscape ? 10.h : 14.h),
 
         // Button 1: Get Premium (with ic_get_premium.svg)
         GestureDetector(
@@ -337,6 +427,164 @@ class _DifficultySelectionDialogState
                 ),
               ],
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Flash Sale Banner for Unlock Popup (banner_sales_popup.png with live countdown timer)
+  Widget _buildFlashSaleBanner(bool isLandscape) {
+    final hours = _flashSaleRemaining.inHours.toString().padLeft(2, '0');
+    final minutes = (_flashSaleRemaining.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (_flashSaleRemaining.inSeconds % 60).toString().padLeft(2, '0');
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pop(null);
+        context.push('/premium');
+      },
+      child: AspectRatio(
+        aspectRatio: 855 / 276,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 1. Popup Flash Sale Banner Graphic (Fixed aspect ratio 855:276, zero distortion)
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/banner_sales_popup.webp',
+                fit: BoxFit.contain,
+              ),
+            ),
+
+            // 2. Countdown Timer overlay in the right dark purple section
+            Positioned.fill(
+              child: Row(
+                children: [
+                  // Left ~46% is occupied by the 3D Lightning & FLASH SALE text
+                  const Spacer(flex: 46),
+
+                  // Right ~54% contains the Countdown Timer
+                  Expanded(
+                    flex: 54,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: isLandscape ? 6.w : 10.w,
+                        top: isLandscape ? 2.h : 3.h,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: 20.h,),
+                          Text(
+                            context.tr('ends_in'),
+                            style: TextStyle(
+                              fontSize: isLandscape ? 8 : 10.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          SizedBox(height: isLandscape ? 2.h : 3.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildPopupTimerColumn(
+                                hours,
+                                context.tr('hours'),
+                                isLandscape,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isLandscape ? 1.5.w : 2.5.w,
+                                  vertical: isLandscape ? 1.h : 2.h,
+                                ),
+                                child: Text(
+                                  ':',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isLandscape ? 9 : 12,
+                                  ),
+                                ),
+                              ),
+                              _buildPopupTimerColumn(
+                                minutes,
+                                context.tr('minutes'),
+                                isLandscape,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isLandscape ? 1.5.w : 2.5.w,
+                                  vertical: isLandscape ? 1.h : 2.h,
+                                ),
+                                child: Text(
+                                  ':',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isLandscape ? 9 : 12,
+                                  ),
+                                ),
+                              ),
+                              _buildPopupTimerColumn(
+                                seconds,
+                                context.tr('seconds'),
+                                isLandscape,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopupTimerColumn(String value, String label, bool isLandscape) {
+    final boxSize = isLandscape ? 12.w : 23.w;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: boxSize,
+          height: boxSize,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color(0xFF130826).withValues(alpha: 0.75),
+            borderRadius: BorderRadius.circular(isLandscape ? 3.r : 4.r),
+            border: Border.all(
+              color: const Color(0xFF6E40A8).withValues(alpha: 0.9),
+              width: 1.0,
+            ),
+          ),
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: isLandscape ? 8 : 11,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        SizedBox(height: isLandscape ? 1.h : 2.h),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: isLandscape ? 5.5 : 6.5,
+            color: Colors.white70,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
