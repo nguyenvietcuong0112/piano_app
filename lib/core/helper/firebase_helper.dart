@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:easy_ads_flutter/easy_ads_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:injectable/injectable.dart';
 
@@ -27,6 +26,9 @@ class FirebaseHelper {
   static const sale_popup_view = "sale_popup_view";
   static const sale_banner_view = "sale_banner_view";
 
+  static const language_view = "language_view";
+  static const language_fo_view = "language_fo_view";
+
   static const main_view = "main_view";
   static const onboard1_view = "onboard1_view";
   static const onboard2_view = "onboard2_view";
@@ -36,6 +38,7 @@ class FirebaseHelper {
   static const show_dialog_no_internet_in_FO = "show_dialog_no_internet_in_FO";
 
   // Event purchase
+  static const click_purchase = 'click_purchase';
   static const EVENT_CLICK_PURCHASE_WEEKLY = 'click_purchase_weekly';
   static const EVENT_CLICK_PURCHASE_MONTHLY = 'click_purchase_monthly';
   static const EVENT_CLICK_PURCHASE_YEARLY = 'click_purchase_yearly';
@@ -54,6 +57,56 @@ class FirebaseHelper {
   static const EVENT_PURCHASE_SUCCESS_REMOVE_ADS =
       'purchase_success_remove_ads';
   static const EVENT_PURCHASE_ERROR = 'purchase_error';
+
+  static void logLanguageView({bool isFirstLaunch = false}) {
+    setTrackingScreenName("LanguageScreen");
+    logEventName(isFirstLaunch ? language_fo_view : language_view);
+  }
+
+  static void logPaywallView({String from = 'unknown'}) {
+    setTrackingScreenName("PremiumScreen");
+    try {
+      analytics.logEvent(
+        name: paywall_view,
+        parameters: {"from": from},
+      );
+    } catch (_) {}
+    logEventName(premium_view);
+  }
+
+  static void logClickPurchase({
+    required String productId,
+    required String packageType,
+  }) {
+    try {
+      analytics.logEvent(
+        name: click_purchase,
+        parameters: {
+          "product_id": productId,
+          "package_type": packageType,
+          "store": Platform.isIOS ? "Apple" : "Google",
+        },
+      );
+    } catch (_) {}
+  }
+
+  static void logPaymentFailed({
+    required String productId,
+    String? errorCode,
+    String? errorMessage,
+  }) {
+    try {
+      analytics.logEvent(
+        name: payment_failed,
+        parameters: {
+          "product_id": productId,
+          "error_code": errorCode ?? 'unknown',
+          "error_message": errorMessage ?? '',
+          "store": Platform.isIOS ? "Apple" : "Google",
+        },
+      );
+    } catch (_) {}
+  }
 
   static setUserId(String userId) {
     analytics.setUserId(id: userId);

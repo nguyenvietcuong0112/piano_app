@@ -107,6 +107,7 @@ class SplashController extends ChangeNotifier {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
+          settings: const RouteSettings(name: 'language'),
           builder: (context) => const LanguagePage(isFirstLaunch: true),
         ),
       );

@@ -11,6 +11,7 @@ import '../../ads/const/ad_id_factory.dart';
 import '../../ads/const/ad_id_name.dart';
 import '../../ads/dimens/ad_dimen.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/helper/firebase_helper.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import '../../core/theme/app_colors.dart';
@@ -31,6 +32,7 @@ class _LanguagePageState extends ConsumerState<LanguagePage> {
   @override
   void initState() {
     super.initState();
+    FirebaseHelper.logLanguageView(isFirstLaunch: widget.isFirstLaunch);
     if (widget.isFirstLaunch) {
       EasyAds.instance.appLifecycleReactor?.setOnSplashScreen(true);
     }

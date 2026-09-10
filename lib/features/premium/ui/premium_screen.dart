@@ -38,7 +38,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseHelper.logEventName(FirebaseHelper.premium_view);
+    FirebaseHelper.logPaywallView(from: 'premium_screen');
     AppConstants.isPremiumUser.addListener(_onPremiumStatusChanged);
     IAPHelper.queryProducts();
 
@@ -151,11 +151,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
         break;
     }
 
+    FirebaseHelper.logClickPurchase(
+      productId: productId,
+      packageType: _selectedPackage,
+    );
+
     final productDetails = IAPHelper.productsMap.value[productId];
 
     if (productDetails != null) {
       final success = await IAPHelper.buyProduct(productDetails);
       if (!success && mounted) {
+        FirebaseHelper.logPaymentFailed(
+          productId: productId,
+          errorCode: 'init_failed',
+          errorMessage: 'buyProduct returned false',
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.tr('purchase_init_error')),
@@ -163,6 +173,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
         );
       }
     } else {
+      FirebaseHelper.logPaymentFailed(
+        productId: productId,
+        errorCode: 'product_not_found',
+        errorMessage: 'store product details not available',
+      );
       // Fallback if products could not be fetched from store (e.g. Sandbox/Emulator without Store login)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -222,54 +237,68 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           children: [
                             SizedBox(height: 0.31.sh),
 
-                            // Title: "Learn Piano"
-                            Text(
-                              context.tr('app_title'),
-                              style: AppTextStyles.textWhite22.copyWith(
-                                fontSize: 28.sp,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-
-                            SizedBox(height: 12.h),
-
-                            // 2-Column Feature Checklist
+                            // Feature Overview Card (Background: bg_des_premium.png)
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 24.w),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
+                              padding: EdgeInsets.symmetric(horizontal: 20.w),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage('assets/images/bg_des_premium.png'),
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Title: "Learn Piano"
+                                    Text(
+                                      context.tr('app_title'),
+                                      textAlign: TextAlign.center,
+                                      style: AppTextStyles.textWhite22.copyWith(
+                                        fontSize: 26.sp,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+
+                                    SizedBox(height: 8.h),
+
+                                    // 2-Column Feature Checklist
+                                    Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        _buildFeatureItem("🚫", context.tr('remove_ads')),
-                                        SizedBox(height: 6.h),
-                                        _buildFeatureItem("🎵", context.tr('unlock_all_songs')),
-                                        SizedBox(height: 6.h),
-                                        _buildFeatureItem("🎨", context.tr('unlock_all_themes')),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              _buildFeatureItem("🚫", context.tr('remove_ads')),
+                                              SizedBox(height: 4.h),
+                                              _buildFeatureItem("🎵", context.tr('unlock_all_songs')),
+                                              SizedBox(height: 4.h),
+                                              _buildFeatureItem("🎨", context.tr('unlock_all_themes')),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              _buildFeatureItem("🎹", context.tr('unlock_premium_instruments')),
+                                              SizedBox(height: 4.h),
+                                              _buildFeatureItem("🎙️", context.tr('keyboard_recording')),
+                                              SizedBox(height: 4.h),
+                                              _buildFeatureItem("⭐", context.tr('premium_features')),
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        _buildFeatureItem("🎹", context.tr('unlock_premium_instruments')),
-                                        SizedBox(height: 6.h),
-                                        _buildFeatureItem("🎙️", context.tr('keyboard_recording')),
-                                        SizedBox(height: 6.h),
-                                        _buildFeatureItem("⭐", context.tr('premium_features')),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-
-                            SizedBox(height: 12.h),
                             Padding(
                               padding: EdgeInsets.only(left: 16.w,right: 4.w),
                               child: _buildFlashSaleBanner(),
@@ -311,6 +340,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                           packageKey: 'weekly',
                                           title: context.tr('weekly_pro'),
                                           price: weeklyPrice,
+                                          period: context.tr('period_week'),
                                         ),
 
                                         SizedBox(height: 10.h),
@@ -320,6 +350,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                           packageKey: 'monthly',
                                           title: context.tr('monthly_pro'),
                                           price: monthlyPrice,
+                                          period: context.tr('period_month'),
                                         ),
 
                                         SizedBox(height: 10.h),
@@ -329,6 +360,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                           packageKey: 'yearly',
                                           title: context.tr('yearly_pro'),
                                           price: yearlyPrice,
+                                          period: context.tr('period_year'),
                                         ),
                                       ],
                                     ),
@@ -345,6 +377,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                         packageKey: 'weekly',
                                         title: context.tr('weekly_pro'),
                                         price: weeklyPrice,
+                                        period: context.tr('period_week'),
                                       ),
 
                                       SizedBox(height: 10.h),
@@ -354,6 +387,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                         packageKey: 'monthly',
                                         title: context.tr('monthly_pro'),
                                         price: monthlyPrice,
+                                        period: context.tr('period_month'),
                                       ),
 
                                       SizedBox(height: 10.h),
@@ -363,6 +397,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                         packageKey: 'yearly',
                                         title: context.tr('yearly_pro'),
                                         price: yearlyPrice,
+                                        period: context.tr('period_year'),
                                       ),
 
                                       SizedBox(height: 10.h),
@@ -548,7 +583,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           child: Text(
             title,
             style: AppTextStyles.textWhite12.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               fontSize: 12.sp,
             ),
             overflow: TextOverflow.ellipsis,
@@ -738,17 +773,23 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        context.tr('lifetime_pro'),
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w900,
-                          color: const Color(0xFF1E0A2A),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            context.tr('lifetime_pro'),
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF1E0A2A),
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 8.w),
+                      SizedBox(width: 6.w),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFF1493),
                           borderRadius: BorderRadius.circular(12.r),
@@ -772,6 +813,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF6B3A6F),
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -812,6 +855,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     required String packageKey,
     required String title,
     required String price,
+    String? period,
   }) {
     final bool isSelected = _selectedPackage == packageKey;
 
@@ -879,18 +923,35 @@ class _PremiumScreenState extends State<PremiumScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: AppTextStyles.textWhite14.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 14.sp,
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.textWhite14.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(
-            price,
-            style: AppTextStyles.textWhite16.copyWith(
-              fontWeight: FontWeight.w900,
-              fontSize: 15.sp,
+          SizedBox(width: 8.w),
+          Text.rich(
+            TextSpan(
+              text: price,
+              style: AppTextStyles.textWhite16.copyWith(
+                fontWeight: FontWeight.w900,
+                fontSize: 15.sp,
+              ),
+              children: [
+                if (period != null && period.isNotEmpty)
+                  TextSpan(
+                    text: period,
+                    style: AppTextStyles.textWhite12.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12.sp,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

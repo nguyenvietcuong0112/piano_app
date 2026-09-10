@@ -141,6 +141,11 @@ class IAPHelper {
             purchase: purchaseDetails,
             isGoogle: defaultTargetPlatform == TargetPlatform.android,
           );
+          FirebaseHelper.logPaymentFailed(
+            productId: purchaseDetails.productID,
+            errorCode: purchaseDetails.error?.code,
+            errorMessage: purchaseDetails.error?.message,
+          );
         } else if (purchaseDetails.status == PurchaseStatus.purchased ||
             purchaseDetails.status == PurchaseStatus.restored) {
           isLoading.value = false;
@@ -212,6 +217,7 @@ class IAPHelper {
         isGoogle: isGoogle,
       );
     }
+    FirebaseHelper.logEventName(FirebaseHelper.payment_successful);
     debugPrint('IAP Purchase successful: ${purchaseDetails.productID}');
   }
 
