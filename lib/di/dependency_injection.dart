@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +15,11 @@ final GetIt getIt = GetIt.instance;
 @injectableInit
 Future<void> configure(String environment) async {
   final sharedPreferences = await SharedPreferences.getInstance();
-  await FirebaseRemoteConfigService.initFirebaseRemoteConfig();
+  try {
+    await FirebaseRemoteConfigService.initFirebaseRemoteConfig();
+  } catch (e) {
+    debugPrint('FirebaseRemoteConfigService init error: $e');
+  }
 
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
   getIt.registerSingleton<FirebaseAnalytics>(FirebaseAnalytics.instance);

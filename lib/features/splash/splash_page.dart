@@ -8,6 +8,7 @@ import '../../ads/const/ad_id_extension.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/helper/firebase_helper.dart';
 import '../../core/services/firebase_remote_config_service.dart';
 import 'splash_controller.dart';
 
@@ -23,6 +24,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
+    FirebaseHelper.setTrackingScreenName("SplashScreen");
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(splashControllerProvider).init(
         context,
@@ -33,7 +35,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ref.watch(splashControllerProvider);
+    ref.watch(splashControllerProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,

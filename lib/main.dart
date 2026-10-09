@@ -22,25 +22,34 @@ const String env = Environment.prod;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Firebase initialization error in main: $e');
+  }
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-    DeviceOrientation.portraitUp,
-  ]);
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.immersiveSticky,
-  );
+  try {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+    );
+  } catch (e) {
+    debugPrint('SystemChrome configuration error: $e');
+  }
 
-
-
-  await configureDependencies();
-  await ThemeService.init();
-
+  try {
+    await configureDependencies();
+    await ThemeService.init();
+  } catch (e) {
+    debugPrint('Dependencies configuration error: $e');
+  }
 
   runApp(
     const ProviderScope( 
@@ -48,7 +57,6 @@ void main() async {
     ),
   );
   _initAsyncServices();
-
 }
 
 void _initAsyncServices() {

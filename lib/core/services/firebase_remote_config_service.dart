@@ -36,7 +36,7 @@ class FirebaseRemoteConfigService {
     try {
       await remoteConfig.setConfigSettings(
         RemoteConfigSettings(
-          fetchTimeout: const Duration(minutes: 2),
+          fetchTimeout: const Duration(seconds: 3),
           minimumFetchInterval: const Duration(seconds: 60),
         ),
       );
@@ -61,7 +61,10 @@ class FirebaseRemoteConfigService {
         "interval_inter_ad": 30,
         "time_delay_close_premium": 3,
       });
-      await remoteConfig.fetchAndActivate();
+      await remoteConfig.fetchAndActivate().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () => false,
+      );
     } catch (e) {}
   }
 

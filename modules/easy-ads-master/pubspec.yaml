@@ -42,3 +42,8 @@ dev_dependencies:
 flutter:
   assets:
     - assets/json/
+  plugin:
+    platforms:
+      android:
+        package: com.cscmobi.easy_ads_flutter
+        pluginClass: EasyAdsFlutterPlugin
